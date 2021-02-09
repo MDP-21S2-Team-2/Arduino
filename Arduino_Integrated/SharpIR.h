@@ -7,8 +7,8 @@
 #ifndef SHARP_IR_H
 #define SHARP_IR_H
 
-#define MEDIAN_FILTER
-//#define MEDOFMEDIANS_FILTER
+//#define MEDIAN_FILTER
+#define MEDOFMEDIANS_FILTER
 
 #define NUM_SAMPLES 25  // for median filter: read odd no. times
 #define HALF_NUM_SAMPLES 12 // index of median
@@ -41,7 +41,7 @@ class SharpIR {
       sensorType( _sensorType ) , pin( _sensorPin ) {}
 
     // get distance from analog input
-    double getDistance(bool avoidBurstRead);
+    double getDistance();
 
     // median of medians implementation from archery2000 @ https://github.com/guillaume-rico/SharpIR/
     void partialSort(int a[], int min, int max);

@@ -1,13 +1,13 @@
 #include "SharpIR.h"
 
-double SharpIR::getDistance(bool avoidBurstRead) {
+double SharpIR::getDistance() {
+
+  //return analogRead(pin);
 
   int readings[NUM_SAMPLES] = {};
   double distance;  // in cm
   int median;
   
-  //if( !avoidBurstRead ) while( millis() <= lastTime + 20 ) {} //wait for sensor's sampling time
-
   // 2800-2808 microseconds for 25 readings
   for (int i=0; i< NUM_SAMPLES; i++) {
       // Read analog value
@@ -16,13 +16,14 @@ double SharpIR::getDistance(bool avoidBurstRead) {
 
   // regular median filter
 #ifdef MEDIAN_FILTER
+  // get median reading from analog pin
   sort(readings, NUM_SAMPLES); // sort the readings
   median = readings[HALF_NUM_SAMPLES]; // return the median reading
-  Serial.println("Median");
-#elif MEDOFMEDIANS_FILTER
-  // get median reading from analog pin
+  //Serial.println("Median");
+#endif
+#ifdef MEDOFMEDIANS_FILTER
   median = medianOfMedians(readings, NUM_SAMPLES);  // 28, 40-56 microseconds
-  Serial.println("Median of medians");
+  //Serial.println("Median of medians");
 #endif
   
   switch( sensorType )
