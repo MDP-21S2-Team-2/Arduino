@@ -45,6 +45,7 @@ volatile unsigned long R_timeWidth = 0;
 //const int targetPulseWidth = 821; //rpm=100: 1067;//rpm=130: 821;  // 60 / 130 / 562.25 * 1000000.0;
 double targetRpm = 100.0;
 //double targetDuration = 0.46154;  // for 1 rpm
+double target_count = 0;
 int leftSign = 1;
 int rightSign = 1;
 
@@ -121,14 +122,14 @@ void moveForward(double tDistance)
   R_prevTime = micros();
   
   // check if either motor reached the target number of ticks
-  /*while ((encL_count <= L_tEncodeVal) || (encR_count<= R_tEncodeVal))
+  while ((encL_count <= L_tEncodeVal) || (encR_count<= R_tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
-  md.setBrakes(BRAKE_L, BRAKE_R);*/
+  md.setBrakes(BRAKE_L, BRAKE_R);
 }
 void moveBackward(double tDistance)
 {
@@ -139,20 +140,26 @@ void moveBackward(double tDistance)
   // reduce tEncodeVal by no. ticks needed for braking
   double L_tEncodeVal = fLval + tDistance/oneRevDis * 562.25; //- 35;  // 38
   double R_tEncodeVal = fRval + tDistance/oneRevDis * 562.25; //- 36;  // 33
+  //target_count = (fLval+fRval)/2;
+  //target_count += tDistance/oneRevDis * 562.25;
 
   // set multiplier for motor speed direction
   leftSign = 1;
   rightSign = -1;
+  
+  // reset prevTime to get more accurate timeWidth
+  L_prevTime = micros();
+  R_prevTime = micros();
 
   // check if either motor reached the target number of ticks
-  /*while ((encL_count <= L_tEncodeVal) || (encR_count<= R_tEncodeVal))
+  while ((encL_count <= L_tEncodeVal) || (encR_count<= R_tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
-  md.setBrakes(BRAKE_L, BRAKE_R);*/
+  md.setBrakes(BRAKE_L, BRAKE_R);
 }
 
 void rotateLeft(double angle)
@@ -160,7 +167,7 @@ void rotateLeft(double angle)
 //  //Store current encoder value
 //  int curLeftEnc = encL_count;
 //  int curRightEnc = encR_count;
-  double target_count = (encL_count+encR_count)/2;
+  target_count = (encL_count+encR_count)/2;
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
@@ -179,14 +186,14 @@ void rotateLeft(double angle)
   L_prevTime = micros();
   R_prevTime = micros();
   
-  /*while ((encL_count + encR_count)/2 <= target_count)
+  while ((encL_count + encR_count)/2 <= target_count)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
-  md.setBrakes(BRAKE_L, BRAKE_R);*/
+  md.setBrakes(BRAKE_L, BRAKE_R);
 }
 
 void rotateRight(double angle)
@@ -194,7 +201,7 @@ void rotateRight(double angle)
   //Store current encoder value
   int curLeftEnc = encL_count;
   int curRightEnc = encR_count;
-  double target_count = (encL_count+encR_count)/2;
+  target_count = (encL_count+encR_count)/2;
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
@@ -213,14 +220,14 @@ void rotateRight(double angle)
   L_prevTime = micros();
   R_prevTime = micros();
 
-  /*while ((encL_count + encR_count)/2 <= target_count)
+  while ((encL_count + encR_count)/2 <= target_count)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
-  md.setBrakes(BRAKE_L, BRAKE_R);*/
+  md.setBrakes(BRAKE_L, BRAKE_R);
 }
 
 void setup() {
@@ -281,8 +288,8 @@ void loop() {
 //   }
 
   // test PID/reading IR sensor data
-//  testInLoop_motorsPID();
- //testInLoop_readingIR();
+  //testInLoop_motorsPID();
+  //testInLoop_readingIR();
 }
 
 void robotSystem_loop() {
@@ -331,7 +338,7 @@ void robotSystem_loop() {
       
     }
   } // if Serial.available() end
-  else {  // TODO: should this even be here lmao
+  /*else {  // TODO: should this even be here lmao
     // TODO: change to average ticks? ((encL_count + encR_count)/2 <= target_count)
     if ((encL_count <= target_count) || (encR_count <= target_count))
     {
@@ -348,7 +355,7 @@ void robotSystem_loop() {
     // movement completed
     md.setBrakes(BRAKE_L, BRAKE_R);
     // POTENTIAL TODO: check if robot should self-calibrate
-  }
+  }*/
 }
 
 void sendEncoderTicks() {
@@ -367,25 +374,32 @@ void sendIRSensorsReadings() {
   double dist_S1 = left_S1.getDistance();
   double dist_S2 = left_S2.getDistance();
   double dist_LR = right_long.getDistance();
+
+  byte* ptr_dist_D1 = (byte*) &dist_D1;
+  byte* ptr_dist_D2 = (byte*) &dist_D2;
+  byte* ptr_dist_D3 = (byte*) &dist_D3;
+  byte* ptr_dist_S1 = (byte*) &dist_S1;
+  byte* ptr_dist_S2 = (byte*) &dist_S2;
+  byte* ptr_dist_LR = (byte*) &dist_LR;
   
   Serial.write("IR,");
-  Serial.write(dist_D1);
+  Serial.write(ptr_dist_D1, 4);
   Serial.write(",");
-  Serial.write(dist_D2);
+  Serial.write(ptr_dist_D2, 4);
   Serial.write(",");
-  Serial.write(dist_D3);
+  Serial.write(ptr_dist_D3, 4);
   Serial.write(",");
-  Serial.write(dist_S1);
+  Serial.write(ptr_dist_S1, 4);
   Serial.write(",");
-  Serial.write(dist_S2);
+  Serial.write(ptr_dist_S2, 4);
   Serial.write(",");
-  Serial.write(dist_LR);
+  Serial.write(ptr_dist_LR, 4);
 }
 
 void testInLoop_readingIR() {
     //delay(100);
   
- // Serial.println(front_D1.getDistance());
+  Serial.println(front_D1.getDistance());
  // Serial.println(front_D2.getDistance());
   //Serial.println(front_D3.getDistance());
 
@@ -408,7 +422,7 @@ void testInLoop_motorsPID() {
   
     //Serial.println(R_timeWidth);
     //Serial.println(R_timeWidth);
-  
+
     double R_rpm = calculateRpm(R_timeWidth);
     double L_rpm = calculateRpm(L_timeWidth);
     

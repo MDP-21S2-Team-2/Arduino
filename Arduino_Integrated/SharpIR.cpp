@@ -7,11 +7,12 @@ double SharpIR::getDistance() {
   int readings[NUM_SAMPLES] = {};
   double distance;  // in cm
   int median;
-  
+
+
   // 2800-2808 microseconds for 25 readings
   for (int i=0; i< NUM_SAMPLES; i++) {
-      // Read analog value
-      readings[i] = analogRead(pin);
+    // Read analog value
+    readings[i] = analogRead(pin);
   }
 
   // regular median filter
@@ -25,7 +26,7 @@ double SharpIR::getDistance() {
   median = medianOfMedians(readings, NUM_SAMPLES);  // 28, 40-56 microseconds
   //Serial.println("Median of medians");
 #endif
-  
+
   switch( sensorType )
   {
   case D1:
