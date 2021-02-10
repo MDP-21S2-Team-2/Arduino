@@ -293,6 +293,10 @@ void loop() {
 }
 
 void robotSystem_loop() {
+
+  sendIRSensorsReadings();
+  delay(1000);
+  
   if (Serial.available() > 0) { // new command
     // read incoming line
     input = Serial.readString();
@@ -368,6 +372,7 @@ void sendEncoderTicks() {
 }
 
 void sendIRSensorsReadings() {
+  
   double dist_D1 = front_D1.getDistance();
   double dist_D2 = front_D2.getDistance();
   double dist_D3 = front_D3.getDistance();
@@ -394,6 +399,7 @@ void sendIRSensorsReadings() {
   Serial.write(ptr_dist_S2, 4);
   Serial.write(",");
   Serial.write(ptr_dist_LR, 4);
+  Serial.write('\n');
 }
 
 void testInLoop_readingIR() {
