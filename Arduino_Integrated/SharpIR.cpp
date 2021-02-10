@@ -1,16 +1,5 @@
 #include "SharpIR.h"
 
-int read_analogPin() {
-      #define MY_PIN    8
-
-    // do this once at setup
-    uint8_t myPin_mask = digitalPinToBitMask(MY_PIN);
-    volatile uint8_t *myPin_port = portInputRegister(digitalPinToPort(MY_PIN));
-
-    // read the pin
-    uint8_t pinValue = (*myPin_port & myPin_mask) != 0;
-}
-
 double SharpIR::getDistance() {
 
   //return analogRead(pin);
