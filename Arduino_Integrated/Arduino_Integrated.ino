@@ -7,7 +7,7 @@
 SharpIR front_D1(SharpIR::D1, A0);  // PS1, front right
 SharpIR front_D2(SharpIR::D2, A1);  // PS2, front middle
 SharpIR front_D3(SharpIR::D3, A2);  // PS3, front left
-//S1 range until 
+//S1 range until
 SharpIR left_S1(SharpIR::S1, A4); // PS5, side front
 // S2 range until 40
 SharpIR left_S2(SharpIR::S2, A3); // PS4, side back
@@ -50,8 +50,8 @@ int leftSign = 1;
 int rightSign = 1;
 
 double calculateRpm(int pulseWidth) {
-  if (pulseWidth == 0) 
-     return 0;
+  if (pulseWidth == 0)
+    return 0;
   else
     return 60000000.0 / (pulseWidth  * 562.25);  // time for 1 revolution in seconds
   //to get RPM, 60 / <above value>
@@ -91,8 +91,20 @@ void motorL_ISR() {
 
 //9 feb 6.35V 1y1w
 // can move straight
-PID leftPIDController(0.95, 2.13, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
-PID rightPIDController(0.92, 2.04, 5.5, 130.0, -130.0); 
+//PID leftPIDController(0.95, 2.13, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
+//PID rightPIDController(0.92, 2.04, 5.5, 130.0, -130.0);
+
+// 10 Feb 6.22V 1y1w
+//PID leftPIDController(0.961, 2.1, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
+//PID rightPIDController(0.92, 2.04, 5.5, 130.0, -130.0);
+
+// 10 Feb 6.42V 2y target speed:100
+PID leftPIDController(0.91, 2.02, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
+PID rightPIDController(0.82, 1.96, 5.7, 130.0, -130.0);
+
+// 10 Feb target speed:50 6.42V 2y
+//PID leftPIDController(0.6, 2.68, 4.4, 50.0, -50); // red // for 130rpm // initially: I = 2.015
+//PID rightPIDController(0.58, 2.65, 5.1, 50.0, -50.0);
 
 
 // Distance Function
@@ -100,7 +112,7 @@ PID rightPIDController(0.92, 2.04, 5.5, 130.0, -130.0);
 //double rightWheelDiameter = 6.0;  // in cm
 //Wheel to wheel distance = 18.5cm
 //Circumference of whole robot = 58.11cm
-// 90 degree = 14.5275cm 
+// 90 degree = 14.5275cm
 double oneRevDis = 18.849556; // in cm
 
 void moveForward(double tDistance)
@@ -110,8 +122,8 @@ void moveForward(double tDistance)
   int fRval = encR_count;
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double L_tEncodeVal = fLval + tDistance/oneRevDis * 562.25; //- 35;  // 38
-  double R_tEncodeVal = fRval + tDistance/oneRevDis * 562.25; //- 36;  // 33
+  double L_tEncodeVal = fLval + tDistance / oneRevDis * 562.25; //- 35;  // 38
+  double R_tEncodeVal = fRval + tDistance / oneRevDis * 562.25; //- 36;  // 33
 
   // set multiplier for motor speed direction
   leftSign = -1;
@@ -120,9 +132,9 @@ void moveForward(double tDistance)
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
   R_prevTime = micros();
-  
+
   // check if either motor reached the target number of ticks
-  while ((encL_count <= L_tEncodeVal) || (encR_count<= R_tEncodeVal))
+  while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -138,21 +150,21 @@ void moveBackward(double tDistance)
   int fRval = encR_count;
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double L_tEncodeVal = fLval + tDistance/oneRevDis * 562.25; //- 35;  // 38
-  double R_tEncodeVal = fRval + tDistance/oneRevDis * 562.25; //- 36;  // 33
+  double L_tEncodeVal = fLval + tDistance / oneRevDis * 562.25; //- 35;  // 38
+  double R_tEncodeVal = fRval + tDistance / oneRevDis * 562.25; //- 36;  // 33
   //target_count = (fLval+fRval)/2;
   //target_count += tDistance/oneRevDis * 562.25;
 
   // set multiplier for motor speed direction
   leftSign = 1;
   rightSign = -1;
-  
+
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
   R_prevTime = micros();
 
   // check if either motor reached the target number of ticks
-  while ((encL_count <= L_tEncodeVal) || (encR_count<= R_tEncodeVal))
+  while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -162,20 +174,48 @@ void moveBackward(double tDistance)
   md.setBrakes(BRAKE_L, BRAKE_R);
 }
 
+void rotateLeft2(double angle) {
+
+  int fLval = encL_count;
+  int fRval = encR_count;
+  // Calculate target number of ticks to travel the distance,
+  // reduce tEncodeVal by no. ticks needed for braking
+  double L_tEncodeVal = fLval + angle * 4.45; //4.46; for brakes: //- 35;  // 38
+  double R_tEncodeVal = fRval + angle * 4.45; //4.46; for brakes: //- 36;  // 33
+
+
+  // set multiplier for motor speed direction
+  leftSign = 1;
+  rightSign = 1;
+
+  // reset prevTime to get more accurate timeWidth
+  L_prevTime = micros();
+  R_prevTime = micros();
+
+  while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
+  {
+    if (PID::checkPIDCompute()) {
+      md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+    }
+  }
+  md.setBrakes(BRAKE_L, BRAKE_R);
+}
+
 void rotateLeft(double angle)
 {
-//  //Store current encoder value
-//  int curLeftEnc = encL_count;
-//  int curRightEnc = encR_count;
-  target_count = (encL_count+encR_count)/2;
+  //  //Store current encoder value
+  //  int curLeftEnc = encL_count;
+  //  int curRightEnc = encR_count;
+  target_count = (encL_count + encR_count) / 2;
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle <= 90)
-    target_count += angle * 4.59;
-  else if ( 90< angle <= 180)
+    target_count += angle * 4.41;
+  else if ( 90 < angle <= 180)
     target_count += angle * 4.65;
 
   // set multiplier for motor speed direction
@@ -185,8 +225,8 @@ void rotateLeft(double angle)
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
   R_prevTime = micros();
-  
-  while ((encL_count + encR_count)/2 <= target_count)
+
+  while ((encL_count + encR_count) / 2 <= target_count)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -201,7 +241,7 @@ void rotateRight(double angle)
   //Store current encoder value
   int curLeftEnc = encL_count;
   int curRightEnc = encR_count;
-  target_count = (encL_count+encR_count)/2;
+  target_count = (encL_count + encR_count) / 2;
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
@@ -209,18 +249,18 @@ void rotateRight(double angle)
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle <= 90)
     target_count += angle * 4.51;
-  else if ( 90< angle <= 180)
+  else if ( 90 < angle <= 180)
     target_count += angle * 4.54;
-    
+
   // set multiplier for motor speed direction
   leftSign = -1;
   rightSign = -1;
-    
+
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
   R_prevTime = micros();
 
-  while ((encL_count + encR_count)/2 <= target_count)
+  while ((encL_count + encR_count) / 2 <= target_count)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -236,19 +276,19 @@ void setup() {
   //(default is input so technically not needed)
   //pinMode(LeftMotorE1A, INPUT);
   //pinMode(RightMotorE2A, INPUT);
-  
+
   // enable interrupts for calculating motor rpm
   enableInterrupt(LeftMotorE1A, motorL_ISR, RISING);
   enableInterrupt(RightMotorE2A, motorR_ISR, RISING);
-  
+
   // init Serial
   Serial.begin(115200);
   // init motor drivers
   md.init();
 
-// left
+  // left
   //md.setM1Speed(-400);
-// right
+  // right
   //md.setM2Speed(400);
 
   // set starting times
@@ -259,36 +299,36 @@ void setup() {
 void loop() {
 
   // main robot system loop
-  robotSystem_loop();
+  //robotSystem_loop();
 
   // try moving for some time
-//  if (micros() - startTime > 1500000) {}
-//  else if (encL_count>=620) //310 = 10cm, // 562 = 1 rev
-//  {//micros() - startTime >= 1000000) {
-//     //stop
-//    md.setBrakes(400, 400);
-//    Serial.print(encL_count);
-//    Serial.print(",");
-//    Serial.println(encR_count);
-//  }
-//  else {
-//    if (PID::checkPIDCompute()) {
-//    // PID
-//      md.setM1Speed(-leftPIDController.computePID(L_timeWidth, targetPulseWidth));
-//      md.setM2Speed(rightPIDController.computePID(R_timeWidth, targetPulseWidth));
-//    }
-//  }
+  //  if (micros() - startTime > 1500000) {}
+  //  else if (encL_count>=620) //310 = 10cm, // 562 = 1 rev
+  //  {//micros() - startTime >= 1000000) {
+  //     //stop
+  //    md.setBrakes(400, 400);
+  //    Serial.print(encL_count);
+  //    Serial.print(",");
+  //    Serial.println(encR_count);
+  //  }
+  //  else {
+  //    if (PID::checkPIDCompute()) {
+  //    // PID
+  //      md.setM1Speed(-leftPIDController.computePID(L_timeWidth, targetPulseWidth));
+  //      md.setM2Speed(rightPIDController.computePID(R_timeWidth, targetPulseWidth));
+  //    }
+  //  }
 
-  // move forward/rotate in small units
-// for (int i = 0; i <4 ; i++){
-//   delay(2000);
-//     moveForward(30);
-//     leftPIDController.resetPID();
-//     rightPIDController.resetPID();
-//   }
+  //move forward/rotate in small units
+//  for (int i = 0; i < 4 ; i++) {
+//    delay(2000);
+//    rotateLeft2(90);
+//    leftPIDController.resetPID();
+//    rightPIDController.resetPID();
+//  }
 
   // test PID/reading IR sensor data
-  //testInLoop_motorsPID();
+  testInLoop_motorsPID();
   //testInLoop_readingIR();
 }
 
@@ -296,7 +336,7 @@ void robotSystem_loop() {
 
   sendIRSensorsReadings();
   delay(1000);
-  
+
   if (Serial.available() > 0) { // new command
     // read incoming line
     input = Serial.readString();
@@ -308,38 +348,38 @@ void robotSystem_loop() {
       // TODO: compare the performance of using String toInt() instead
       // TODO: might need to check next char if it's possible to be commanded to move >=10 units
       char numUnits = input.charAt(1);
-      
+
       // TODO: acknowledge the command?
       Serial.write("ACK,");
       Serial.write(command);
       Serial.write(numUnits);
-      
+
       moveForward((numUnits - '0') * 10);
     }
     else if (command == 'T') {  // turn/rotate
       // read next character for what turn to make
       char turnBy = input.charAt(1);
-      
+
       // TODO: acknowledge the command?
       Serial.write("ACK,");
       Serial.write(command);
       Serial.write(turnBy);
-      
+
       switch (turnBy) {
-      case 'L': // turn left by 90 degrees
-        rotateLeft(90);
-        break;
-      case 'R': // turn right by 90 degrees
-        rotateRight(90);
-        break;
-      case 'B': // turn 180 degrees
-        rotateLeft(180);
-        break;
+        case 'L': // turn left by 90 degrees
+          rotateLeft(90);
+          break;
+        case 'R': // turn right by 90 degrees
+          rotateRight(90);
+          break;
+        case 'B': // turn 180 degrees
+          rotateLeft(180);
+          break;
       }
     }
     else if (command == 'C') {  // calibrate
       // TODO: determine logic for robot self-calibration
-      
+
     }
   } // if Serial.available() end
   /*else {  // TODO: should this even be here lmao
@@ -359,7 +399,7 @@ void robotSystem_loop() {
     // movement completed
     md.setBrakes(BRAKE_L, BRAKE_R);
     // POTENTIAL TODO: check if robot should self-calibrate
-  }*/
+    }*/
 }
 
 void sendEncoderTicks() {
@@ -372,7 +412,7 @@ void sendEncoderTicks() {
 }
 
 void sendIRSensorsReadings() {
-  
+
   double dist_D1 = front_D1.getDistance();
   double dist_D2 = front_D2.getDistance();
   double dist_D3 = front_D3.getDistance();
@@ -386,7 +426,7 @@ void sendIRSensorsReadings() {
   byte* ptr_dist_S1 = (byte*) &dist_S1;
   byte* ptr_dist_S2 = (byte*) &dist_S2;
   byte* ptr_dist_LR = (byte*) &dist_LR;
-  
+
   Serial.write("IR,");
   Serial.write(ptr_dist_D1, 4);
   Serial.write(",");
@@ -403,21 +443,21 @@ void sendIRSensorsReadings() {
 }
 
 void testInLoop_readingIR() {
-    //delay(100);
-  
-  Serial.println(front_D1.getDistance());
- // Serial.println(front_D2.getDistance());
+  //delay(100);
+
+  //Serial.println(front_D1.getDistance());
+  // Serial.println(front_D2.getDistance());
   //Serial.println(front_D3.getDistance());
 
-//  Serial.print("Front, right: ");
-//  Serial.println(front_D1.getDistance());
-//  Serial.print("Front, middle: ");
-//  Serial.println(front_D2.getDistance());
+  //  Serial.print("Front, right: ");
+  //  Serial.println(front_D1.getDistance());
+  //  Serial.print("Front, middle: ");
+  //  Serial.println(front_D2.getDistance());
   //Serial.println(left_S1.getDistance());
-//Serial.println(left_S2.getDistance());
-//  Serial.println(right_long.getDistance());
+  //Serial.println(left_S2.getDistance());
+  Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
-//  
+  //
 }
 
 void testInLoop_motorsPID() {
@@ -425,17 +465,24 @@ void testInLoop_motorsPID() {
     // send RPM of left motor
     //R_rpm = calculateRpm_R_v2();
     //Serial.println(60 / R_rpm);
-  
+
     //Serial.println(R_timeWidth);
     //Serial.println(R_timeWidth);
 
     double R_rpm = calculateRpm(R_timeWidth);
     double L_rpm = calculateRpm(L_timeWidth);
-    
+
     Serial.print(R_rpm);
     Serial.print(",");
     Serial.println(L_rpm);
-  
+    //Serial.print(leftPIDController.getLastValue());
+    //Serial.write(",");
+    //Serial.print(leftPIDController.getSumError());
+    //Serial.write(",");
+    //Serial.print(rightPIDController.getLastValue());
+    //Serial.write(",");
+    //Serial.println(rightPIDController.getSumError());
+
     //md.setM1Speed(-350);
     //md.setM2Speed(350);
     // update motor speed with PID controller

@@ -25,6 +25,9 @@ class PID {
       _Imax(Imax), _Imin(Imin),
       _lastValue(0.0), _sumError(0.0) {}
 
+      double getLastValue() { return _lastValue; }
+      double getSumError() { return _sumError; }
+
     // compute PID function
     double computePID(double input, double setPoint);
     void resetPID();
