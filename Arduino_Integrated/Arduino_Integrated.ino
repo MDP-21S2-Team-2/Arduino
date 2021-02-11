@@ -106,7 +106,7 @@ void motorL_ISR() {
 //PID leftPIDController(0.6, 2.68, 4.4, 50.0, -50); // red // for 130rpm // initially: I = 2.015
 //PID rightPIDController(0.58, 2.65, 5.1, 50.0, -50.0);
 
-// 11 Feb target speed:100 6.34V 2y
+// 11 Feb target speed:100 6.34V 2y, 6.31V after use
 PID leftPIDController(0.961, 2.055, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
 PID rightPIDController(0.91, 1.985, 5.5, 130.0, -130.0);
 
@@ -369,18 +369,18 @@ void loop() {
   //  }
 
   //move forward/rotate in small units
-  for (int i = 0; i < 4 ; i++) {
-    delay(2000);
-    // change angle target depending on surface
-    rotateLeft2(180);
-    //rotateRight(180);
-    leftPIDController.resetPID();
-    rightPIDController.resetPID();
-  }
+//  for (int i = 0; i < 4 ; i++) {
+//    delay(2000);
+//    // change angle target depending on surface
+//    rotateLeft2(180);
+//    //rotateRight(180);
+//    leftPIDController.resetPID();
+//    rightPIDController.resetPID();
+//  }
 
   // test PID/reading IR sensor data
   //testInLoop_motorsPID();
-  //testInLoop_readingIR();
+  testInLoop_readingIR();
 }
 
 void robotSystem_loop() {

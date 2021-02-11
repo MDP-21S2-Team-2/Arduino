@@ -26,7 +26,9 @@ double SharpIR::getDistance() {
   median = medianOfMedians(readings, NUM_SAMPLES);  // 28, 40-56 microseconds
   //Serial.println("Median of medians");
 #endif
-  return median;
+
+  //return median;
+
   switch( sensorType )
   {
   case D1:
@@ -65,10 +67,19 @@ double SharpIR::getDistance() {
       return distance - S2_OFFSET;
       
   case LR:
-      // check out of range
-      if(median > 540) return 15;
-      else if(median < 165) return 77;
-      distance = -24.0575 + 25654.8826/(median+91.9346);
+      // check median ranges
+      if(median > 550) return 13; // out of range
+      else if (median >= 539) // 13-15cm
+        distance = 123 - 0.2*median;
+      else if (median >= 499) // 15-20cm
+        distance = 65.7006 + 18567.84/(median-905.1389);
+      else if (median >= 398)  // 20-30cm
+        distance = 69.42099 - 0.09901*median;
+      else if (median >= 353) // 30-35cm
+        distance = 76.17186 - 0.1162*median;
+      else if (median >= 160) // 35-80cm
+        distance = -0.12527 + 12186.82/(median-7.023576);
+      else return 80;  // median < 160, out of range
       return distance - LR_OFFSET;
   }
 }
