@@ -184,23 +184,9 @@ void rotateLeft2(double angle) {
   int fRval = encR_count;
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  // was previously 4.45
-  double L_tEncodeVal = fLval; //4.46; for brakes: //- 35;  // 38
-  double R_tEncodeVal = fRval; //4.46; for brakes: //- 36;  // 33
+  double L_tEncodeVal = fLval + angle * 4.45; //4.46; for brakes: //- 35;  // 38
+  double R_tEncodeVal = fRval + angle * 4.45; //4.46; for brakes: //- 36;  // 33
 
-  if (angle <= 50) {
-     L_tEncodeVal += angle * 4.21;  // 4.27 works
-     R_tEncodeVal += angle * 4.21;  // 4.27 works
-  }
-  else if (angle <= 91) {
-  // 4.42 FKING SOLID 11 FEB 6.34V TUNING
-     L_tEncodeVal += angle * 4.42;
-     R_tEncodeVal += angle * 4.42;
-  }
-  else if (angle <= 180) {
-     L_tEncodeVal += angle * 4.51;
-     R_tEncodeVal += angle * 4.51;
-  }
 
   // set multiplier for motor speed direction
   leftSign = 1;
@@ -254,35 +240,6 @@ void rotateLeft(double angle)
   md.setBrakes(BRAKE_L, BRAKE_R);
 }
 
-void rotateRight2(double angle) // doesn't really work but I'll leave it here
-{
-  //Store current encoder value
-  int fLval = encL_count;
-  int fRval = encR_count;
-  //4.8147 exact multiplier
-  // Calculate target number of ticks to travel the distance,
-  // reduce tEncodeVal by no. ticks needed for braking
-  double L_tEncodeVal = fLval + angle * 4.42; //4.46; for brakes: //- 35;  // 38
-  double R_tEncodeVal = fRval + angle * 4.42; //4.46; for brakes: //- 36;  // 33
-
-  // set multiplier for motor speed direction
-  leftSign = -1;
-  rightSign = -1;
-
-  // reset prevTime to get more accurate timeWidth
-  L_prevTime = micros();
-  R_prevTime = micros();
-
-  while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
-  {
-    if (PID::checkPIDCompute()) {
-      md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-    }
-  }
-  md.setBrakes(BRAKE_L, BRAKE_R);
-}
-
 void rotateRight(double angle)
 {
   //Store current encoder value
@@ -318,6 +275,8 @@ void rotateRight(double angle)
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
 }
+
+bool runObstacleAvoidance = true;
 
 void setup() {
   // put your setup code here, to run once:
@@ -369,18 +328,58 @@ void loop() {
   //  }
 
   //move forward/rotate in small units
-  for (int i = 0; i < 4 ; i++) {
-    delay(2000);
-    // change angle target depending on surface
-    rotateLeft2(180);
-    //rotateRight(180);
-    leftPIDController.resetPID();
-    rightPIDController.resetPID();
-  }
+//  for (int i = 0; i < 4 ; i++) {
+//    delay(2000);
+//    rotateLeft2(90);
+//    leftPIDController.resetPID();
+//    rightPIDController.resetPID();
+//  }
 
   // test PID/reading IR sensor data
   //testInLoop_motorsPID();
   //testInLoop_readingIR();
+
+  if (runObstacleAvoidance) {
+      bool noObstacle = true;
+    while (noObstacle)
+    {
+      if (PID::checkPIDCompute()) {
+        md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+        md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      }
+  
+      // check sensor readings
+      double dist_D1 = front_D1.getDistance();
+      double dist_D2 = front_D2.getDistance();
+      double dist_D3 = front_D3.getDistance();
+
+      Serial.print(dist_D1);
+      Serial.write(",");
+      Serial.print(dist_D2);
+      Serial.write(",");
+      Serial.print(dist_D3);
+      Serial.write("\n");
+  
+      // if at least 1/3 of the sensors return <=10-15cm (after offset), consider as obstacle detected
+      if ((dist_D1 > 8.0 && dist_D1 <= 12.0) ||
+      (dist_D2 > 8.0 && dist_D2 <= 12.0) ||
+      (dist_D3 > 8.0 && dist_D3 <= 12.0)) {
+        noObstacle = false;
+      }
+    }
+    // stop moving
+    md.setBrakes(BRAKE_L, BRAKE_R);
+    // rotate 45 degrees
+    rotateRight(45);
+    // move forward (diagonal)
+    moveForward(37.83);
+    // rotate back
+    rotateLeft(90);
+    // move forward (diagonal)
+    moveForward(37.83);
+
+    runObstacleAvoidance = false;
+  }
 }
 
 void robotSystem_loop() {
