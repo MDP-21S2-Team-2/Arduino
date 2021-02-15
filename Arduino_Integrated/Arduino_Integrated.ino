@@ -110,7 +110,7 @@ void motorL_ISR() {
 //PID leftPIDController(0.961, 2.055, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
 //PID rightPIDController(0.91, 1.985, 5.5, 130.0, -130.0);
 
-// 15 Feb target speed:100 6.32V 2y, 6.25V after use
+// 15 Feb target speed:100 6.32V 2y, 6.26V after use
 PID leftPIDController(0.961, 2.071, 6.5, 130.0, -130); // red
 PID rightPIDController(0.91, 2.01, 5.5, 130.0, -130.0);
 
@@ -204,7 +204,7 @@ void rotateLeft2(double angle) {
   else if (angle <= 180) {
     L_tEncodeVal += angle * 4.51;
     R_tEncodeVal += angle * 4.51;
-  }*/
+  }
 
   // set multiplier for motor speed direction
   leftSign = 1;
@@ -373,18 +373,18 @@ void loop() {
   //  }
 
   //move forward/rotate in small units
-  for (int i = 0; i < 4; i++) {
-    // change angle target depending on surface?
-    rotateLeft2(20);
-    //rotateRight(180);
-    leftPIDController.resetPID();
-    rightPIDController.resetPID();
-    delay(2000);
-  }
+//  for (int i = 0; i < 4; i++) {
+//    // change angle target depending on surface?
+//    rotateLeft2(20);
+//    //rotateRight(180);
+//    leftPIDController.resetPID();
+//    rightPIDController.resetPID();
+//    delay(2000);
+//  }
 
   // test PID/reading IR sensor data
   //testInLoop_motorsPID();
-  //testInLoop_readingIR();
+  testInLoop_readingIR();
 }
 
 void robotSystem_loop() {
@@ -508,6 +508,11 @@ void testInLoop_readingIR() {
   //  Serial.println(front_D1.getDistance());
   //  Serial.print("Front, middle: ");
   //  Serial.println(front_D2.getDistance());
+  //Serial.println(left_S1.getDistance());
+  //Serial.println(left_S2.getDistance());
+  
+  //Serial.println(front_D1.getDistance());
+  //Serial.println(front_D3.getDistance());
   //Serial.println(left_S1.getDistance());
   //Serial.println(left_S2.getDistance());
   Serial.println(right_long.getDistance());
