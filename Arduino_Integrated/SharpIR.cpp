@@ -47,23 +47,36 @@ double SharpIR::getDistance() {
 
   case D3:
       // check out of range
-      if(median > 635) return 7;
-      else if(median < 114) return 51;
-      distance = -3.61655 + 6829.367/(median+12.4999);
+      if (median > 635) return 7;
+      else if (median >= 591) // 7-8cm
+        distance = 21.43182 - 0.02273*median;
+      else if (median >= 168) // 8-35cm
+        distance = -1.28379 + 5321.748/(median-21.49596);
+      else if (median >= 142) // 35-40cm
+        distance = 61.20559 + 2894.61/(median-278.5809);
+      else if (median >= 114) // 40-50cm
+        distance = 90.81596 - 0.31157*median;
+      else return 51; // median < 114, out of range
       return distance - D3_OFFSET;
 
   case S1:  // GO
       // check out of range
-      if(median > 622) return 7;
-      else if(median < 101) return 51;
-      distance = -2.5396 + 6251.4/(median+22.56);
+      if (median > 622) return 7;
+      else if (median >= 125) // 7-40cm
+        distance = -1.82125 + 5790.725/(median+12.6569);
+      else if (median >= 101) // 40-47.5cm
+        distance = 79.0625 - 0.3125*median;
+      else return 48; // median < 101, out of range
       return distance - S1_OFFSET;
 
   case S2:
       // check out of range
-      if(median > 614) return 8;
-      else if(median < 114) return 51;
-      distance = -1.314 + 5779.5093/(median-2.45285);
+      if (median > 614) return 8;
+      else if (median >= 142) // 8-40cm
+        distance = -1.61521 + 5974.987/(median+2.26629);
+      else if (median >= 114) // 40-50cm
+        distance = 90.55131 - 0.35561*median;
+      else return 51; // median < 114, out of range
       return distance - S2_OFFSET;
       
   case LR:

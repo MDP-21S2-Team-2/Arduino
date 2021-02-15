@@ -107,8 +107,12 @@ void motorL_ISR() {
 //PID rightPIDController(0.58, 2.65, 5.1, 50.0, -50.0);
 
 // 11 Feb target speed:100 6.34V 2y, 6.31V after use
-PID leftPIDController(0.961, 2.055, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
-PID rightPIDController(0.91, 1.985, 5.5, 130.0, -130.0);
+//PID leftPIDController(0.961, 2.055, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
+//PID rightPIDController(0.91, 1.985, 5.5, 130.0, -130.0);
+
+// 15 Feb target speed:100 6.32V 2y, 6.25V after use
+PID leftPIDController(0.961, 2.071, 6.5, 130.0, -130); // red
+PID rightPIDController(0.91, 2.01, 5.5, 130.0, -130.0);
 
 
 // Distance Function
@@ -189,18 +193,18 @@ void rotateLeft2(double angle) {
   double R_tEncodeVal = fRval; //4.46; for brakes: //- 36;  // 33
 
   if (angle <= 50) {
-     L_tEncodeVal += angle * 4.21;  // 4.27 works
-     R_tEncodeVal += angle * 4.21;  // 4.27 works
+    L_tEncodeVal += angle * 4.21;  // 4.27 works
+    R_tEncodeVal += angle * 4.21;  // 4.27 works
   }
   else if (angle <= 91) {
   // 4.42 FKING SOLID 11 FEB 6.34V TUNING
-     L_tEncodeVal += angle * 4.42;
-     R_tEncodeVal += angle * 4.42;
+    L_tEncodeVal += angle * 4.42;
+    R_tEncodeVal += angle * 4.42;
   }
   else if (angle <= 180) {
-     L_tEncodeVal += angle * 4.51;
-     R_tEncodeVal += angle * 4.51;
-  }
+    L_tEncodeVal += angle * 4.51;
+    R_tEncodeVal += angle * 4.51;
+  }*/
 
   // set multiplier for motor speed direction
   leftSign = 1;
@@ -369,18 +373,18 @@ void loop() {
   //  }
 
   //move forward/rotate in small units
-//  for (int i = 0; i < 4 ; i++) {
-//    delay(2000);
-//    // change angle target depending on surface
-//    rotateLeft2(180);
-//    //rotateRight(180);
-//    leftPIDController.resetPID();
-//    rightPIDController.resetPID();
-//  }
+  for (int i = 0; i < 4; i++) {
+    // change angle target depending on surface?
+    rotateLeft2(20);
+    //rotateRight(180);
+    leftPIDController.resetPID();
+    rightPIDController.resetPID();
+    delay(2000);
+  }
 
   // test PID/reading IR sensor data
   //testInLoop_motorsPID();
-  testInLoop_readingIR();
+  //testInLoop_readingIR();
 }
 
 void robotSystem_loop() {
