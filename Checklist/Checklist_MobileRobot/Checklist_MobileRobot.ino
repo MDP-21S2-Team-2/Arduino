@@ -377,6 +377,7 @@ void obstacleAvoidance() {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      //md.setSpeeds();
     }
 
     // check sensor readings
