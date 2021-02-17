@@ -13,7 +13,7 @@ SharpIR left_S1(SharpIR::S1, A4); // PS5, side front
 SharpIR left_S2(SharpIR::S2, A3); // PS4, side back
 SharpIR right_long(SharpIR::LR, A5); // PS6, long range
 
-DualVNH5019MotorShield md;t
+DualVNH5019MotorShield md;
 // pins for the motors' encoder channels
 #define LeftMotorE1A 11
 #define RightMotorE2A 3
