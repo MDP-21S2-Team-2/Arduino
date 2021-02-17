@@ -44,6 +44,7 @@ volatile unsigned long R_timeWidth = 0;
 // target speed for motors to reach
 //const int targetPulseWidth = 821; //rpm=100: 1067;//rpm=130: 821;  // 60 / 130 / 562.25 * 1000000.0;
 double targetRpm = 100.0;
+double alignmentTargetRpm = 50.0;
 //double targetDuration = 0.46154;  // for 1 rpm
 double target_count = 0;
 int leftSign = 1;
@@ -110,10 +111,14 @@ void motorL_ISR() {
 //PID leftPIDController(0.961, 2.055, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
 //PID rightPIDController(0.91, 1.985, 5.5, 130.0, -130.0);
 
-// 15 Feb target speed:100 6.32V 2y, 6.26V after use
-PID leftPIDController(0.961, 2.071, 6.5, 130.0, -130); // red
-PID rightPIDController(0.91, 2.01, 5.5, 130.0, -130.0);
+// 16 Feb target speed:120 6.33V 2y, 6.29V after use
+//PID leftPIDController(1.1, 2.617, 5.75, 130.0, -130); // red // initially 1.2, 2.63, 5.75
+//PID rightPIDController(1.08, 2.52, 5.95, 130.0, -130.0);
 
+
+// 17 Feb target speed:120 6.29V 2y, 6.25V after use
+PID leftPIDController(0.961, 2.078, 6, 130.0, -130); // red
+PID rightPIDController(0.91, 2.035, 6, 130.0, -130.0);
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
@@ -145,8 +150,9 @@ void moveForward(double tDistance)
   while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
-      md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      //md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      //md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
@@ -175,8 +181,9 @@ void moveBackward(double tDistance)
   while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
-      md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      //md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      //md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      md.setSpeeds(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), -rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
@@ -217,8 +224,9 @@ void rotateLeft2(double angle) {
   while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
-      md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      //md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      //md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      md.setSpeeds(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
@@ -251,8 +259,9 @@ void rotateLeft(double angle)
   while ((encL_count + encR_count) / 2 <= target_count)
   {
     if (PID::checkPIDCompute()) {
-      md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      //md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      //md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      md.setSpeeds(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
@@ -280,8 +289,9 @@ void rotateRight2(double angle) // doesn't really work but I'll leave it here
   while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
-      md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      //md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      //md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), -rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
@@ -316,11 +326,67 @@ void rotateRight(double angle)
   while ((encL_count + encR_count) / 2 <= target_count)
   {
     if (PID::checkPIDCompute()) {
-      md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      //md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      //md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), -rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
+}
+
+#define THRESHOLD 0.5
+
+// Robot self-calibration: wall alignment
+void alignToLeftWall() {
+  double dist_S1, dist_S2, difference;
+  bool align = true;
+  
+  while (align) {
+    dist_S1 = left_S1.getDistance();
+    dist_S2 = left_S2.getDistance();
+    difference = dist_S1 - dist_S2;
+    
+    // abs: is a macro, so should be efficient
+    if (abs(difference) < THRESHOLD) {
+      md.setBrakes(400, 400);
+      align = false;
+    } else if (PID::checkPIDCompute()) {  // continue aligning
+      if (difference > 0) { // tilted to the right; turn left
+        md.setSpeeds(leftPIDController.computePID(calculateRpm(L_timeWidth), alignmentTargetRpm),
+          rightPIDController.computePID(calculateRpm(R_timeWidth), alignmentTargetRpm));
+      } else {  // tilted to the left; turn right
+        md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), alignmentTargetRpm),
+          -rightPIDController.computePID(calculateRpm(R_timeWidth), alignmentTargetRpm));
+      }
+    }
+  }
+}
+
+void alignToFrontWall_Left() {
+  // use front-left (D3) and front-mid (D2) for alignment
+  double dist_D2, dist_D3, difference;
+  bool align = true;
+  
+  while (align) {
+    dist_D2 = front_D2.getDistance();
+    dist_D3 = front_D3.getDistance();
+
+    difference = dist_D2 - dist_D3;
+    
+    // abs: is a macro, so should be efficient
+    if (abs(difference) < THRESHOLD) {
+      md.setBrakes(400, 400);
+      align = false;
+    } else if (PID::checkPIDCompute()) {  // continue aligning
+      if (difference > 0) { // tilted to the right; turn left
+        md.setSpeeds(leftPIDController.computePID(calculateRpm(L_timeWidth), alignmentTargetRpm),
+          rightPIDController.computePID(calculateRpm(R_timeWidth), alignmentTargetRpm));
+      } else {  // tilted to the left; turn right
+        md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), alignmentTargetRpm),
+          -rightPIDController.computePID(calculateRpm(R_timeWidth), alignmentTargetRpm));
+      }
+    }
+  }
 }
 
 void setup() {
@@ -373,18 +439,19 @@ void loop() {
   //  }
 
   //move forward/rotate in small units
-//  for (int i = 0; i < 4; i++) {
-//    // change angle target depending on surface?
-//    rotateLeft2(20);
-//    //rotateRight(180);
-//    leftPIDController.resetPID();
-//    rightPIDController.resetPID();
-//    delay(2000);
-//  }
+  for (int i = 0; i < 4; i++) {
+    // change angle target depending on surface?
+    //rotateLeft2(20);
+    //rotateRight(180);
+    moveForward(30);
+    leftPIDController.resetPID();
+    rightPIDController.resetPID();
+    delay(2000);
+  }
 
   // test PID/reading IR sensor data
   //testInLoop_motorsPID();
-  testInLoop_readingIR();
+  //testInLoop_readingIR();
 }
 
 void robotSystem_loop() {
@@ -546,7 +613,8 @@ void testInLoop_motorsPID() {
     //md.setM1Speed(-350);
     //md.setM2Speed(350);
     // update motor speed with PID controller
-    md.setM1Speed(-leftPIDController.computePID(L_rpm, targetRpm));
-    md.setM2Speed(rightPIDController.computePID(R_rpm, targetRpm));
+    //md.setM1Speed(-leftPIDController.computePID(L_rpm, targetRpm));
+    //md.setM2Speed(rightPIDController.computePID(R_rpm, targetRpm));
+    md.setSpeeds(-leftPIDController.computePID(L_rpm, targetRpm), rightPIDController.computePID(R_rpm, targetRpm));
   }
 }

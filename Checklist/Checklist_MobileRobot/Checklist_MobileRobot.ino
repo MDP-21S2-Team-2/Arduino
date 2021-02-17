@@ -13,7 +13,7 @@ SharpIR left_S1(SharpIR::S1, A4); // PS5, side front
 SharpIR left_S2(SharpIR::S2, A3); // PS4, side back
 SharpIR right_long(SharpIR::LR, A5); // PS6, long range
 
-DualVNH5019MotorShield md;
+DualVNH5019MotorShield md;t
 // pins for the motors' encoder channels
 #define LeftMotorE1A 11
 #define RightMotorE2A 3
@@ -344,10 +344,10 @@ void loop() {
 //  }
 
   // test PID/reading IR sensor data
-  //testInLoop_motorsPID();
+  testInLoop_motorsPID();
   //testInLoop_readingIR();
 
-  if (runProgram) {
+  //if (runProgram) {
     // Checklist: Move Forward 
     //moveForward(140);
     // Checklist: Obstacle Avoidance
