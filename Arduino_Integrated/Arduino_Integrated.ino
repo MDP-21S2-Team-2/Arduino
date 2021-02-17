@@ -1,4 +1,5 @@
 #include <DualVNH5019MotorShield.h>
+
 #include <EnableInterrupt.h>
 
 #include "PID.h"
@@ -43,7 +44,7 @@ volatile unsigned long R_timeWidth = 0;
 
 // target speed for motors to reach
 //const int targetPulseWidth = 821; //rpm=100: 1067;//rpm=130: 821;  // 60 / 130 / 562.25 * 1000000.0;
-double targetRpm = 100.0;
+double targetRpm = 125.0;
 //double targetDuration = 0.46154;  // for 1 rpm
 double target_count = 0;
 int leftSign = 1;
@@ -111,8 +112,12 @@ void motorL_ISR() {
 //PID rightPIDController(0.91, 1.985, 5.5, 130.0, -130.0);
 
 // 15 Feb target speed:100 6.32V 2y, 6.26V after use
-PID leftPIDController(0.961, 2.071, 6.5, 130.0, -130); // red
-PID rightPIDController(0.91, 2.01, 5.5, 130.0, -130.0);
+//PID leftPIDController(0.961, 2.071, 6.5, 130.0, -130); // red
+//PID rightPIDController(0.91, 2.01, 5.5, 130.0, -130.0);
+
+// 16 Feb target speed:120 6.33V 2y, 6.V after use
+PID leftPIDController(1.1, 2.617, 5.75, 130.0, -130); // red // initially 1.2, 2.63, 5.75
+PID rightPIDController(1.08, 2.52, 5.95, 130.0, -130.0);
 
 
 // Distance Function
@@ -372,19 +377,20 @@ void loop() {
   //    }
   //  }
 
-  //move forward/rotate in small units
-//  for (int i = 0; i < 4; i++) {
-//    // change angle target depending on surface?
+ // move forward/rotate in small units
+  for (int i = 0; i < 4; i++) {
+    // change angle target depending on surface?
 //    rotateLeft2(20);
-//    //rotateRight(180);
-//    leftPIDController.resetPID();
-//    rightPIDController.resetPID();
-//    delay(2000);
-//  }
+    //rotateRight(180);
+    moveForward(50);
+    leftPIDController.resetPID();
+    rightPIDController.resetPID();
+    delay(2000);
+  }
 
   // test PID/reading IR sensor data
   //testInLoop_motorsPID();
-  testInLoop_readingIR();
+    //testInLoop_readingIR();
 }
 
 void robotSystem_loop() {
@@ -502,20 +508,21 @@ void testInLoop_readingIR() {
 
   //Serial.println(front_D1.getDistance());
   // Serial.println(front_D2.getDistance());
-  //Serial.println(front_D3.getDistance());
+  Serial.print("Front, left: ");  
+  Serial.println(front_D3.getDistance());
 
-  //  Serial.print("Front, right: ");
-  //  Serial.println(front_D1.getDistance());
-  //  Serial.print("Front, middle: ");
-  //  Serial.println(front_D2.getDistance());
+//    Serial.print("Front, right: ");
+//    Serial.println(front_D1.getDistance());
+//    Serial.print("Front, middle: ");
+//    Serial.println(front_D2.getDistance());
   //Serial.println(left_S1.getDistance());
   //Serial.println(left_S2.getDistance());
   
-  //Serial.println(front_D1.getDistance());
+
   //Serial.println(front_D3.getDistance());
   //Serial.println(left_S1.getDistance());
   //Serial.println(left_S2.getDistance());
-  Serial.println(right_long.getDistance());
+//  Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
   //
 }
