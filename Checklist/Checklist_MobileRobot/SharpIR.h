@@ -14,9 +14,9 @@
 #define HALF_NUM_SAMPLES 12 // index of median
 
 // physical sensor offsets
-#define D1_OFFSET 3.6
-#define D2_OFFSET 3.2
-#define D3_OFFSET 6.2
+#define D1_OFFSET 5.0
+#define D2_OFFSET 4.9
+#define D3_OFFSET 5.0
 #define S1_OFFSET 0
 #define S2_OFFSET 0
 #define LR_OFFSET 0
