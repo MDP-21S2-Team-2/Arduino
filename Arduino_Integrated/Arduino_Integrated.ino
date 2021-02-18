@@ -5,8 +5,8 @@
 #include "PID.h"
 #include "SharpIR.h"
 
-SharpIR front_D1(SharpIR::D1, A0);  // PS1, front right
-SharpIR front_D2(SharpIR::D2, A1);  // PS2, front middle
+SharpIR front_D1(SharpIR::D1, A0);  // PS1, front middle
+SharpIR front_D2(SharpIR::D2, A1);  // PS2, front right
 SharpIR front_D3(SharpIR::D3, A2);  // PS3, front left
 //S1 range until
 SharpIR left_S1(SharpIR::S1, A4); // PS5, side front
@@ -458,19 +458,19 @@ void loop() {
   //  }
 
  // move forward/rotate in small units
-  for (int i = 0; i < 4; i++) {
-    // change angle target depending on surface?
-//    rotateLeft2(20);
-    //rotateRight(90);
-    moveForward(10);
-    leftPIDController.resetPID();
-    rightPIDController.resetPID();
-    delay(2000);
-  }
+//  for (int i = 0; i < 4; i++) {
+//    // change angle target depending on surface?
+////    rotateLeft2(20);
+//    //rotateRight(90);
+//    moveForward(10);
+//    leftPIDController.resetPID();
+//    rightPIDController.resetPID();
+//    delay(2000);
+//  } 
 
   // test PID/reading IR sensor data
-  testInLoop_motorsPID();
-  //testInLoop_readingIR();
+  //testInLoop_motorsPID();
+  testInLoop_readingIR();
 }
 
 void robotSystem_loop() {
@@ -588,8 +588,8 @@ void testInLoop_readingIR() {
 
   //Serial.println(front_D1.getDistance());
   // Serial.println(front_D2.getDistance());
-  Serial.print("Front, left: ");  
-  Serial.println(front_D3.getDistance());
+  Serial.print("Front, left: ");
+  Serial.println(front_D1.getDistance());
 
 //    Serial.print("Front, right: ");
 //    Serial.println(front_D1.getDistance());

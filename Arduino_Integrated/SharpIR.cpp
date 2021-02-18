@@ -32,19 +32,21 @@ double SharpIR::getDistance() {
   switch( sensorType )
   {
   case D1:
-      // check out of range
-      if(median > 639) return 7;
-      else if (median >= 601) // 7-8cm
-        distance = 14.06667 + 1629.102/(median-869.5333);
-      else if (median >= 347) // 8-15cm
-        distance = -5.67432 + 10198.92/(median+146.005);
-      else if (median >= 125) // 15-45cm
-        distance = -1.37507 + 5666.653/(median-2.777881);
-      else if (median >= 110) // 45-50cm
-        distance = -6.1679 + 7732.175/(median+27.5616);
-      else return 51; // median < 110, out of range
-      distance = -2.2771 + 6159.08/(median+6.781);
-      return distance - D1_OFFSET;
+    if (median > 632)
+      return 7;
+    else if (median >= 492) //7-10
+      distance = 228.579 -1.1436*median + 0.002*median*median + 0.000001*median*median*median;  // x^3 3rd order constant is too small to be represented in Arduino, also error gets magnified
+    else if (median >= 263) //10-20
+      distance = (-0.39877)+ (4867.15/(median-24.6871));
+    else if (median >= 165) //20-33
+      distance = (0.11937)+(4929.93)/(median-15.281);
+    else if (median >= 137) //33-40
+      distance = 94.9596+(-0.516238)*(median) + (0.000854)*(median)*(median);
+    else if (median >= 105)
+      distance = (-0.32063)*(median) + 83.7398;
+    else 
+      return 51;
+    return distance - D1_OFFSET;
 
   case D2:
       // check out of range
