@@ -49,6 +49,11 @@ double target_count = 0;
 int leftSign = 1;
 int rightSign = 1;
 
+void resetEnc(){
+  encL_count = 0;
+  encR_count = 0;
+}
+
 double calculateRpm(int pulseWidth) {
   if (pulseWidth == 0)
     return 0;
@@ -111,8 +116,19 @@ void motorL_ISR() {
 //PID rightPIDController(0.91, 1.985, 5.5, 130.0, -130.0);
 
 // 15 Feb target speed:100 6.32V 2y
-PID leftPIDController(0.961, 2.071, 6.5, 130.0, -130); // red
-PID rightPIDController(0.91, 2.01, 5.5, 130.0, -130.0);
+//PID leftPIDController(0.961, 2.071, 6.5, 130.0, -130); // red
+//PID rightPIDController(0.91, 2.01, 5.5, 130.0, -130.0);
+
+
+// 18 Feb target speed:100 6.35V 2y
+//PID leftPIDController(0.961, 2.0225, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
+//PID rightPIDController(0.91, 2.023, 5.5, 130.0, -130.0);
+
+
+// 18 Feb target speed:100 6.31V 2y, now 6.25V
+PID leftPIDController(0.965, 1.4845, 5.5, 180.0, -180); // red // for 130rpm // initially: I = 2.015
+PID rightPIDController(0.65, 1.485, 5.5, 180.0, -180.0);
+
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
@@ -247,7 +263,7 @@ void rotateLeft(double angle)
     target_count += angle * 4.41;
   else if ( 90 < angle <= 180)
     target_count += angle * 4.65;
-
+  
   // set multiplier for motor speed direction
   leftSign = 1;
   rightSign = 1;
@@ -261,6 +277,36 @@ void rotateLeft(double angle)
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+    }
+  }
+  md.setBrakes(BRAKE_L, BRAKE_R);
+}
+
+void rotateRight2(double angle) // doesn't really work but I'll leave it here
+{
+  //Store current encoder value
+  int fLval = encL_count;
+  int fRval = encR_count;
+  //4.8147 exact multiplier
+  // Calculate target number of ticks to travel the distance,
+  // reduce tEncodeVal by no. ticks needed for braking
+  double L_tEncodeVal = fLval + angle * 4.41; // for brakes: //- 35;  // 38
+  double R_tEncodeVal = fRval + angle * 4.41; // for brakes: //- 36;  // 33
+
+  // set multiplier for motor speed direction
+  leftSign = -1;
+  rightSign = -1;
+
+  // reset prevTime to get more accurate timeWidth
+  L_prevTime = micros();
+  R_prevTime = micros();
+
+  while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
+  {
+    if (PID::checkPIDCompute()) {
+      //md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      //md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), -rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
@@ -330,48 +376,12 @@ void setup() {
   R_prevTime = L_prevTime;
 }
 
-void loop() {
-
-  // main robot system loop
-  //robotSystem_loop();
-
-  //move forward/rotate in small units
-//  for (int i = 0; i < 4 ; i++) {
-//    rotateLeft2(20);
-//    leftPIDController.resetPID();
-//    rightPIDController.resetPID();
-//    delay(2000);
-//  }
-
-  // test PID/reading IR sensor data
-  testInLoop_motorsPID();
-  //testInLoop_readingIR();
-
-  //if (runProgram) {
-    // Checklist: Move Forward 
-    //moveForward(140);
-    // Checklist: Obstacle Avoidance
-    //obstacleAvoidance();
-
-    // test: series of commands
-//    moveForward(60);
-//    rotateRight(90);
-//    moveForward(50);
-//    rotateLeft2(90);
-//    moveForward(90);
-//    rotateRight(90);
-//    moveForward(60);
-//    rotateLeft2(90);
-//    moveForward(10);
-    runProgram = false;
-  }
-}
-
 void obstacleAvoidance() {
   bool noObstacle = true;
   int encL_start = encL_count;
   int encR_start = encL_count;
-  
+
+  // 1. keep moving until obstacle is encountered
   while (noObstacle)
   {
     if (PID::checkPIDCompute()) {
@@ -385,48 +395,73 @@ void obstacleAvoidance() {
     double dist_D2 = front_D2.getDistance();
     double dist_D3 = front_D3.getDistance();
 
-    Serial.print(dist_D1);
-    Serial.write(",");
-    Serial.print(dist_D2);
-    Serial.write(",");
-    Serial.print(dist_D3);
-    Serial.write("\n");
-
     // if at least 1/3 of the sensors return <=10-15cm (after offset), consider as obstacle detected
-    if ((dist_D1 > 8.0 && dist_D1 <= 12.0) ||
-    (dist_D2 > 8.0 && dist_D2 <= 12.0) ||
-    (dist_D3 > 8.0 && dist_D3 <= 12.0)) {
+    if ((dist_D1 > 8.0 && dist_D1 <= 15.0) ||
+    (dist_D2 > 8.0 && dist_D2 <= 15.0) ||
+    (dist_D3 > 8.0 && dist_D3 <= 15.0)) {
       noObstacle = false;
     }
   }
   // stop moving
   md.setBrakes(BRAKE_L, BRAKE_R);
-
-  // delay a short while to wait for robot to finish braking
-  delay(20);
-
+  delay(1000);
+  
   // calculate distance traveled
   int aveTicksTraveled = ((encR_count - encR_start) + (encL_count - encL_start)) / 2;
   double dist = oneRevDis * ((double)aveTicksTraveled / 562.25);  // in cm
+
+  // reset PID and encoders
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  resetEnc();
   
-  // rotate 45 degrees
-  rotateRight(45);
-  // move forward (diagonal)
-  moveForward(37.83);
-  // rotate back
-  rotateLeft2(90);
-  // move forward (diagonal)
-  moveForward(37.83);
-  // rotate back to straight line
-  rotateRight(45);
+  // 2. rotate 45 degrees
+  rotateLeft2(45);
+  delay(1000);
+  // reset PID and encoders
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  resetEnc();
+  
+  // 3. move forward (diagonal)
+  moveForward(38.89);
+  delay(1000);
+  // reset PID and encoders
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  resetEnc();
+  
+  // 4. rotate back
+  rotateRight2(90);
+  delay(2000);
+  // reset PID and encoders
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  resetEnc();
+
+  // 5. move forward (diagonal)
+  moveForward(38.89);
+  delay(2000);
+  // reset PID and encoders
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  resetEnc();
+  
+  // 6. rotate back to straight line
+  rotateLeft2(45);
+  delay(2000);
+  // reset PID and encoders
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  resetEnc();
   
   // calculate remaining straight line distance to travel
   /// let's take total length of line to be 150cm
-  /// also, the robot stopped about 1.5 units before the obstacle, and ended 1.5 units after the obstacle
-  /// the obstacle is 1 unit. Therefore, total the robot also covered additional 4 units = 40cm
-  double remainingDist = 150 - 40 - dist;
+  /// also, the robot stopped about 2 units before the obstacle, and ended 2 units after the obstacle
+  /// the obstacle is 1 unit. Therefore, total the robot also covered additional 5 units = 50cm
+  double remainingDist = 150 - 50 - dist;
   
-  // move forward only if there is remaining distance
+  // 7. move forward only if there is remaining distance
   if (remainingDist > 0)
     moveForward(remainingDist);
 }
@@ -587,5 +622,62 @@ void testInLoop_motorsPID() {
     // update motor speed with PID controller
     md.setM1Speed(-leftPIDController.computePID(L_rpm, targetRpm));
     md.setM2Speed(rightPIDController.computePID(R_rpm, targetRpm));
+  }
+}
+
+
+void loop() {
+
+  // main robot system loop
+  //robotSystem_loop();
+
+  //move forward/rotate in small units
+//  for (int i = 0; i < 4 ; i++) {
+//    //rotateRight2(90);
+//    moveForward(150);
+//    leftPIDController.resetPID();
+//    rightPIDController.resetPID();
+//    delay(2000);
+//  }
+
+  // test PID/reading IR sensor data
+  //testInLoop_motorsPID();
+  //testInLoop_readingIR();
+
+  if (runProgram) {
+    // Checklist: Move Forward 
+    //moveForward(150);
+    // Checklist: Obstacle Avoidance
+    //obstacleAvoidance();
+
+// 720
+    for (int i = 0; i < 8; ++i) {
+      rotateRight(90);
+      delay(5000);
+      leftPIDController.resetPID();
+      rightPIDController.resetPID();
+      resetEnc();
+    }
+// 740
+    for (int i = 0; i < 2; ++i) {
+      rotateLeft2(20);
+      delay(500);
+      leftPIDController.resetPID();
+      rightPIDController.resetPID();
+      resetEnc();
+    }
+
+
+    // test: series of commands
+//    moveForward(60);
+//    rotateRight(90);
+//    moveForward(50);
+//    rotateLeft2(90);
+//    moveForward(90);
+//    rotateRight(90);
+//    moveForward(60);
+//    rotateLeft2(90);
+//    moveForward(10);
+    runProgram = false;
   }
 }

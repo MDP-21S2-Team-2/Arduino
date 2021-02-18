@@ -44,7 +44,8 @@ volatile unsigned long R_timeWidth = 0;
 
 // target speed for motors to reach
 //const int targetPulseWidth = 821; //rpm=100: 1067;//rpm=130: 821;  // 60 / 130 / 562.25 * 1000000.0;
-double targetRpm = 125.0; // 100.0;
+//double targetRpm = 125.0; // 100.0;
+double targetRpm = 100.0;
 double alignmentTargetRpm = 50.0;
 //double targetDuration = 0.46154;  // for 1 rpm
 double target_count = 0;
@@ -121,9 +122,22 @@ void motorL_ISR() {
 //PID rightPIDController(1.08, 2.52, 5.95, 130.0, -130.0);
 
 
-// 17 Feb target speed:120 6.29V 2y, 6.25V after use
-PID leftPIDController(0.961, 2.078, 6, 130.0, -130); // red
-PID rightPIDController(0.91, 2.035, 6, 130.0, -130.0);
+// 17 Feb target speed:100 6.29V 2y, 6.25V after use
+//PID leftPIDController(0.961, 2.078, 6, 130.0, -130); // red
+//PID rightPIDController(0.91, 2.035, 6, 130.0, -130.0);
+
+// 18 Feb target speed: 100 start: 6.29V 2y -- cmi battery level too low, right keeps starting faster sometimes asdfjakd
+//PID leftPIDController(0.961, 2.078, 0.0, 130.0, -130); // red
+//PID rightPIDController(0.91, 2.03, 0.0, 130.0, -130.0);
+
+// 18 Feb target speed: 100 start: 6.4V 2y
+//PID leftPIDController(0.961, 2.03, 6.0, 130.0, -130); // red
+//PID rightPIDController(0.91, 1.97, 6.0, 130.0, -130.0);
+
+// 18 Feb target speed:100 6.31V 1y1w
+PID leftPIDController(0.961, 2.0697, 5.6, 130.0, -130); // red // for 130rpm // initially: I = 2.015
+PID rightPIDController(0.91, 2.023, 5.5, 130.0, -130.0);
+
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
@@ -314,7 +328,7 @@ void rotateRight(double angle)
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle <= 50)  // for 45 deg
-    target_count += angle * 4.34;
+    target_count += angle * 4.27;
   else if (angle <= 90)
     target_count += angle * 4.41; // 4.42 for paper, 4.41 for arena
   else if ( 90 < angle <= 180)
@@ -447,15 +461,15 @@ void loop() {
   for (int i = 0; i < 4; i++) {
     // change angle target depending on surface?
 //    rotateLeft2(20);
-    //rotateRight(180);
-    moveForward(50);
+    //rotateRight(90);
+    moveForward(10);
     leftPIDController.resetPID();
     rightPIDController.resetPID();
     delay(2000);
   }
 
   // test PID/reading IR sensor data
-  //testInLoop_motorsPID();
+  testInLoop_motorsPID();
   //testInLoop_readingIR();
 }
 
