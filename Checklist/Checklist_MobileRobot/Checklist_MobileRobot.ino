@@ -126,9 +126,13 @@ void motorL_ISR() {
 
 
 // 18 Feb target speed:100 6.31V 2y, now 6.25V
-PID leftPIDController(0.965, 1.4845, 5.5, 180.0, -180); // red // for 130rpm // initially: I = 2.015
-PID rightPIDController(0.65, 1.485, 5.5, 180.0, -180.0);
+//PID leftPIDController(0.965, 1.4845, 5.5, 180.0, -180); // red // for 130rpm // initially: I = 2.015
+//PID rightPIDController(0.65, 1.485, 5.5, 180.0, -180.0);
 
+
+// 19 Feb target speed:100 6.39V 2y
+PID leftPIDController(0.961, 2.045, 1.0, 130.0, -130); // red
+PID rightPIDController(0.7, 2.017, 2.0, 130.0, -130.0); // right starts up faster
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
@@ -221,8 +225,8 @@ void rotateLeft2(double angle) {
   }
   else if (angle <= 91) {
   // 4.42 FKING SOLID 11 FEB 6.34V TUNING
-    L_tEncodeVal += angle * 4.42;
-    R_tEncodeVal += angle * 4.42;
+    L_tEncodeVal += angle * 4.41;
+    R_tEncodeVal += angle * 4.41;
   }
   else if (angle <= 180) {
     L_tEncodeVal += angle * 4.51;
@@ -304,9 +308,9 @@ void rotateRight2(double angle) // doesn't really work but I'll leave it here
   while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
-      //md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      //md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-      md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), -rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), -rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
@@ -378,6 +382,7 @@ void setup() {
 
 void obstacleAvoidance() {
   bool noObstacle = true;
+  bool detectedOnLeft = false;
   int encL_start = encL_count;
   int encR_start = encL_count;
 
@@ -400,6 +405,11 @@ void obstacleAvoidance() {
     (dist_D2 > 8.0 && dist_D2 <= 15.0) ||
     (dist_D3 > 8.0 && dist_D3 <= 15.0)) {
       noObstacle = false;
+      // if only left sensor detected it, rotate right instead
+      if ((dist_D3 > 8.0 && dist_D3 <= 15.0) &&  // left sensor detected obstacle
+      (dist_D1 < 8.0 || dist_D1 > 15.0)) { // right sensor does not detect
+        detectedOnLeft = true;
+      }
     }
   }
   // stop moving
@@ -416,7 +426,10 @@ void obstacleAvoidance() {
   resetEnc();
   
   // 2. rotate 45 degrees
-  rotateLeft2(45);
+  if (detectedOnLeft)
+    rotateRight(45);
+  else
+    rotateLeft2(45);
   delay(1000);
   // reset PID and encoders
   leftPIDController.resetPID();
@@ -432,7 +445,10 @@ void obstacleAvoidance() {
   resetEnc();
   
   // 4. rotate back
-  rotateRight2(90);
+  if (detectedOnLeft)
+    rotateLeft(90);
+  else
+    rotateRight2(90);
   delay(2000);
   // reset PID and encoders
   leftPIDController.resetPID();
@@ -448,7 +464,10 @@ void obstacleAvoidance() {
   resetEnc();
   
   // 6. rotate back to straight line
-  rotateLeft2(45);
+  if (detectedOnLeft)
+    rotateRight(45);
+  else
+    rotateLeft2(45);
   delay(2000);
   // reset PID and encoders
   leftPIDController.resetPID();
@@ -646,27 +665,31 @@ void loop() {
 
   if (runProgram) {
     // Checklist: Move Forward 
-    //moveForward(150);
+    //moveForward(120);
     // Checklist: Obstacle Avoidance
-    //obstacleAvoidance();
+    obstacleAvoidance();
 
+// Checkist: Rotation
 // 720
-    for (int i = 0; i < 8; ++i) {
-      rotateRight(90);
-      delay(5000);
-      leftPIDController.resetPID();
-      rightPIDController.resetPID();
-      resetEnc();
-    }
-// 740
-    for (int i = 0; i < 2; ++i) {
-      rotateLeft2(20);
-      delay(500);
-      leftPIDController.resetPID();
-      rightPIDController.resetPID();
-      resetEnc();
-    }
-
+//    for (int i = 0; i < 8; ++i) {
+//      rotateLeft2(90);
+//      delay(500);
+//      leftPIDController.resetPID();
+//      rightPIDController.resetPID();
+//      resetEnc();
+//    }
+//    rotateLeft2(90);
+//      delay(500);
+//      leftPIDController.resetPID();
+//      rightPIDController.resetPID();
+//      resetEnc();
+//    for (int i = 0; i < 4; ++i) {
+//      rotateLeft2(20);
+//      delay(500);
+//      leftPIDController.resetPID();
+//      rightPIDController.resetPID();
+//      resetEnc();
+//    }
 
     // test: series of commands
 //    moveForward(60);
