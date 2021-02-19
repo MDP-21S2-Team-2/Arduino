@@ -34,15 +34,21 @@ double SharpIR::getDistance() {
   case D1:
     if (median > 632)
       return 7;
-    else if (median >= 492) //7-10
-      distance = 228.579 -1.1436*median + 0.002*median*median + 0.000001*median*median*median;  // x^3 3rd order constant is too small to be represented in Arduino, also error gets magnified
-    else if (median >= 263) //10-20
-      distance = (-0.39877)+ (4867.15/(median-24.6871));
-    else if (median >= 165) //20-33
+    else if (median >= 532) //7-9
+      distance = 13.5555+ 1493.2/(median-859.778);
+    else if (median >= 340) //9-15
+      distance = 0.0000581*median*median - 0.081448*median +35.93;
+    else if (median >= 263) //15-20
+      distance = (0.0001827*median*median)-0.175152*median + 53.42216;
+    else if (median >= 180) //20-30
       distance = (0.11937)+(4929.93)/(median-15.281);
-    else if (median >= 137) //33-40
-      distance = 94.9596+(-0.516238)*(median) + (0.000854)*(median)*(median);
-    else if (median >= 105)
+//    else if (median >= 137) //33-40  bad readings off by 1cm
+//      distance = 94.9596+(-0.516238)*(median) + (0.000854)*(median)*(median);
+    else if (median >= 153) //30-35
+      distance = -0.25*median +74.25;
+    else if (median >= 144) //35-40 //35 onwards is bad
+      distance = 34.3551+9.2450/(median-141.46911);
+    else if (median >= 105) //40-50
       distance = (-0.32063)*(median) + 83.7398;
     else 
       return 51;
@@ -90,7 +96,6 @@ double SharpIR::getDistance() {
       return distance - S2_OFFSET;
       
   case LR:
-      // check median ranges
       if(median > 550) return 13; // out of range
       else if (median >= 539) // 13-15cm
         distance = 123 - 0.2*median;
@@ -100,8 +105,20 @@ double SharpIR::getDistance() {
         distance = 69.42099 - 0.09901*median;
       else if (median >= 353) // 30-35cm
         distance = 76.17186 - 0.1162*median;
-      else if (median >= 160) // 35-80cm
+      else if (median >= 160) // 35-40cm
         distance = -0.12527 + 12186.82/(median-7.023576);
+      else if (median >= 276) // 40-44cm
+        distance = 0.003888*median*median -2.40388*median + 411.2333;
+      else if (median >= 228) // 44-54cm
+        distance = 0.0019645*median*median -1.19897*median + 225.26526;
+      else if (median >= 204) // 54-60cm
+        distance = 0.0038898*median*median -1.92879*median + 291.5673;
+      else if (median >= 184) // 60-66cm
+        distance = -0.006955*median*median +2.39829*median -139.7925;
+      else if (median >= 169) // 66-72cm
+        distance = 0.0041723*median*median -1.87928*median + 270.48473;
+      else if (median >= 152) // 72-80cm
+        distance = 0.013080*median*median -4.61753*median + 479.73486;
       else return 80;  // median < 160, out of range
       return distance - LR_OFFSET;
   }
