@@ -63,6 +63,11 @@ double calculateRpm(int pulseWidth) {
 const int alpha = 1;
 const int alphaInv = 9;
 
+void resetEnc() {
+  encL_count = 0;
+  encR_count = 0;
+}
+
 void motorR_ISR() {
   encR_count++;
   R_currTime = micros();
@@ -154,6 +159,22 @@ PID rightPIDController(0.7, 2.017, 2.0, 130.0, -130.0); // right starts up faste
 // 90 degree = 14.5275cm
 double oneRevDis = 18.849556; // in cm
 
+void checkForCalibration() {
+  double dist_D1 = front_D1.getDistance();
+  double dist_D2 = front_D2.getDistance();
+  double dist_D3 = front_D3.getDistance();
+  double dist_S1 = left_S1.getDistance();
+  double dist_S2 = left_S2.getDistance();
+  double dist_LR = right_long.getDistance();
+
+  byte* ptr_dist_D1 = (byte*) &dist_D1;
+  byte* ptr_dist_D2 = (byte*) &dist_D2;
+  byte* ptr_dist_D3 = (byte*) &dist_D3;
+  byte* ptr_dist_S1 = (byte*) &dist_S1;
+  byte* ptr_dist_S2 = (byte*) &dist_S2;
+  byte* ptr_dist_LR = (byte*) &dist_LR;
+}
+
 void moveForward(double tDistance)
 {
   //Store current encoder value
@@ -179,9 +200,18 @@ void moveForward(double tDistance)
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
       //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+
+      // read IR sensors here
+      checkForCalibration();
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
+
+  // reset PID
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  // reset encoder ticks
+  resetEnc();
 
   // TEMPORARY: SEND AFTER EVERY 1 UNIT
   //sendIRSensorsReadings();
@@ -216,6 +246,12 @@ void moveBackward(double tDistance)
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
+  
+  // reset PID
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  // reset encoder ticks
+  resetEnc();
 }
 
 void rotateLeft2(double angle) {
@@ -259,6 +295,12 @@ void rotateLeft2(double angle) {
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
+  
+  // reset PID
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  // reset encoder ticks
+  resetEnc();
 }
 
 void rotateLeft(double angle)
@@ -294,6 +336,12 @@ void rotateLeft(double angle)
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
+  
+  // reset PID
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  // reset encoder ticks
+  resetEnc();
 }
 
 void rotateRight2(double angle) // doesn't really work but I'll leave it here
@@ -324,6 +372,12 @@ void rotateRight2(double angle) // doesn't really work but I'll leave it here
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
+  
+  // reset PID
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  // reset encoder ticks
+  resetEnc();
 }
 
 void rotateRight(double angle)
@@ -361,6 +415,12 @@ void rotateRight(double angle)
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
+  
+  // reset PID
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+  // reset encoder ticks
+  resetEnc();
 }
 
 #define THRESHOLD 0.5
@@ -447,7 +507,7 @@ void setup() {
 void loop() {
 
   // main robot system loop
-  robotSystem_loop();
+  //robotSystem_loop();
 
   // try moving for some time
   //  if (micros() - startTime > 1500000) {}

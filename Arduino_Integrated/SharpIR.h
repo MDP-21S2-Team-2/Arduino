@@ -19,7 +19,7 @@
 #define D3_OFFSET 0 // 5.0
 #define S1_OFFSET 0 // TBC
 #define S2_OFFSET 0 // TBC
-#define LR_OFFSET 0 // 9.9
+#define LR_OFFSET 9.9 // 9.9
 
 #include <Arduino.h>
 
