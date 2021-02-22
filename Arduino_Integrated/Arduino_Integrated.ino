@@ -16,8 +16,8 @@ SharpIR right_long(SharpIR::LR, A5); // PS6, long range
 
 DualVNH5019MotorShield md;
 // pins for the motors' encoder channels
-#define LeftMotorE1A 11
-#define RightMotorE2A 3
+#define LeftMotorA 11 // E2A
+#define RightMotorA 3 // E1A
 
 #define BRAKE_L 400
 #define BRAKE_R 400
@@ -482,12 +482,12 @@ void setup() {
   // put your setup code here, to run once:
   //init encoder pins
   //(default is input so technically not needed)
-  //pinMode(LeftMotorE1A, INPUT);
-  //pinMode(RightMotorE2A, INPUT);
+  //pinMode(LeftMotorA, INPUT);
+  //pinMode(RightMotorA, INPUT);
 
   // enable interrupts for calculating motor rpm
-  enableInterrupt(LeftMotorE1A, motorL_ISR, RISING);
-  enableInterrupt(RightMotorE2A, motorR_ISR, RISING);
+  enableInterrupt(LeftMotorA, motorL_ISR, RISING);
+  enableInterrupt(RightMotorA, motorR_ISR, RISING);
 
   // init Serial
   Serial.begin(115200);
