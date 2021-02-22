@@ -507,25 +507,7 @@ void setup() {
 void loop() {
 
   // main robot system loop
-  //robotSystem_loop();
-
-  // try moving for some time
-  //  if (micros() - startTime > 1500000) {}
-  //  else if (encL_count>=620) //310 = 10cm, // 562 = 1 rev
-  //  {//micros() - startTime >= 1000000) {
-  //     //stop
-  //    md.setBrakes(400, 400);
-  //    Serial.print(encL_count);
-  //    Serial.print(",");
-  //    Serial.println(encR_count);
-  //  }
-  //  else {
-  //    if (PID::checkPIDCompute()) {
-  //    // PID
-  //      md.setM1Speed(-leftPIDController.computePID(L_timeWidth, targetPulseWidth));
-  //      md.setM2Speed(rightPIDController.computePID(R_timeWidth, targetPulseWidth));
-  //    }
-  //  }
+  robotSystem_loop();
 
  // move forward/rotate in small units
 //  for (int i = 0; i < 4; i++) {
@@ -553,11 +535,16 @@ void robotSystem_loop() {
     char command = input.charAt(0);
     if (command == 'M') { // move
       // read next character for no. units to move
-      // TODO: compare the performance of using String toInt() instead
-      // TODO: might need to check next char if it's possible to be commanded to move >=10 units
-      char numUnits = input.charAt(1);
+      //char numUnits = input.charAt(1);
+      //moveForward((numUnits - '0') * 10);
 
-      moveForward((numUnits - '0') * 10);
+      // check remaining characters as it's possible to be commanded to move >=10 units
+      input.trim();
+      int numUnits = input.substring(1).toInt();
+      moveForward(numUnits * 10);
+
+      // TODO: compare the performance of using String toInt() instead      
+
       // TODO: acknowledge the command?
       Serial.write("R\n");
       //Serial.write(command);
