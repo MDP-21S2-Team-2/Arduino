@@ -661,7 +661,7 @@ void loop() {
 
   // test PID/reading IR sensor data
   //testInLoop_motorsPID();
-  //testInLoop_readingIR();
+  testInLoop_readingIR();
 
   if (runProgram) {
     // Checklist: Move Forward 
