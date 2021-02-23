@@ -48,7 +48,7 @@ volatile unsigned long R_timeWidth = 0;
 double targetRpm = 100.0;
 double alignmentTargetRpm = 50.0;
 //double targetDuration = 0.46154;  // for 1 rpm
-double target_count = 0;
+
 int leftSign = 1;
 int rightSign = 1;
 
@@ -148,8 +148,20 @@ void motorL_ISR() {
 //PID rightPIDController(0.7, 2.0215, 0.0, 130.0, -130.0); // right starts up faster
 
 // 19 Feb target speed:100 6.39V 2y
-PID leftPIDController(0.961, 2.045, 1.0, 130.0, -130); // red
-PID rightPIDController(0.7, 2.017, 2.0, 130.0, -130.0); // right starts up faster
+//PID leftPIDController(0.961, 2.045, 1.0, 130.0, -130); // red
+//PID rightPIDController(0.7, 2.017, 2.0, 130.0, -130.0); // right starts up faster
+
+// 22 Feb target speed:100 6.37V 2y
+//PID leftPIDController(3.745, 2.1, 3.5 , 130.0, -130); // red
+//PID rightPIDController(3.665, 2.0465, 4.3, 130.0, -130.0); // right starts up faster
+
+// 23 Feb target speed:100 6.31V 2y
+//PID leftPIDController(3.745, 2.068, 4.5 , 130.0, -130); // red
+//PID rightPIDController(3.665, 2.06, 5.5, 130.0, -130.0); // right starts up faster
+// 6.27V 2y
+PID leftPIDController(3.745, 2.064, 4.5 , 130.0, -130); // red
+PID rightPIDController(3.66, 2.063, 5.8, 130.0, -130.0); // right starts up faster
+
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
@@ -177,13 +189,11 @@ void checkForCalibration() {
 
 void moveForward(double tDistance)
 {
-  //Store current encoder value
-  int fLval = encL_count;
-  int fRval = encR_count;
+  // reset encoder ticks
+  resetEnc();
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double L_tEncodeVal = fLval + tDistance / oneRevDis * 562.25; //- 35;  // 38
-  double R_tEncodeVal = fRval + tDistance / oneRevDis * 562.25; //- 36;  // 33
+  double tEncodeVal = tDistance / oneRevDis * 562.25 - 20; // brakes
 
   // set multiplier for motor speed direction
   leftSign = -1;
@@ -194,7 +204,8 @@ void moveForward(double tDistance)
   R_prevTime = micros();
 
   // check if either motor reached the target number of ticks
-  while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
+  while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
+  //while (0.5*(encL_count + encR_count) <= tEncodeVal)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -210,23 +221,17 @@ void moveForward(double tDistance)
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
-  // reset encoder ticks
-  resetEnc();
 
   // TEMPORARY: SEND AFTER EVERY 1 UNIT
   //sendIRSensorsReadings();
 }
 void moveBackward(double tDistance)
 {
-  //Store current encoder value
-  int fLval = encL_count;
-  int fRval = encR_count;
+  // reset encoder ticks
+  resetEnc();
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double L_tEncodeVal = fLval + tDistance / oneRevDis * 562.25; //- 35;  // 38
-  double R_tEncodeVal = fRval + tDistance / oneRevDis * 562.25; //- 36;  // 33
-  //target_count = (fLval+fRval)/2;
-  //target_count += tDistance/oneRevDis * 562.25;
+  double tEncodeVal = tDistance / oneRevDis * 562.25 - 20; //- 36;  // 33
 
   // set multiplier for motor speed direction
   leftSign = 1;
@@ -237,12 +242,11 @@ void moveBackward(double tDistance)
   R_prevTime = micros();
 
   // check if either motor reached the target number of ticks
-  while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
+  while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
-      //md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      //md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-      md.setSpeeds(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), -rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
@@ -250,32 +254,26 @@ void moveBackward(double tDistance)
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
-  // reset encoder ticks
-  resetEnc();
 }
 
 void rotateLeft2(double angle) {
 
-  int fLval = encL_count;
-  int fRval = encR_count;
+  // reset encoder ticks
+  resetEnc();
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
   // was previously 4.45
-  double L_tEncodeVal = fLval; //4.46; for brakes: //- 35;  // 38
-  double R_tEncodeVal = fRval; //4.46; for brakes: //- 36;  // 33
+  double tEncodeVal = 0;
 
   if (angle <= 50) {
-    L_tEncodeVal += angle * 4.21;  // 4.27 works
-    R_tEncodeVal += angle * 4.21;  // 4.27 works
+    tEncodeVal = angle * 4.21;  // 4.27 works
   }
   else if (angle <= 91) {
   // 4.42 FKING SOLID 11 FEB 6.34V TUNING
-    L_tEncodeVal += angle * 4.42;
-    R_tEncodeVal += angle * 4.42;
+    tEncodeVal += angle * 4.42;
   }
   else if (angle <= 180) {
-    L_tEncodeVal += angle * 4.51;
-    R_tEncodeVal += angle * 4.51;
+    tEncodeVal += angle * 4.51;
   }
 
   // set multiplier for motor speed direction
@@ -286,7 +284,7 @@ void rotateLeft2(double angle) {
   L_prevTime = micros();
   R_prevTime = micros();
 
-  while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
+  while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -299,25 +297,22 @@ void rotateLeft2(double angle) {
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
-  // reset encoder ticks
-  resetEnc();
 }
 
 void rotateLeft(double angle)
 {
-  //  //Store current encoder value
-  //  int curLeftEnc = encL_count;
-  //  int curRightEnc = encR_count;
-  target_count = (encL_count + encR_count) / 2;
+  // reset encoder ticks
+  resetEnc();
+  double tEncodeVal = 0;
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle <= 90)
-    target_count += angle * 4.41;
+    tEncodeVal = angle * 4.41;
   else if ( 90 < angle <= 180)
-    target_count += angle * 4.65;
+    tEncodeVal = angle * 4.65;
 
   // set multiplier for motor speed direction
   leftSign = 1;
@@ -327,7 +322,7 @@ void rotateLeft(double angle)
   L_prevTime = micros();
   R_prevTime = micros();
 
-  while ((encL_count + encR_count) / 2 <= target_count)
+  while ((encL_count + encR_count) / 2 <= tEncodeVal)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -340,20 +335,16 @@ void rotateLeft(double angle)
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
-  // reset encoder ticks
-  resetEnc();
 }
 
 void rotateRight2(double angle) // doesn't really work but I'll leave it here
 {
-  //Store current encoder value
-  int fLval = encL_count;
-  int fRval = encR_count;
+  // reset encoder ticks
+  resetEnc();
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double L_tEncodeVal = fLval + angle * 4.42; //4.46; for brakes: //- 35;  // 38
-  double R_tEncodeVal = fRval + angle * 4.42; //4.46; for brakes: //- 36;  // 33
+  double tEncodeVal = angle * 4.42; //4.46; for brakes: //- 35;  // 38
 
   // set multiplier for motor speed direction
   leftSign = -1;
@@ -363,7 +354,7 @@ void rotateRight2(double angle) // doesn't really work but I'll leave it here
   L_prevTime = micros();
   R_prevTime = micros();
 
-  while ((encL_count <= L_tEncodeVal) || (encR_count <= R_tEncodeVal))
+  while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -376,27 +367,24 @@ void rotateRight2(double angle) // doesn't really work but I'll leave it here
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
-  // reset encoder ticks
-  resetEnc();
 }
 
 void rotateRight(double angle)
 {
-  //Store current encoder value
-  int curLeftEnc = encL_count;
-  int curRightEnc = encR_count;
-  target_count = (encL_count + encR_count) / 2;
+  // reset encoder ticks
+  resetEnc();
+  double tEncodeVal = 0;
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle <= 50)  // for 45 deg
-    target_count += angle * 4.27;
+    tEncodeVal = angle * 4.27;
   else if (angle <= 90)
-    target_count += angle * 4.41; // 4.42 for paper, 4.41 for arena
+    tEncodeVal = angle * 4.41; // 4.42 for paper, 4.41 for arena
   else if ( 90 < angle <= 180)
-    target_count += angle * 4.54;
+    tEncodeVal = angle * 4.54;
 
   // set multiplier for motor speed direction
   leftSign = -1;
@@ -406,7 +394,7 @@ void rotateRight(double angle)
   L_prevTime = micros();
   R_prevTime = micros();
 
-  while ((encL_count + encR_count) / 2 <= target_count)
+  while ((encL_count + encR_count) / 2 <= tEncodeVal)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -419,8 +407,6 @@ void rotateRight(double angle)
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
-  // reset encoder ticks
-  resetEnc();
 }
 
 #define THRESHOLD 0.5
@@ -509,20 +495,18 @@ void loop() {
   // main robot system loop
   //robotSystem_loop();
 
- // move forward/rotate in small units
-//  for (int i = 0; i < 4; i++) {
-//    // change angle target depending on surface?
-//    //rotateLeft2(20);
-//    //rotateRight(90);
-//    moveForward(50);
-//    leftPIDController.resetPID();
-//    rightPIDController.resetPID();
-//    delay(2000);
-//  }
+  // move forward/rotate in small units
+  for (int i = 0; i < 4; i++) {
+    // change angle target depending on surface?
+    //rotateLeft2(20);
+    //rotateRight(90);
+    moveForward(40);
+    delay(2000);
+  }
 
   // test PID/reading IR sensor data
-//  testInLoop_motorsPID();
-  testInLoop_readingIR();
+  //testInLoop_motorsPID();
+  //testInLoop_readingIR();
 }
 
 void robotSystem_loop() {
