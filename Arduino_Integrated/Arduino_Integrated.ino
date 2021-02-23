@@ -171,7 +171,7 @@ PID rightPIDController(3.66, 2.063, 5.8, 130.0, -130.0); // right starts up fast
 // 90 degree = 14.5275cm
 double oneRevDis = 18.849556; // in cm
 
-bool emergencyBrake = false;
+bool emergencyBrakes = false;
 
 // check for crash while robot is moving
 void checkForCrashCalibration() {
@@ -180,6 +180,11 @@ void checkForCrashCalibration() {
   double dist_D3 = front_D3.getDistance();
 
   // check if robot is too near obstacle in front for emergency stop
+  if ((dist_D1 > 3.0 && dist_D1 < 9.0) ||
+    (dist_D2 > 3.0 && dist_D2 < 9.0) ||
+    (dist_D3 > 3.0 && dist_D3 < 9.0)) {
+      emergencyBrakes = true;
+  }
 
   double dist_S1 = left_S1.getDistance();
   double dist_S2 = left_S2.getDistance();
@@ -229,7 +234,7 @@ void moveForward(double tDistance)
   R_prevTime = micros();
 
   // check if either motor reached the target number of ticks
-  while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
+  while (!emergencyBrakes || (encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
   //while (0.5*(encL_count + encR_count) <= tEncodeVal)
   {
     if (PID::checkPIDCompute()) {
@@ -238,17 +243,23 @@ void moveForward(double tDistance)
       //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
 
       // read IR sensors here
-      checkForAlignmentCalibration();
+      checkForCrashCalibration();
+      // TODO: send IR sensor data to algo?
+      
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
+
+  if (emergencyBrakes) {
+    // TODO: perform recovery action
+  }
 
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
 
-  // TEMPORARY: SEND AFTER EVERY 1 UNIT
-  //sendIRSensorsReadings();
+  // check if robot is aligned
+  checkForAlignmentCalibration();
 }
 void moveBackward(double tDistance)
 {
