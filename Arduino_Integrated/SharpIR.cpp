@@ -92,22 +92,22 @@ double SharpIR::getDistance() {
         distance = 48.0; // median < 101, out of range
       return distance - S1_OFFSET;
 
-  case S2:
+  case S2:  // 30cm=29.7cm, 30-35+cm is bad, 40cm=38~39cm
       // check out of range
-      if (median > 614)
-        distance = 8.0;
-      else if (median >= 301) // 8-18cm
-        distance = -3.3022 + 7509.447/(median+51.4748);
-      else if (median >= 200) // 18-28cm
-        distance = -2.05219 + 6159.744/(median+5.07957);
-      else if (median >= 142) // 28-40cm
-        distance = 5.6118 + 3736.051/(median-33.10736);
-      else if (median >= 128) // 40-45cm
-        distance = median*median*(-0.00298) + 0.44643*median + 36.619;
-      else if (median >= 114) // 45-50cm
-        distance = 60.0 + 420.0/(median-156.0);
+      if (median > 639)
+        distance = 7.0;
+      else if (median >= 539) // 7-9cm
+        distance = -0.02*median + 19.78;
+      else if (median >= 194) // 9-28cm
+        distance = -2.05173 + 6108.373/(median+9.203);
+//      else if (median >= 149) // 28-35cm
+//        distance = 13.7867 + 1962.2/(median-56.3288);
+      else if (median >= 141) // 28-38cm
+        distance = 19.8196 + 818.444/(median-95.765);
+      else if (median >= 105) // 35-50cm
+        distance = median*median*(0.000684) - 0.5175*median + 97.0153;
       else
-        distance = 51.0; // median < 114, out of range
+        distance = 51.0; // median < 105, out of range
       return distance - S2_OFFSET;
       
   case LR:

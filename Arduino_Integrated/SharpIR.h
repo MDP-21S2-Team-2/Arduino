@@ -17,8 +17,8 @@
 #define D1_OFFSET 0 // 3.6
 #define D2_OFFSET 0 // 3.2
 #define D3_OFFSET 0 // 6.2
-#define S1_OFFSET 0 // 5.4
-#define S2_OFFSET 0
+#define S1_OFFSET 0 // 5.2
+#define S2_OFFSET 0 // 5.1
 #define LR_OFFSET 0
 
 #include <Arduino.h>
