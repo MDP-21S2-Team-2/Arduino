@@ -111,32 +111,22 @@ double SharpIR::getDistance() {
       return distance - S2_OFFSET;
       
   case LR:
-      if(median > 550)
+      if(median > 540)
         distance = 13.0; // out of range
-      else if (median >= 539) // 13-15cm
-        distance = 123 - 0.2*median;
-      else if (median >= 499) // 15-20cm
-        distance = 65.7006 + 18567.84/(median-905.1389);
-      else if (median >= 398)  // 20-30cm
-        distance = 69.42099 - 0.09901*median;
-      else if (median >= 353) // 30-35cm
-        distance = 76.17186 - 0.1162*median;
-      else if (median >= 160) // 35-40cm
-        distance = -0.12527 + 12186.82/(median-7.023576);
-      else if (median >= 276) // 40-44cm
-        distance = 0.003888*median*median -2.40388*median + 411.2333;
-      else if (median >= 228) // 44-54cm
-        distance = 0.0019645*median*median -1.19897*median + 225.26526;
-      else if (median >= 204) // 54-60cm
-        distance = 0.0038898*median*median -1.92879*median + 291.5673;
-      else if (median >= 184) // 60-66cm
-        distance = -0.006955*median*median +2.39829*median -139.7925;
-      else if (median >= 169) // 66-72cm
-        distance = 0.0041723*median*median -1.87928*median + 270.48473;
-      else if (median >= 152) // 72-80cm
-        distance = 0.013080*median*median -4.61753*median + 479.73486;
+      else if (median >= 386) // 13-30cm
+        distance = -0.00013*median*median + 0.01436*median + 44.37745;
+      else if (median >= 283) // 30-43cm
+        distance = -5.1981 + 13634.87/median;
+      else if (median >= 245) // 43-50cm
+        distance = 71.6641 + 3443.622/(median-403.436);
+      else if (median >= 179) // 50-70cm
+        distance = 0.001863*median*median - 1.0929*median + 205.8814;
+      else if (median >= 165) // 70-75cm
+        distance = -0.00128*median*median + 0.0577*median + 100.751;
+      else if (median >= 135) // 75-90cm
+        distance = -13.361 + 17255.81/(median+29.6083);
       else
-        distance = 80.0;  // median < 160, out of range
+        distance = 91.0;  // median < 135, out of range
       return distance - LR_OFFSET;
   }
 }
