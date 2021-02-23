@@ -183,7 +183,11 @@ void checkForCrashCalibration() {
   if ((dist_D1 > 3.0 && dist_D1 < 9.0) ||
     (dist_D2 > 3.0 && dist_D2 < 9.0) ||
     (dist_D3 > 3.0 && dist_D3 < 9.0)) {
+      md.setBrakes(BRAKE_L, BRAKE_R);
       emergencyBrakes = true;
+      Serial.write("EMERGENCY ");
+
+      return;
   }
 
   double dist_S1 = left_S1.getDistance();
@@ -234,7 +238,7 @@ void moveForward(double tDistance)
   R_prevTime = micros();
 
   // check if either motor reached the target number of ticks
-  while (!emergencyBrakes || (encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
+  while (!emergencyBrakes && ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal)))
   //while (0.5*(encL_count + encR_count) <= tEncodeVal)
   {
     if (PID::checkPIDCompute()) {
@@ -248,10 +252,13 @@ void moveForward(double tDistance)
       
     }
   }
-  md.setBrakes(BRAKE_L, BRAKE_R);
+  if (!emergencyBrakes)
+    md.setBrakes(BRAKE_L, BRAKE_R);
 
   if (emergencyBrakes) {
     // TODO: perform recovery action
+    Serial.write("EMERGENCY\n");
+    emergencyBrakes = false;
   }
 
   // reset PID
@@ -259,7 +266,7 @@ void moveForward(double tDistance)
   rightPIDController.resetPID();
 
   // check if robot is aligned
-  checkForAlignmentCalibration();
+  //checkForAlignmentCalibration();
 }
 void moveBackward(double tDistance)
 {
@@ -470,7 +477,7 @@ void alignToLeftWall() {
     // abs: is a macro, so should be efficient
     if (abs(difference) <= THRESHOLD) { // very small gap, so stop moving
       //delay(1); // 1ms
-      md.setBrakes(400, 400);
+      md.setBrakes(BRAKE_L, BRAKE_R);
       checkAlignment = false;
     } /*else if (abs(difference) <= THRESHOLD_1) {  // continue aligning at a decreasing speed
       //motorSpeed -= 10;
@@ -515,7 +522,7 @@ void alignToFrontWall_Left() {
     // abs: is a macro, so should be efficient
     if (abs(difference) <= THRESHOLD) { // very small gap, so stop moving
       //delay(1); // 1ms
-      md.setBrakes(400, 400);
+      md.setBrakes(BRAKE_L, BRAKE_R);
       checkAlignment = false;
     } /*else if (abs(difference) <= THRESHOLD_1) {  // continue aligning at a decreasing speed
       //motorSpeed -= 10;
@@ -560,7 +567,7 @@ void alignToFrontWall_Right() {
     // abs: is a macro, so should be efficient
     if (abs(difference) <= THRESHOLD) { // very small gap, so stop moving
       //delay(1); // 1ms
-      md.setBrakes(400, 400);
+      md.setBrakes(BRAKE_L, BRAKE_R);
       checkAlignment = false;
     } /*else if (abs(difference) <= THRESHOLD_1) {  // continue aligning at a decreasing speed
       //motorSpeed -= 10;
@@ -637,7 +644,7 @@ void loop() {
     input = Serial.readString();
     char command = input.charAt(0);
     if (command == 'A')
-      checkForAlignmentCalibration();
+      moveForward(10);
   }
 }
 
