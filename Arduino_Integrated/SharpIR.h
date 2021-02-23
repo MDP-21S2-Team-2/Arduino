@@ -14,11 +14,11 @@
 #define HALF_NUM_SAMPLES 12 // index of median
 
 // physical sensor offsets
-#define D1_OFFSET 0 // 3.6
-#define D2_OFFSET 0 // 3.2
-#define D3_OFFSET 0 // 6.2
-#define S1_OFFSET 0 // 5.2
-#define S2_OFFSET 0 // 5.1
+#define D1_OFFSET 5.0 // 3.6
+#define D2_OFFSET 4.9 // 3.2
+#define D3_OFFSET 5.0 // 6.2
+#define S1_OFFSET 5.2 // 5.2
+#define S2_OFFSET 4.1 // 5.1
 #define LR_OFFSET 0
 
 #include <Arduino.h>

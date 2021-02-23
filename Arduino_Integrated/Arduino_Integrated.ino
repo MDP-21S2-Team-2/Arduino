@@ -158,8 +158,8 @@ void motorL_ISR() {
 // 23 Feb target speed:100 6.31V 2y
 //PID leftPIDController(3.745, 2.068, 4.5 , 130.0, -130); // red
 //PID rightPIDController(3.665, 2.06, 5.5, 130.0, -130.0); // right starts up faster
-// 6.27V 2y
-PID leftPIDController(3.745, 2.064, 4.5 , 130.0, -130); // red
+// 6.27V~6.31V, 2y
+PID leftPIDController(3.745, 2.062, 4.8 , 130.0, -130); // red
 PID rightPIDController(3.66, 2.063, 5.8, 130.0, -130.0); // right starts up faster
 
 
@@ -171,7 +171,26 @@ PID rightPIDController(3.66, 2.063, 5.8, 130.0, -130.0); // right starts up fast
 // 90 degree = 14.5275cm
 double oneRevDis = 18.849556; // in cm
 
-void checkForCalibration() {
+bool emergencyBrake = false;
+
+// check for crash while robot is moving
+void checkForCrashCalibration() {
+  double dist_D1 = front_D1.getDistance();
+  double dist_D2 = front_D2.getDistance();
+  double dist_D3 = front_D3.getDistance();
+
+  // check if robot is too near obstacle in front for emergency stop
+
+  double dist_S1 = left_S1.getDistance();
+  double dist_S2 = left_S2.getDistance();
+  //double dist_LR = right_long.getDistance();
+  
+  // check if robot is aligned on the side or might crash the side
+  
+}
+
+// check when robot is not moving, e.g. after moving forward, after rotating
+void checkForAlignmentCalibration() {
   double dist_D1 = front_D1.getDistance();
   double dist_D2 = front_D2.getDistance();
   double dist_D3 = front_D3.getDistance();
@@ -179,12 +198,18 @@ void checkForCalibration() {
   double dist_S2 = left_S2.getDistance();
   double dist_LR = right_long.getDistance();
 
-  byte* ptr_dist_D1 = (byte*) &dist_D1;
-  byte* ptr_dist_D2 = (byte*) &dist_D2;
-  byte* ptr_dist_D3 = (byte*) &dist_D3;
-  byte* ptr_dist_S1 = (byte*) &dist_S1;
-  byte* ptr_dist_S2 = (byte*) &dist_S2;
-  byte* ptr_dist_LR = (byte*) &dist_LR;
+  // only try to align when within certain range from obstacle in front
+//  if (dist_D1 >= 3.0 && dist_D1 <= 20.0 && dist_D3 >= 3.0 && dist_D3 <= 20.0) { // front left
+//    Serial.write("UWU\n");
+//    alignToFrontWall_Left();
+//  }
+//  if (dist_D1 >= 3.0 && dist_D1 <= 20.0 && dist_D2 >= 3.0 && dist_D2 <= 20.0) { // front right
+//    Serial.write("owo\n");
+//    alignToFrontWall_Right();
+//  }
+  if (dist_S1 >= 3.0 && dist_S1 <= 20.0 && dist_S2 >= 3.0 && dist_S2 <= 20.0) { // left side
+    alignToLeftWall();
+  }
 }
 
 void moveForward(double tDistance)
@@ -213,7 +238,7 @@ void moveForward(double tDistance)
       //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
 
       // read IR sensors here
-      checkForCalibration();
+      checkForAlignmentCalibration();
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
@@ -409,56 +434,144 @@ void rotateRight(double angle)
   rightPIDController.resetPID();
 }
 
-#define THRESHOLD 0.5
+#define THRESHOLD 0.1
+#define HS_THRESHOLD 0.8  // high-speed threshold
+
+#define STATE_DIFFGT0 1
+#define STATE_DIFFLT0 2
 
 // Robot self-calibration: wall alignment
 void alignToLeftWall() {
-  double dist_S1, dist_S2, difference;
-  bool align = true;
   
-  while (align) {
+  // use side sensors for alignment
+  double dist_S1, dist_S2, difference;
+  bool checkAlignment = true;
+
+  // 0: have not started moving; 1: diff > 0; 2: diff < 0
+  char currState = 0, newState = 0;
+  
+  while (checkAlignment) {
     dist_S1 = left_S1.getDistance();
     dist_S2 = left_S2.getDistance();
+
     difference = dist_S1 - dist_S2;
-    
+
     // abs: is a macro, so should be efficient
-    if (abs(difference) < THRESHOLD) {
+    if (abs(difference) <= THRESHOLD) { // very small gap, so stop moving
+      //delay(1); // 1ms
       md.setBrakes(400, 400);
-      align = false;
-    } else if (PID::checkPIDCompute()) {  // continue aligning
+      checkAlignment = false;
+    } /*else if (abs(difference) <= THRESHOLD_1) {  // continue aligning at a decreasing speed
+      //motorSpeed -= 10;
       if (difference > 0) { // tilted to the right; turn left
-        md.setSpeeds(leftPIDController.computePID(calculateRpm(L_timeWidth), alignmentTargetRpm),
-          rightPIDController.computePID(calculateRpm(R_timeWidth), alignmentTargetRpm));
+        md.setSpeeds(20, 20);
       } else {  // tilted to the left; turn right
-        md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), alignmentTargetRpm),
-          -rightPIDController.computePID(calculateRpm(R_timeWidth), alignmentTargetRpm));
+        md.setSpeeds(-20, -20);
+      }
+    } // greater than first threshold
+    */
+    else {
+      newState = (difference > 0) ? STATE_DIFFGT0 : STATE_DIFFLT0;
+      if (currState != newState) {  // change in state
+        // set new speed
+        if (abs(difference) > HS_THRESHOLD) {
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(100, 100); // tilted to the right; turn left
+          else  md.setSpeeds(-100, -100); // tilted to the left; turn right
+        } else {
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(70, 70); // tilted to the right; turn left
+          else  md.setSpeeds(-70, -70); // tilted to the left; turn right
+        }
+        currState = newState;
       }
     }
   }
 }
 
 void alignToFrontWall_Left() {
-  // use front-left (D3) and front-mid (D2) for alignment
-  double dist_D2, dist_D3, difference;
-  bool align = true;
+  // use front-left (D3) and front-mid (D1) for alignment
+  double dist_D1, dist_D3, difference;
+  bool checkAlignment = true;
+
+  // 0: have not started moving; 1: diff > 0; 2: diff < 0
+  char currState = 0, newState = 0;
   
-  while (align) {
-    dist_D2 = front_D2.getDistance();
+  while (checkAlignment) {
+    dist_D1 = front_D1.getDistance();
     dist_D3 = front_D3.getDistance();
 
-    difference = dist_D2 - dist_D3;
-    
+    difference = dist_D1 - dist_D3;
+
     // abs: is a macro, so should be efficient
-    if (abs(difference) < THRESHOLD) {
+    if (abs(difference) <= THRESHOLD) { // very small gap, so stop moving
+      //delay(1); // 1ms
       md.setBrakes(400, 400);
-      align = false;
-    } else if (PID::checkPIDCompute()) {  // continue aligning
+      checkAlignment = false;
+    } /*else if (abs(difference) <= THRESHOLD_1) {  // continue aligning at a decreasing speed
+      //motorSpeed -= 10;
       if (difference > 0) { // tilted to the right; turn left
-        md.setSpeeds(leftPIDController.computePID(calculateRpm(L_timeWidth), alignmentTargetRpm),
-          rightPIDController.computePID(calculateRpm(R_timeWidth), alignmentTargetRpm));
+        md.setSpeeds(20, 20);
       } else {  // tilted to the left; turn right
-        md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), alignmentTargetRpm),
-          -rightPIDController.computePID(calculateRpm(R_timeWidth), alignmentTargetRpm));
+        md.setSpeeds(-20, -20);
+      }
+    } // greater than first threshold
+    */
+    else {
+      newState = (difference > 0) ? STATE_DIFFGT0 : STATE_DIFFLT0;
+      if (currState != newState) {  // change in state
+        // set new speed
+        if (abs(difference) > HS_THRESHOLD) {
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(100, 100); // tilted to the right; turn left
+          else  md.setSpeeds(-100, -100); // tilted to the left; turn right
+        } else {
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(70, 70); // tilted to the right; turn left
+          else  md.setSpeeds(-70, -70); // tilted to the left; turn right
+        }
+        currState = newState;
+      }
+    }
+  }
+}
+
+void alignToFrontWall_Right() {
+  // use front-right (D2) and front-mid (D1) for alignment
+  double dist_D1, dist_D2, difference;
+  bool checkAlignment = true;
+
+  // 0: have not started moving; 1: diff > 0; 2: diff < 0
+  char currState = 0, newState = 0;
+  
+  while (checkAlignment) {
+    dist_D1 = front_D1.getDistance();
+    dist_D2 = front_D2.getDistance();
+
+    difference = dist_D2 - dist_D1;
+
+    // abs: is a macro, so should be efficient
+    if (abs(difference) <= THRESHOLD) { // very small gap, so stop moving
+      //delay(1); // 1ms
+      md.setBrakes(400, 400);
+      checkAlignment = false;
+    } /*else if (abs(difference) <= THRESHOLD_1) {  // continue aligning at a decreasing speed
+      //motorSpeed -= 10;
+      if (difference > 0) { // tilted to the right; turn left
+        md.setSpeeds(20, 20);
+      } else {  // tilted to the left; turn right
+        md.setSpeeds(-20, -20);
+      }
+    } // greater than first threshold
+    */
+    else {
+      newState = (difference > 0) ? STATE_DIFFGT0 : STATE_DIFFLT0;
+      if (currState != newState) {  // change in state
+        // set new speed
+        if (abs(difference) > HS_THRESHOLD) {
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(100, 100); // tilted to the right; turn left
+          else  md.setSpeeds(-100, -100); // tilted to the left; turn right
+        } else {
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(70, 70); // tilted to the right; turn left
+          else  md.setSpeeds(-70, -70); // tilted to the left; turn right
+        }
+        currState = newState;
       }
     }
   }
@@ -496,17 +609,25 @@ void loop() {
   //robotSystem_loop();
 
   // move forward/rotate in small units
-  for (int i = 0; i < 4; i++) {
-    // change angle target depending on surface?
-    //rotateLeft2(20);
-    //rotateRight(90);
-    moveForward(40);
-    delay(2000);
-  }
+//  for (int i = 0; i < 4; i++) {
+//    delay(2000);
+//    // change angle target depending on surface?
+//    rotateLeft2(90);
+//    //rotateRight(90);
+//    //moveForward(10);
+//    delay(500);
+//  }
 
   // test PID/reading IR sensor data
   //testInLoop_motorsPID();
   //testInLoop_readingIR();
+
+  if (Serial.available() > 0) {
+    input = Serial.readString();
+    char command = input.charAt(0);
+    if (command == 'A')
+      checkForAlignmentCalibration();
+  }
 }
 
 void robotSystem_loop() {
@@ -637,8 +758,12 @@ void testInLoop_readingIR() {
 
   //Serial.println(front_D1.getDistance());
   // Serial.println(front_D2.getDistance());
-  Serial.print("Side, front: ");
-  Serial.println(left_S2.getDistance());
+  Serial.print("Front Right (D1): ");
+  Serial.print(front_D1.getDistance());
+  Serial.print(" | Front Mid (D2): ");
+  Serial.print(front_D2.getDistance());
+  Serial.print(" | Front Left (D3): ");
+  Serial.println(front_D3.getDistance());
 
 //    Serial.print("Front, right: ");
 //    Serial.println(front_D1.getDistance());
