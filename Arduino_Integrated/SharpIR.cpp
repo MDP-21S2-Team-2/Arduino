@@ -131,8 +131,8 @@ double SharpIR::getDistance() {
   }
 }
 
-#define NUM_MEDIANS 5 // NUM_SAMPLES / 5
-#define HALF_NUM_MEDIANS 2  // NUM_MEDIANS / 2
+#define NUM_MEDIANS 3 // NUM_SAMPLES / 5
+#define HALF_NUM_MEDIANS 1  // NUM_MEDIANS / 2
 
 int SharpIR::medianOfMedians(int a[], int size){
   int ans;

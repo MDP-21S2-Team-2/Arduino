@@ -10,16 +10,16 @@
 //#define MEDIAN_FILTER
 #define MEDOFMEDIANS_FILTER
 
-#define NUM_SAMPLES 25  // for median filter: read odd no. times
-#define HALF_NUM_SAMPLES 12 // index of median
+#define NUM_SAMPLES 15  // for median filter: read odd no. times
+#define HALF_NUM_SAMPLES 7 // index of median
 
 // physical sensor offsets
 #define D1_OFFSET 5.0 // 3.6
 #define D2_OFFSET 4.9 // 3.2
 #define D3_OFFSET 5.0 // 6.2
 #define S1_OFFSET 5.2 // 5.2
-#define S2_OFFSET 4.1 // 5.1
-#define LR_OFFSET 0
+#define S2_OFFSET 5.1 // 5.1
+#define LR_OFFSET 9.9
 
 #include <Arduino.h>
 

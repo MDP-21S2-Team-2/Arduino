@@ -44,13 +44,14 @@ volatile unsigned long R_timeWidth = 0;
 
 // target speed for motors to reach
 //const int targetPulseWidth = 821; //rpm=100: 1067;//rpm=130: 821;  // 60 / 130 / 562.25 * 1000000.0;
-//double targetRpm = 125.0; // 100.0;
-double targetRpm = 100.0;
-double alignmentTargetRpm = 50.0;
 //double targetDuration = 0.46154;  // for 1 rpm
 
-int leftSign = 1;
-int rightSign = 1;
+// 125 RPM
+#define targetRpm 125.0
+#define MOVE_OFFTICKS 24
+// 100 RPM
+//#define targetRpm 100.0
+//#define MOVE_OFFTICKS 20
 
 double calculateRpm(int pulseWidth) {
   if (pulseWidth == 0)
@@ -159,15 +160,19 @@ void motorL_ISR() {
 //PID leftPIDController(3.745, 2.068, 4.5 , 130.0, -130); // red
 //PID rightPIDController(3.665, 2.06, 5.5, 130.0, -130.0); // right starts up faster
 // 6.27V~6.31V, 2y
-PID leftPIDController(3.745, 2.062, 4.8 , 130.0, -130); // red
-PID rightPIDController(3.66, 2.063, 5.8, 130.0, -130.0); // right starts up faster
+//PID leftPIDController(3.745, 2.062, 4.8 , 130.0, -130); // red
+//PID rightPIDController(3.66, 2.063, 5.8, 130.0, -130.0); // right starts up faster
+
+// 24 Feb target speed: 125 6.26V 2y
+PID leftPIDController(3.8, 2.6, 0.7, 130.0, -130); // red
+PID rightPIDController(3.7, 2.57, 0.65, 130.0, -130.0); // right starts up faster
 
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
-//double rightWheelDiameter = 6.0;  // in cm
+//double rightWheelDiameter = 6.0;  // in cLLm
 //Wheel to wheel distance = 18.5cm
-//Circumference of whole robot = 58.11cm
+//Circumference of whole robot m= 58.11cm
 // 90 degree = 14.5275cm
 double oneRevDis = 18.849556; // in cm
 
@@ -192,7 +197,7 @@ void checkForCrashCalibration() {
 
   double dist_S1 = left_S1.getDistance();
   double dist_S2 = left_S2.getDistance();
-  //double dist_LR = right_long.getDistance();
+  //double dist_LR = right_long.getDistance();  // can use to check if veering too close to a wall on the right?
   
   // check if robot is aligned on the side or might crash the side
   
@@ -208,17 +213,15 @@ void checkForAlignmentCalibration() {
   double dist_LR = right_long.getDistance();
 
   // only try to align when within certain range from obstacle in front
-//  if (dist_D1 >= 3.0 && dist_D1 <= 20.0 && dist_D3 >= 3.0 && dist_D3 <= 20.0) { // front left
-//    Serial.write("UWU\n");
-//    alignToFrontWall_Left();
-//  }
+  if (dist_D1 >= 3.0 && dist_D1 <= 20.0 && dist_D3 >= 3.0 && dist_D3 <= 20.0) { // front left
+    alignToFrontWall_Left();
+  }
 //  if (dist_D1 >= 3.0 && dist_D1 <= 20.0 && dist_D2 >= 3.0 && dist_D2 <= 20.0) { // front right
-//    Serial.write("owo\n");
 //    alignToFrontWall_Right();
 //  }
-  if (dist_S1 >= 3.0 && dist_S1 <= 20.0 && dist_S2 >= 3.0 && dist_S2 <= 20.0) { // left side
-    alignToLeftWall();
-  }
+//  if (dist_S1 >= 3.0 && dist_S1 <= 20.0 && dist_S2 >= 3.0 && dist_S2 <= 20.0) { // left side
+//    alignToLeftWall();
+//  }
 }
 
 void moveForward(double tDistance)
@@ -227,11 +230,7 @@ void moveForward(double tDistance)
   resetEnc();
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double tEncodeVal = tDistance / oneRevDis * 562.25 - 20; // brakes
-
-  // set multiplier for motor speed direction
-  leftSign = -1;
-  rightSign = 1;
+  double tEncodeVal = tDistance / oneRevDis * 562.25 - MOVE_OFFTICKS;
 
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
@@ -247,7 +246,7 @@ void moveForward(double tDistance)
       //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
 
       // read IR sensors here
-      checkForCrashCalibration();
+      //checkForCrashCalibration();
       // TODO: send IR sensor data to algo?
       
     }
@@ -255,11 +254,11 @@ void moveForward(double tDistance)
   if (!emergencyBrakes)
     md.setBrakes(BRAKE_L, BRAKE_R);
 
-  if (emergencyBrakes) {
-    // TODO: perform recovery action
-    Serial.write("EMERGENCY\n");
-    emergencyBrakes = false;
-  }
+//  if (emergencyBrakes) {
+//    // TODO: perform recovery action
+//    Serial.write("EMERGENCY\n");
+//    emergencyBrakes = false;
+//  }
 
   // reset PID
   leftPIDController.resetPID();
@@ -274,11 +273,7 @@ void moveBackward(double tDistance)
   resetEnc();
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double tEncodeVal = tDistance / oneRevDis * 562.25 - 20; //- 36;  // 33
-
-  // set multiplier for motor speed direction
-  leftSign = 1;
-  rightSign = -1;
+  double tEncodeVal = tDistance / oneRevDis * 562.25 - MOVE_OFFTICKS - 6; //- 36;  // 33
 
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
@@ -315,13 +310,9 @@ void rotateLeft2(double angle) {
   // 4.42 FKING SOLID 11 FEB 6.34V TUNING
     tEncodeVal += angle * 4.42;
   }
-  else if (angle <= 180) {
+  else if (angle <= 181) {
     tEncodeVal += angle * 4.51;
   }
-
-  // set multiplier for motor speed direction
-  leftSign = 1;
-  rightSign = 1;
 
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
@@ -352,14 +343,10 @@ void rotateLeft(double angle)
   // reduce tEncodeVal by no. ticks needed for braking
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
-  if (angle <= 90)
-    tEncodeVal = angle * 4.41;
+  if (angle <= 91)
+    tEncodeVal = angle * 4.33;  // 4.41: 100 RPM
   else if ( 90 < angle <= 180)
-    tEncodeVal = angle * 4.65;
-
-  // set multiplier for motor speed direction
-  leftSign = 1;
-  rightSign = 1;
+    tEncodeVal = angle * 4.5;  // 4.65
 
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
@@ -388,10 +375,6 @@ void rotateRight2(double angle) // doesn't really work but I'll leave it here
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
   double tEncodeVal = angle * 4.42; //4.46; for brakes: //- 35;  // 38
-
-  // set multiplier for motor speed direction
-  leftSign = -1;
-  rightSign = -1;
 
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
@@ -424,14 +407,10 @@ void rotateRight(double angle)
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle <= 50)  // for 45 deg
     tEncodeVal = angle * 4.27;
-  else if (angle <= 90)
-    tEncodeVal = angle * 4.41; // 4.42 for paper, 4.41 for arena
-  else if ( 90 < angle <= 180)
-    tEncodeVal = angle * 4.54;
-
-  // set multiplier for motor speed direction
-  leftSign = -1;
-  rightSign = -1;
+  else if (angle <= 91)
+    tEncodeVal = angle * 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
+  else if (angle <= 181)
+    tEncodeVal = angle * 4.48;
 
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
@@ -623,29 +602,35 @@ void setup() {
 
 void loop() {
 
+  //sendIRSensorsReadings();
+  //delay(1000);
+
   // main robot system loop
   //robotSystem_loop();
 
   // move forward/rotate in small units
-//  for (int i = 0; i < 4; i++) {
-//    delay(2000);
-//    // change angle target depending on surface?
-//    rotateLeft2(90);
-//    //rotateRight(90);
-//    //moveForward(10);
-//    delay(500);
-//  }
+  for (int i = 0; i < 4; i++) {
+    delay(2000);
+    // change angle target depending on surface?
+    //rotateLeft(90);
+    //rotateRight(90);
+    //rotateLeft(180);  // left is better
+    rotateRight(180);
+    //moveForward(10);
+    //moveBackward(10);
+    delay(500);
+  }
 
   // test PID/reading IR sensor data
   //testInLoop_motorsPID();
   //testInLoop_readingIR();
 
-  if (Serial.available() > 0) {
-    input = Serial.readString();
-    char command = input.charAt(0);
-    if (command == 'A')
-      moveForward(10);
-  }
+//  if (Serial.available() > 0) {
+//    input = Serial.readString();
+//    char command = input.charAt(0);
+//    if (command == 'A')
+//      moveForward(10);
+//  }
 }
 
 void robotSystem_loop() {
@@ -663,7 +648,7 @@ void robotSystem_loop() {
 
       // check remaining characters as it's possible to be commanded to move >=10 units
       input.trim();
-      int numUnits = input.substring(1).toInt();
+      int numUnits = input.substring(1).toInt();  // TODO: probably super slow
       moveForward(numUnits * 10);
 
       // TODO: compare the performance of using String toInt() instead      
@@ -730,11 +715,6 @@ void sendEncoderTicks() {
   Serial.write("\n");
 }
 
-typedef union {
- double floatingPoint;
- byte binary[4];
-} binaryFloat;
-
 void sendIRSensorsReadings() {
 
   double dist_D1 = front_D1.getDistance();
@@ -744,6 +724,7 @@ void sendIRSensorsReadings() {
   double dist_S2 = left_S2.getDistance();
   double dist_LR = right_long.getDistance();
 
+  // 296~308 micros
   byte* ptr_dist_D1 = (byte*) &dist_D1;
   byte* ptr_dist_D2 = (byte*) &dist_D2;
   byte* ptr_dist_D3 = (byte*) &dist_D3;
@@ -751,44 +732,38 @@ void sendIRSensorsReadings() {
   byte* ptr_dist_S2 = (byte*) &dist_S2;
   byte* ptr_dist_LR = (byte*) &dist_LR;
 
-  //binaryFloat
+  Serial.write("IR,");
+  Serial.write(ptr_dist_D1, 4);
+  Serial.write(",");
+  Serial.write(ptr_dist_D2, 4);
+  Serial.write(",");
+  Serial.write(ptr_dist_D3, 4);
+  Serial.write(",");
+  Serial.write(ptr_dist_S1, 4);
+  Serial.write(",");
+  Serial.write(ptr_dist_S2, 4);
+  Serial.write(",");
+  Serial.write(ptr_dist_LR, 4);
+  Serial.write('\n');
 
-//  Serial.write("IR,");
-//  Serial.write(ptr_dist_D1, 4);
-//  Serial.write(",");
-//  Serial.write(ptr_dist_D2, 4);
-//  Serial.write(",");
-//  Serial.write(ptr_dist_D3, 4);
-//  Serial.write(",");
-//  Serial.write(ptr_dist_S1, 4);
-//  Serial.write(",");
-//  Serial.write(ptr_dist_S2, 4);
-//  Serial.write(",");
-//  Serial.write(ptr_dist_LR, 4);
-//  Serial.write('\n');
-
-// TEMPORARY DUMMY VALUES
-Serial.write("IR,10.0,10.0,10.0,10.0,10.0,10.0\n");
+  // TEMPORARY DUMMY VALUES
+  //Serial.write("IR,10.0,10.0,10.0,10.0,10.0,10.0\n");
 }
 
 void testInLoop_readingIR() {
   //delay(100);
 
-  //Serial.println(front_D1.getDistance());
-  // Serial.println(front_D2.getDistance());
-  Serial.print("Front Right (D1): ");
-  Serial.print(front_D1.getDistance());
-  Serial.print(" | Front Mid (D2): ");
+  Serial.print("Front Right (D2): ");
   Serial.print(front_D2.getDistance());
+  Serial.print(" | Front Mid (D1): ");
+  Serial.print(front_D1.getDistance());
   Serial.print(" | Front Left (D3): ");
   Serial.println(front_D3.getDistance());
 
-//    Serial.print("Front, right: ");
-//    Serial.println(front_D1.getDistance());
-//    Serial.print("Front, middle: ");
-//    Serial.println(front_D2.getDistance());
-  //Serial.println(left_S1.getDistance());
-  //Serial.println(left_S2.getDistance());
+//  Serial.print("Side, front: ");
+//  Serial.print(left_S1.getDistance());
+//  Serial.print(" | Side, back: ");
+//  Serial.println(left_S2.getDistance());
   
 
   //Serial.println(front_D3.getDistance());
