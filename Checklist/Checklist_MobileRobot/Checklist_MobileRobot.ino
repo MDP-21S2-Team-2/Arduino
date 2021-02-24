@@ -131,8 +131,12 @@ void motorL_ISR() {
 
 
 // 19 Feb target speed:100 6.39V 2y
-PID leftPIDController(0.961, 2.045, 1.0, 130.0, -130); // red
-PID rightPIDController(0.7, 2.017, 2.0, 130.0, -130.0); // right starts up faster
+//PID leftPIDController(0.961, 2.045, 1.0, 130.0, -130); // red
+//PID rightPIDController(0.7, 2.017, 2.0, 130.0, -130.0); // right starts up faster
+
+// 24 Feb target speed:100 6.21V 1y1w
+PID leftPIDController(3.23, 2.058, 5.6, 130.0, -130); // red
+PID rightPIDController(3.34, 2.065, 5.7, 130.0, -130.0); // right starts up faster
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
@@ -149,8 +153,8 @@ void moveForward(double tDistance)
   int fRval = encR_count;
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double L_tEncodeVal = fLval + tDistance / oneRevDis * 562.25; //- 35;  // 38
-  double R_tEncodeVal = fRval + tDistance / oneRevDis * 562.25; //- 36;  // 33
+  double L_tEncodeVal = fLval + tDistance / oneRevDis * 562.25 - 20; //- 35;  // 38
+  double R_tEncodeVal = fRval + tDistance / oneRevDis * 562.25 - 20; //- 36;  // 33
 
   // set multiplier for motor speed direction
   leftSign = -1;
@@ -437,7 +441,7 @@ void obstacleAvoidance() {
   resetEnc();
   
   // 3. move forward (diagonal)
-  moveForward(38.89);
+  moveForward(40.65); // 38.89
   delay(1000);
   // reset PID and encoders
   leftPIDController.resetPID();
@@ -456,7 +460,7 @@ void obstacleAvoidance() {
   resetEnc();
 
   // 5. move forward (diagonal)
-  moveForward(38.89);
+  moveForward(40.65); // 38.89
   delay(2000);
   // reset PID and encoders
   leftPIDController.resetPID();
@@ -478,7 +482,7 @@ void obstacleAvoidance() {
   /// let's take total length of line to be 150cm
   /// also, the robot stopped about 2 units before the obstacle, and ended 2 units after the obstacle
   /// the obstacle is 1 unit. Therefore, total the robot also covered additional 5 units = 50cm
-  double remainingDist = 150 - 50 - dist;
+  double remainingDist = 80 - 50 - dist;
   
   // 7. move forward only if there is remaining distance
   if (remainingDist > 0)
@@ -624,7 +628,6 @@ void testInLoop_motorsPID() {
 
     double R_rpm = calculateRpm(R_timeWidth);
     double L_rpm = calculateRpm(L_timeWidth);
-
     Serial.print(R_rpm);
     Serial.print(",");
     Serial.println(L_rpm);
@@ -660,13 +663,13 @@ void loop() {
 //  }
 
   // test PID/reading IR sensor data
-  //testInLoop_motorsPID();
-  testInLoop_readingIR();
+//  testInLoop_motorsPID();
+//  testInLoop_readingIR();
 
   if (runProgram) {
     // Checklist: Move Forward 
     //moveForward(120);
-    // Checklist: Obstacle Avoidance
+//     Checklist: Obstacle Avoidance
     obstacleAvoidance();
 
 // Checkist: Rotation

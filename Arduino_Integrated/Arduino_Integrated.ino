@@ -163,9 +163,9 @@ void motorL_ISR() {
 //PID leftPIDController(3.745, 2.062, 4.8 , 130.0, -130); // red
 //PID rightPIDController(3.66, 2.063, 5.8, 130.0, -130.0); // right starts up faster
 
-// 24 Feb target speed: 125 6.26V 2y
-PID leftPIDController(3.8, 2.6, 0.7, 130.0, -130); // red
-PID rightPIDController(3.7, 2.57, 0.65, 130.0, -130.0); // right starts up faster
+// 24 Feb target speed: 125 6.26V 1y1w
+PID leftPIDController(3.8, 2.6, 5.2, 130.0, -130); // red
+PID rightPIDController(3.55, 2.6, 5.3, 130.0, -130.0); // right starts up faster
 
 
 // Distance Function
@@ -184,7 +184,7 @@ void checkForCrashCalibration() {
   double dist_D2 = front_D2.getDistance();
   double dist_D3 = front_D3.getDistance();
 
-  // check if robot is too near obstacle in front for emergency stop
+  // check if robot is too near to the obstacle in front, for emergency stop
   if ((dist_D1 > 3.0 && dist_D1 < 9.0) ||
     (dist_D2 > 3.0 && dist_D2 < 9.0) ||
     (dist_D3 > 3.0 && dist_D3 < 9.0)) {
@@ -222,6 +222,19 @@ void checkForAlignmentCalibration() {
 //  if (dist_S1 >= 3.0 && dist_S1 <= 20.0 && dist_S2 >= 3.0 && dist_S2 <= 20.0) { // left side
 //    alignToLeftWall();
 //  }
+}
+
+void alignBack_FrontMid() {
+  
+  // use side sensors for alignment
+  double dist_D1 = 2.0;
+
+  md.setSpeeds(100, -100);
+  
+  while (dist_D1 < 9.0) {
+    dist_D1 = front_D1.getDistance();
+  }
+  md.setBrakes(BRAKE_L, BRAKE_R);
 }
 
 void moveForward(double tDistance)
@@ -273,7 +286,7 @@ void moveBackward(double tDistance)
   resetEnc();
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double tEncodeVal = tDistance / oneRevDis * 562.25 - MOVE_OFFTICKS - 6; //- 36;  // 33
+  double tEncodeVal = tDistance / oneRevDis * 562.25 - MOVE_OFFTICKS - 12; //- 36;  // 33
 
   // reset prevTime to get more accurate timeWidth
   L_prevTime = micros();
@@ -431,7 +444,7 @@ void rotateRight(double angle)
   rightPIDController.resetPID();
 }
 
-#define THRESHOLD 0.1
+#define THRESHOLD 0.05
 #define HS_THRESHOLD 0.8  // high-speed threshold
 
 #define STATE_DIFFGT0 1
@@ -600,38 +613,7 @@ void setup() {
   R_prevTime = L_prevTime;
 }
 
-void loop() {
 
-  //sendIRSensorsReadings();
-  //delay(1000);
-
-  // main robot system loop
-  //robotSystem_loop();
-
-  // move forward/rotate in small units
-  for (int i = 0; i < 4; i++) {
-    delay(2000);
-    // change angle target depending on surface?
-    //rotateLeft(90);
-    //rotateRight(90);
-    //rotateLeft(180);  // left is better
-    rotateRight(180);
-    //moveForward(10);
-    //moveBackward(10);
-    delay(500);
-  }
-
-  // test PID/reading IR sensor data
-  //testInLoop_motorsPID();
-  //testInLoop_readingIR();
-
-//  if (Serial.available() > 0) {
-//    input = Serial.readString();
-//    char command = input.charAt(0);
-//    if (command == 'A')
-//      moveForward(10);
-//  }
-}
 
 void robotSystem_loop() {
 
@@ -753,23 +735,20 @@ void sendIRSensorsReadings() {
 void testInLoop_readingIR() {
   //delay(100);
 
-  Serial.print("Front Right (D2): ");
-  Serial.print(front_D2.getDistance());
-  Serial.print(" | Front Mid (D1): ");
-  Serial.print(front_D1.getDistance());
-  Serial.print(" | Front Left (D3): ");
-  Serial.println(front_D3.getDistance());
+//  Serial.print("Front Right (D2): ");
+//  Serial.print(front_D2.getDistance());
+//  Serial.print(" | Front Mid (D1): ");
+//  Serial.print(front_D1.getDistance());
+//  Serial.print(" | Front Left (D3): ");
+//  Serial.println(front_D3.getDistance());
 
 //  Serial.print("Side, front: ");
 //  Serial.print(left_S1.getDistance());
 //  Serial.print(" | Side, back: ");
 //  Serial.println(left_S2.getDistance());
-  
 
-  //Serial.println(front_D3.getDistance());
-  //Serial.println(left_S1.getDistance());
-  //Serial.println(left_S2.getDistance());
-//  Serial.println(right_long.getDistance());
+  Serial.print("Right Long: ");
+  Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
   //
 }
@@ -803,5 +782,43 @@ void testInLoop_motorsPID() {
     md.setM1Speed(-leftPIDController.computePID(L_rpm, targetRpm));
     md.setM2Speed(rightPIDController.computePID(R_rpm, targetRpm));
     //md.setSpeeds(-leftPIDController.computePID(L_rpm, targetRpm), rightPIDController.computePID(R_rpm, targetRpm));
+  }
+}
+void loop() {
+
+  //sendIRSensorsReadings();
+  //delay(1000);
+
+  // main robot system loop
+  //robotSystem_loop();
+
+  // move forward/rotate in small units
+//  while (true) {
+//    delay(2000);
+//    // change angle target depending on surface?
+//    //moveForward(10);
+//    //rotateLeft(90);
+//    //rotateRight(90);
+//    //rotateLeft(180);  // left is better
+//    //rotateRight(180);
+//    moveForward(20);
+//    delay(2000);
+//    moveBackward(20);
+//    delay(500);
+//  }
+
+  // test PID/reading IR sensor data
+      //testInLoop_motorsPID();
+//    testInLoop_readingIR();
+
+  if (Serial.available() > 0) {
+    input = Serial.readString();
+    char command = input.charAt(0);
+    if (command == 'A')
+      //moveForward(10);
+      alignBack_FrontMid();
+      
+    // check align - cannot call in alignBack, as we do not know which sensor(s) to use for alignment
+    alignToFrontWall_Left();
   }
 }
