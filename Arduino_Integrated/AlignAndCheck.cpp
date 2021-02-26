@@ -17,39 +17,39 @@ void checkForCrashCalibration() {
   double dist_D3 = front_D3.getDistance();
 
   // check if robot is too near to any obstacle in front, for emergency stop
-  if ((/*dist_D1 > 3.0 &&*/ dist_D1 < D1_EXPECTED_DIST + 3.0) ||  // offset to account for robot's speed
-    (/*dist_D2 > 3.0 &&*/ dist_D2 < D2_EXPECTED_DIST + 3.0) ||
-    (/*dist_D3 > 3.0 &&*/ dist_D3 < D3_EXPECTED_DIST + 3.0)) 
+  if ((/*dist_D1 > 3.0 &&*/ dist_D1 < D1_EXPECTED_DIST + 1.0) ||  // offset to account for robot's speed
+    (/*dist_D2 > 3.0 &&*/ dist_D2 < D2_EXPECTED_DIST + 1.0) ||
+    (/*dist_D3 > 3.0 &&*/ dist_D3 < D3_EXPECTED_DIST + 1.0)) 
     {
       md.setBrakes(BRAKE_L, BRAKE_R);
       emergencyBrakes = true;
-      Serial.write("EMERGENCY ");
+      //Serial.write("EMERGENCY ");
       return; // stop checking
     }
-  double dist_S1 = left_S1.getDistance();
-  double dist_S2 = left_S2.getDistance();
+//  double dist_S1 = left_S1.getDistance();
+//  double dist_S2 = left_S2.getDistance();
   //double dist_LR = right_long.getDistance();  // can use to check if veering too close to a wall on the right?
   
   // check if robot is aligned on the side or might crash the side
-  if ((dist_S1 > 3.0 && dist_S1 < 23.0) &&  // check if robot is near the wall
-    (dist_S2 > 3.0 && dist_S2 < 23.0) &&    // check if robot is near the wall
-    (abs(dist_S1 - dist_S2) >= 1.5)) 
-    {  // robot is veering too much to the side, sensors' diff is 1.5cm
-      // recovery action
-      md.setBrakes(BRAKE_L, BRAKE_R);
-      // store current encoder values (before extra ticks are added for recovery action)
-      int encL = encL_count;
-      int encR = encR_count;
-      // get robot to align to left wall
-      alignToLeftWall();
-      delay(10);  // to ensure robot has already braked; TODO: time to delay TBD
-      // reset PID
-      leftPIDController.resetPID();
-      rightPIDController.resetPID();
-      // restore back the encoder counts to recover remaining distance
-      encL_count = encL;
-      encR_count = encR;
-    }
+//  if ((dist_S1 > 3.0 && dist_S1 < 23.0) &&  // check if robot is near the wall
+//    (dist_S2 > 3.0 && dist_S2 < 23.0) &&    // check if robot is near the wall
+//    (abs(dist_S1 - dist_S2) >= 2.5))
+//    {  // robot is veering too much to the side, sensors' diff is 1.5cm
+//      // recovery action
+//      md.setBrakes(BRAKE_L, BRAKE_R);
+//      // store current encoder values (before extra ticks are added for recovery action)
+//      int encL = encL_count;
+//      int encR = encR_count;
+//      // get robot to align to left wall
+//      alignToLeftWall();
+//      delay(10);  // to ensure robot has already braked; TODO: time to delay TBD
+//      // reset PID
+//      leftPIDController.resetPID();
+//      rightPIDController.resetPID();
+//      // restore back the encoder counts to recover remaining distance
+//      encL_count = encL;
+//      encR_count = encR;
+//    }
 }
 
 
@@ -63,12 +63,12 @@ void checkForAlignmentCalibration_initial() {
 //  double dist_S1 = left_S1.getDistance();
 //  double dist_S2 = left_S2.getDistance();
 //  double dist_LR = right_long.getDistance();
-  Serial.print(dist_D1);
-  Serial.write(",");
-  Serial.print(dist_D2);
-  Serial.write(",");
-  Serial.print(dist_D3);
-  Serial.write("\n");
+//  Serial.print(dist_D1);
+//  Serial.write(",");
+//  Serial.print(dist_D2);
+//  Serial.write(",");
+//  Serial.print(dist_D3);
+//  Serial.write("\n");
 
 // check for ideal distance from obstacle
   // check if too near to the wall in front
@@ -86,12 +86,12 @@ void checkForAlignmentCalibration_initial() {
   dist_D1 = front_D1.getDistance();
   dist_D2 = front_D2.getDistance();
   dist_D3 = front_D3.getDistance();
-  Serial.print(dist_D1);
-  Serial.write(",");
-  Serial.print(dist_D2);
-  Serial.write(",");
-  Serial.print(dist_D3);
-  Serial.write("\n");
+//  Serial.print(dist_D1);
+//  Serial.write(",");
+//  Serial.print(dist_D2);
+//  Serial.write(",");
+//  Serial.print(dist_D3);
+//  Serial.write("\n");
   
   // check if too far from the wall in front
   if (dist_D1 > FRONT_INITIAL_EXPECTED_DIST) { // front-mid sensor
@@ -108,12 +108,12 @@ void checkForAlignmentCalibration_initial() {
   dist_D1 = front_D1.getDistance();
   dist_D2 = front_D2.getDistance();
   dist_D3 = front_D3.getDistance();
-  Serial.print(dist_D1);
-  Serial.write(",");
-  Serial.print(dist_D2);
-  Serial.write(",");
-  Serial.print(dist_D3);
-  Serial.write("\n");
+//  Serial.print(dist_D1);
+//  Serial.write(",");
+//  Serial.print(dist_D2);
+//  Serial.write(",");
+//  Serial.print(dist_D3);
+//  Serial.write("\n");
   
 // align robot to be straight
   // front right
@@ -135,12 +135,12 @@ void checkForAlignmentCalibration_initial() {
   dist_D1 = front_D1.getDistance();
   dist_D2 = front_D2.getDistance();
   dist_D3 = front_D3.getDistance();
-  Serial.print(dist_D1);
-  Serial.write(",");
-  Serial.print(dist_D2);
-  Serial.write(",");
-  Serial.print(dist_D3);
-  Serial.write("\n");
+//  Serial.print(dist_D1);
+//  Serial.write(",");
+//  Serial.print(dist_D2);
+//  Serial.write(",");
+//  Serial.print(dist_D3);
+//  Serial.write("\n");
 }
 
 // check when robot is not moving, e.g. after moving forward, after rotating
@@ -233,8 +233,8 @@ void alignToLeftWall() {
           if (newState == STATE_DIFFGT0)  md.setSpeeds(100, 100); // tilted to the right; turn left
           else  md.setSpeeds(-100, -100); // tilted to the left; turn right
         } else {
-          if (newState == STATE_DIFFGT0)  md.setSpeeds(70, 70); // tilted to the right; turn left
-          else  md.setSpeeds(-70, -70); // tilted to the left; turn right
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(60, 60); // tilted to the right; turn left
+          else  md.setSpeeds(-60, -60); // tilted to the left; turn right
         }
         currState = newState;
       }
@@ -278,8 +278,8 @@ void alignToFrontWall_Left() {
           if (newState == STATE_DIFFGT0)  md.setSpeeds(100, 100); // tilted to the right; turn left
           else  md.setSpeeds(-100, -100); // tilted to the left; turn right
         } else {
-          if (newState == STATE_DIFFGT0)  md.setSpeeds(70, 70); // tilted to the right; turn left
-          else  md.setSpeeds(-70, -70); // tilted to the left; turn right
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(60, 60); // tilted to the right; turn left
+          else  md.setSpeeds(-60, -60); // tilted to the left; turn right
         }
         currState = newState;
       }
@@ -323,8 +323,8 @@ void alignToFrontWall_Right() {
           if (newState == STATE_DIFFGT0)  md.setSpeeds(100, 100); // tilted to the right; turn left
           else  md.setSpeeds(-100, -100); // tilted to the left; turn right
         } else {
-          if (newState == STATE_DIFFGT0)  md.setSpeeds(70, 70); // tilted to the right; turn left
-          else  md.setSpeeds(-70, -70); // tilted to the left; turn right
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(60, 60); // tilted to the right; turn left
+          else  md.setSpeeds(-60, -60); // tilted to the left; turn right
         }
         currState = newState;
       }

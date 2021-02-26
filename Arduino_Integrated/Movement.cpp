@@ -76,16 +76,16 @@ void moveForward(int moveUnits)
   }
   if (!emergencyBrakes)
     md.setBrakes(BRAKE_L, BRAKE_R);
-//  if (emergencyBrakes) {
-//    // TODO: perform recovery action
-//    Serial.write("EMERGENCY\n");
-//    emergencyBrakes = false;
-//  }
+  if (emergencyBrakes) {
+    // TODO: perform recovery action
+    //Serial.write("EMERGENCY\n");
+    emergencyBrakes = false;
+  }
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
   // TODO: check if robot is aligned
-  checkForAlignmentCalibration();
+  //checkForAlignmentCalibration();
 }
 void moveBackward(int moveUnits)
 {

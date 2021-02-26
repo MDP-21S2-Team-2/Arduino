@@ -125,7 +125,7 @@ void robotSystem_loop() {
         // read next character for no. units to move
         while (Serial.available() == 0);  // wait for next character
         char numUnits = Serial.read();
-        moveForward(numUnits - '%'); // numUnits - '0' + 11
+        moveForward(numUnits - '&'); // numUnits - '0' + 10
         
         // TODO: acknowledge the command?
         Serial.write("K\n");
@@ -149,7 +149,7 @@ void robotSystem_loop() {
     case 'C': // initial calibration in starting grid
       initialGridCalibration();
       // TODO: acknowledge the command?
-      //Serial.write("K\n");
+      Serial.write("K\n");
       break;
       
     default:  // do nothing
