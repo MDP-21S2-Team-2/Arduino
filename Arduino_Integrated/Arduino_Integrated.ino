@@ -99,55 +99,57 @@ void setup() {
 //  R_prevTime = L_prevTime;
 }
 
-
-
 void robotSystem_loop() {
 
   if (Serial.available() > 0) { // new command
     // read incoming line
-    input = Serial.readString();
-
     // read characters to determine command
-    char command = input.charAt(0);
+    char command = Serial.read();
+    if ((command == '\r') || (command == '\n')) // newline, ignore
+      return;
     
-    switch (command) {  // TODO: a switch case could be more efficient if the characters are sequential?
+    switch (command) {  // TODO: a switch case might be more efficient if the characters are sequential?
     case 'M': // move <=10 units
       {
         // read next character for no. units to move
-        char numUnits = input.charAt(1);
+        while (Serial.available() == 0);  // wait for next character
+        char numUnits = Serial.read();
         moveForward(numUnits - '0');
         
         // TODO: acknowledge the command?
-        Serial.write("R\n");
+        Serial.write("K\n");
       }
       break;
     case 'F': // move >=11 units
       {
         // read next character for no. units to move
-        char numUnits = input.charAt(1);
+        while (Serial.available() == 0);  // wait for next character
+        char numUnits = Serial.read();
         moveForward(numUnits - '%'); // numUnits - '0' + 11
         
         // TODO: acknowledge the command?
-        Serial.write("R\n");
+        Serial.write("K\n");
       }
       break;
     case 'L': // turn left 90
       rotateLeft(90);
       // TODO: acknowledge the command?
-      Serial.write("R\n");
+      Serial.write("K\n");
       break;
     case 'R': // turn right 90
       rotateRight(90);
       // TODO: acknowledge the command?
-      Serial.write("R\n");
+      Serial.write("K\n");
       break;
     case 'B': // turn 180
       rotateLeft(180);
       // TODO: acknowledge the command?
-      Serial.write("R\n");
+      Serial.write("K\n");
       break;
     case 'C': // initial calibration in starting grid
       initialGridCalibration();
+      // TODO: acknowledge the command?
+      //Serial.write("K\n");
       break;
       
     default:  // do nothing
