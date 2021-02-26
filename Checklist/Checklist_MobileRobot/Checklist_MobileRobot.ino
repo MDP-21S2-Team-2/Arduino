@@ -24,6 +24,8 @@ DualVNH5019MotorShield md;
 // Counts for Encoder
 volatile int encL_count = 0;
 volatile int encR_count = 0;
+volatile int encL_curr_count = 0;
+volatile int encR_curr_count = 0;
 
 // Serial communication
 String input;
@@ -43,7 +45,7 @@ volatile unsigned long R_timeWidth = 0;
 
 // target speed for motors to reach
 //const int targetPulseWidth = 821; //rpm=100: 1067;//rpm=130: 821;  // 60 / 130 / 562.25 * 1000000.0;
-double targetRpm = 100.0;
+double targetRpm = 120.0;
 //double targetDuration = 0.46154;  // for 1 rpm
 double target_count = 0;
 int leftSign = 1;
@@ -55,31 +57,50 @@ void resetEnc(){
 }
 
 double calculateRpm(int pulseWidth) {
-  if (pulseWidth == 0)
+  if (pulseWidth == 0) {
     return 0;
-  else
-    return 60000000.0 / (pulseWidth  * 562.25);  // time for 1 revolution in seconds
+  }
+  else {
+    //return 60000000.0 / (pulseWidth  * 56.225);  // time for 1 revolution in seconds
+    return 533570.48 / pulseWidth;
+  }
   //to get RPM, 60 / <above value>
 }
 
-const int alpha = 1;
-const int alphaInv = 9;
+const double alpha = 0.3;
+const double alphaInv = 0.7;
 
 void motorR_ISR() {
   encR_count++;
-  R_currTime = micros();
-  R_timeWidth = alpha * (R_currTime - R_prevTime) + alphaInv * R_timeWidth;
-  R_timeWidth /= 10;
-  R_prevTime = R_currTime;
+  encR_curr_count++;
+  //For every 10 encoder count
+   if (encR_curr_count == 1)
+    {
+      R_prevTime = micros();    
+    }
+    else if (encR_curr_count == 6)
+    {
+      R_currTime = micros();
+      R_timeWidth = alpha * (R_currTime - R_prevTime) + alphaInv * R_timeWidth;
+      encR_curr_count = 0;
+      R_prevTime = R_currTime;
+    }
 }
 
 void motorL_ISR() {
-  L_currTime = micros();
   encL_count++;
-  L_timeWidth = alpha * (L_currTime - L_prevTime) + alphaInv * L_timeWidth;
-  L_timeWidth /= 10;
-  //L_timeWidth = L_currTime - L_prevTime;
-  L_prevTime = L_currTime;
+  encL_curr_count++;
+   if (encL_curr_count == 1)
+    {
+      L_prevTime = micros();    
+    }
+    else if (encL_curr_count == 6)
+    {
+      L_currTime = micros();
+      L_timeWidth = alpha * (L_currTime - L_prevTime) + alphaInv * L_timeWidth;
+      encL_curr_count = 0;
+      L_prevTime = L_currTime;
+    }
 }
 
 // PID controller for each motor
@@ -135,8 +156,11 @@ void motorL_ISR() {
 //PID rightPIDController(0.7, 2.017, 2.0, 130.0, -130.0); // right starts up faster
 
 // 24 Feb target speed:100 6.21V 1y1w
-PID leftPIDController(3.23, 2.058, 5.6, 130.0, -130); // red
-PID rightPIDController(3.34, 2.065, 5.7, 130.0, -130.0); // right starts up faster
+//PID leftPIDController(2.5, 1.65, 3.8, 200.0, -200); // red
+//PID rightPIDController(2.5, 1.65, 3.8, 200.0, -200.0); // right starts up faster
+
+PID leftPIDController(3.22, 1.585, 4.3, 200.0, -200);
+PID rightPIDController(3.68, 1.674, 4.3, 200.0, -200.0);
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
@@ -153,8 +177,8 @@ void moveForward(double tDistance)
   int fRval = encR_count;
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
-  double L_tEncodeVal = fLval + tDistance / oneRevDis * 562.25 - 20; //- 35;  // 38
-  double R_tEncodeVal = fRval + tDistance / oneRevDis * 562.25 - 20; //- 36;  // 33
+  double L_tEncodeVal = fLval + tDistance / oneRevDis * 562.25 - 24; //- 35;  // 38
+  double R_tEncodeVal = fRval + tDistance / oneRevDis * 562.25 - 24; //- 36;  // 33
 
   // set multiplier for motor speed direction
   leftSign = -1;
@@ -267,9 +291,11 @@ void rotateLeft(double angle)
   // reduce tEncodeVal by no. ticks needed for braking
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
-  if (angle <= 90)
-    target_count += angle * 4.41;
-  else if ( 90 < angle <= 180)
+  if (angle <= 45)
+    target_count += angle * 4.21;
+  else if ( angle <= 90)
+    target_count += angle * 4.3;
+  else if ( angle <= 180)
     target_count += angle * 4.65;
   
   // set multiplier for motor speed direction
@@ -332,9 +358,9 @@ void rotateRight(double angle)
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle <= 50)  // for 45 deg
-    target_count += angle * 4.34;
+    target_count += angle * 4.21;
   else if (angle <= 90)
-    target_count += angle * 4.41; // 4.42 for paper, 4.41 for arena
+    target_count += angle * 4.31; // 4.42 for paper, 4.41 for arena
   else if ( 90 < angle <= 180)
     target_count += angle * 4.54;
 
@@ -373,15 +399,6 @@ void setup() {
   Serial.begin(115200);
   // init motor drivers
   md.init();
-
-  // left
-  //md.setM1Speed(-400);
-  // right
-  //md.setM2Speed(400);
-
-  // set starting times
-  L_prevTime = micros();
-  R_prevTime = L_prevTime;
 }
 
 void obstacleAvoidance() {
@@ -482,122 +499,14 @@ void obstacleAvoidance() {
   /// let's take total length of line to be 150cm
   /// also, the robot stopped about 2 units before the obstacle, and ended 2 units after the obstacle
   /// the obstacle is 1 unit. Therefore, total the robot also covered additional 5 units = 50cm
-  double remainingDist = 80 - 50 - dist;
+  double remainingDist = 150 - 50 - dist;
   
   // 7. move forward only if there is remaining distance
   if (remainingDist > 0)
     moveForward(remainingDist);
 }
 
-void robotSystem_loop() {
 
-  sendIRSensorsReadings();
-  delay(1000);
-
-  if (Serial.available() > 0) { // new command
-    // read incoming line
-    input = Serial.readString();
-
-    // read characters to determine command
-    char command = input.charAt(0);
-    if (command == 'M') { // move
-      // read next character for no. units to move
-      // TODO: compare the performance of using String toInt() instead
-      // TODO: might need to check next char if it's possible to be commanded to move >=10 units
-      char numUnits = input.charAt(1);
-
-      // TODO: acknowledge the command?
-      Serial.write("ACK,");
-      Serial.write(command);
-      Serial.write(numUnits);
-
-      moveForward((numUnits - '0') * 10);
-    }
-    else if (command == 'T') {  // turn/rotate
-      // read next character for what turn to make
-      char turnBy = input.charAt(1);
-
-      // TODO: acknowledge the command?
-      Serial.write("ACK,");
-      Serial.write(command);
-      Serial.write(turnBy);
-
-      switch (turnBy) {
-        case 'L': // turn left by 90 degrees
-          rotateLeft(90);
-          break;
-        case 'R': // turn right by 90 degrees
-          rotateRight(90);
-          break;
-        case 'B': // turn 180 degrees
-          rotateLeft(180);
-          break;
-      }
-    }
-    else if (command == 'C') {  // calibrate
-      // TODO: determine logic for robot self-calibration
-
-    }
-  } // if Serial.available() end
-  /*else {  // TODO: should this even be here lmao
-    // TODO: change to average ticks? ((encL_count + encR_count)/2 <= target_count)
-    if ((encL_count <= target_count) || (encR_count <= target_count))
-    {
-      // TODO: can PID be ISR lol
-      if (PID::checkPIDCompute()) {
-        md.setM1Speed(leftSign * leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-        md.setM2Speed(rightSign * rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-      }
-
-      // TODO: Send IR sensor & motor ticks data at some point?
-      //sendEncoderTicks();
-      //sendIRSensorsReadings();
-    }
-    // movement completed
-    md.setBrakes(BRAKE_L, BRAKE_R);
-    // POTENTIAL TODO: check if robot should self-calibrate
-    }*/
-}
-
-void sendEncoderTicks() {
-  int encL = encL_count;
-  int encR = encR_count;
-  Serial.write("Ticks,");
-  Serial.write(encL);
-  Serial.write(",");
-  Serial.write(encR);
-}
-
-void sendIRSensorsReadings() {
-
-  double dist_D1 = front_D1.getDistance();
-  double dist_D2 = front_D2.getDistance();
-  double dist_D3 = front_D3.getDistance();
-  double dist_S1 = left_S1.getDistance();
-  double dist_S2 = left_S2.getDistance();
-  double dist_LR = right_long.getDistance();
-
-  byte* ptr_dist_D1 = (byte*) &dist_D1;
-  byte* ptr_dist_D2 = (byte*) &dist_D2;
-  byte* ptr_dist_D3 = (byte*) &dist_D3;
-  byte* ptr_dist_S1 = (byte*) &dist_S1;
-  byte* ptr_dist_S2 = (byte*) &dist_S2;
-  byte* ptr_dist_LR = (byte*) &dist_LR;
-
-  Serial.write("IR,");
-  Serial.write(ptr_dist_D1, 4);
-  Serial.write(",");
-  Serial.write(ptr_dist_D2, 4);
-  Serial.write(",");
-  Serial.write(ptr_dist_D3, 4);
-  Serial.write(",");
-  Serial.write(ptr_dist_S1, 4);
-  Serial.write(",");
-  Serial.write(ptr_dist_S2, 4);
-  Serial.write(",");
-  Serial.write(ptr_dist_LR, 4);
-  Serial.write('\n');
-}
 
 void testInLoop_readingIR() {
   //delay(100);
@@ -656,7 +565,7 @@ void loop() {
   //move forward/rotate in small units
 //  for (int i = 0; i < 4 ; i++) {
 //    //rotateRight2(90);
-//    moveForward(150);
+//    moveForward(i*10);
 //    leftPIDController.resetPID();
 //    rightPIDController.resetPID();
 //    delay(2000);
@@ -670,6 +579,7 @@ void loop() {
     // Checklist: Move Forward 
     //moveForward(120);
 //     Checklist: Obstacle Avoidance
+    delay(1000);
     obstacleAvoidance();
 
 // Checkist: Rotation

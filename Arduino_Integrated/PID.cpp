@@ -1,7 +1,5 @@
 #include "PID.h"
-
 #define LOOPTIME 20000
-
 unsigned long PID::_targetTime = 0;
 
 double PID::computePID(double input, double setPoint) {
@@ -31,7 +29,7 @@ double PID::computePID(double input, double setPoint) {
   dterm = _Kd * (_lastValue - input);  // last RPM - current RPM
   _lastValue = input;
 
-  return pterm + iterm + dterm;
+  return abs(pterm + iterm + dterm);
 }
 
 void PID::resetPID() {

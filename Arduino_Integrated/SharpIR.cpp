@@ -73,7 +73,7 @@ double SharpIR::getDistance() {
       else if (median >= 168) // 8-35cm
         distance = -1.28379 + 5321.748/(median-21.49596);
       else if (median >= 142) // 35-40cm
-        distance = 61.20559 + 2894.61/(median-278.5809);
+        distance = 57.5 + 2047.5/(median-259);
       else if (median >= 114) // 40-50cm
         distance = 90.81596 - 0.31157*median;
       else
