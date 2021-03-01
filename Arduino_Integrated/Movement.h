@@ -6,6 +6,9 @@
 #define BRAKE_L 400
 #define BRAKE_R 400
 
+// comment away if doing FP
+#define EXPLORATION_MODE
+
 //Declare Variables
 extern bool emergencyBrakes;
 //Counts for encoder

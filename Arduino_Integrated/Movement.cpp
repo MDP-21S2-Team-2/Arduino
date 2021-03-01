@@ -25,8 +25,11 @@ volatile int encR_count = 0;
 volatile int encL_curr_count =0;
 volatile int encR_curr_count =0;
 
-PID leftPIDController(3.48, 1.625, 4.934, 200.0, -200); //red
-PID rightPIDController(3.87, 1.675, 4.85, 200.0, -200.0);
+PID leftPIDController(3.88, 1.695, 4.54, 200.0, -200);
+PID rightPIDController(3.87, 1.695, 4.45, 200.0, -200.0);
+
+//PID leftPIDController(3.48, 1.625, 4.934, 200.0, -200); //red
+//PID rightPIDController(3.87, 1.675, 4.85, 200.0, -200.0);
 
 void resetEnc() {
   encL_count = 0;
@@ -85,7 +88,9 @@ void moveForward(int moveUnits)
   leftPIDController.resetPID();
   rightPIDController.resetPID();
   // TODO: check if robot is aligned
-  //checkForAlignmentCalibration();
+#ifdef EXPLORATION_MODE
+  checkForAlignmentCalibration();
+#endif
 }
 void moveBackward(int moveUnits)
 {

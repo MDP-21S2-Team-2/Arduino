@@ -19,9 +19,6 @@
 const float alpha = 0.3;
 const float alphaInv = 0.7;
 
-// Serial communication
-String input;
-
 void motorR_ISR() {
   encR_count++;
   encR_curr_count++;
@@ -115,9 +112,14 @@ void robotSystem_loop() {
         while (Serial.available() == 0);  // wait for next character
         char numUnits = Serial.read();
         moveForward(numUnits - '0');
-        
-        // TODO: acknowledge the command?
+
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        // acknowledge the command
         Serial.write("K\n");
+#endif
       }
       break;
     case 'F': // move >=11 units
@@ -126,25 +128,48 @@ void robotSystem_loop() {
         while (Serial.available() == 0);  // wait for next character
         char numUnits = Serial.read();
         moveForward(numUnits - '&'); // numUnits - '0' + 10
-        
-        // TODO: acknowledge the command?
+
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        // acknowledge the command
         Serial.write("K\n");
+#endif
       }
       break;
     case 'L': // turn left 90
       rotateLeft(90);
-      // TODO: acknowledge the command?
-      Serial.write("K\n");
+      
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        // acknowledge the command
+        Serial.write("K\n");
+#endif
       break;
     case 'R': // turn right 90
       rotateRight(90);
-      // TODO: acknowledge the command?
-      Serial.write("K\n");
+      
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        // acknowledge the command
+        Serial.write("K\n");
+#endif
       break;
     case 'B': // turn 180
       rotateLeft(180);
-      // TODO: acknowledge the command?
-      Serial.write("K\n");
+      
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        // acknowledge the command
+        Serial.write("K\n");
+#endif
       break;
     case 'C': // initial calibration in starting grid
       initialGridCalibration();
@@ -218,7 +243,7 @@ void testInLoop_readingIR() {
 //  Serial.print(left_S1.getDistance());
 //  Serial.print(" | Side, back: ");
 //  Serial.println(left_S2.getDistance());
-//
+
 //  Serial.print("Right Long: ");
 //  Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
@@ -260,13 +285,29 @@ void loop() {
 
 //  testInLoop_motorsPID();
 //  testInLoop_readingIR();
-//    robotSystem_loop();
-for (int i = 0; i < 8; ++i) {
-      moveForward(2);
-      delay(1000);
-      leftPIDController.resetPID();
-      rightPIDController.resetPID();
-      resetEnc();
-    }
+    robotSystem_loop();
+
+//    delay(1000);
+//for (int i = 1; i <= 5; ++i) {
+//      moveForward(i);
+//      delay(1000);
+//      leftPIDController.resetPID();
+//      rightPIDController.resetPID();
+//      resetEnc();
+//    }
+//
+//    rotateRight(90);
+//      delay(1000);
+//    leftPIDController.resetPID();
+//    rightPIDController.resetPID();
+//    resetEnc();
+//
+//    moveForward(6);
+//      delay(1000);
+//    leftPIDController.resetPID();
+//    rightPIDController.resetPID();
+//    resetEnc();
+
+    
 
 }

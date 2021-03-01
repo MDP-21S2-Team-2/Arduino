@@ -17,9 +17,9 @@ void checkForCrashCalibration() {
   double dist_D3 = front_D3.getDistance();
 
   // check if robot is too near to any obstacle in front, for emergency stop
-  if ((/*dist_D1 > 3.0 &&*/ dist_D1 < D1_EXPECTED_DIST + 1.0) ||  // offset to account for robot's speed
-    (/*dist_D2 > 3.0 &&*/ dist_D2 < D2_EXPECTED_DIST + 1.0) ||
-    (/*dist_D3 > 3.0 &&*/ dist_D3 < D3_EXPECTED_DIST + 1.0)) 
+  if ((/*dist_D1 > 3.0 &&*/ dist_D1 < D1_EXPECTED_DIST + 2.0) ||  // offset to account for robot's speed
+    (/*dist_D2 > 3.0 &&*/ dist_D2 < D2_EXPECTED_DIST + 2.0) ||
+    (/*dist_D3 > 3.0 &&*/ dist_D3 < D3_EXPECTED_DIST + 2.0)) 
     {
       md.setBrakes(BRAKE_L, BRAKE_R);
       emergencyBrakes = true;
@@ -31,25 +31,25 @@ void checkForCrashCalibration() {
   //double dist_LR = right_long.getDistance();  // can use to check if veering too close to a wall on the right?
   
   // check if robot is aligned on the side or might crash the side
-  if (((dist_S1 > 3.0 && dist_S1 <= 8.0 &&  dist_S2 > 3.0 && dist_S2 <= 8.0) ||
-    (dist_S1 > 8.0 && dist_S1 <= 18.0 &&  dist_S2 > 8.0 && dist_S2 <= 18.0)) &&  // check if robot is near the wall
-    (abs(dist_S1 - dist_S2) >= 2.5)) 
-    {  // robot is veering too much to the side, sensors' diff is 1.5cm
-      // recovery action
-      md.setBrakes(BRAKE_L, BRAKE_R);
-      // store current encoder values (before extra ticks are added for recovery action)
-      int encL = encL_count;
-      int encR = encR_count;
-      // get robot to align to left wall
-      alignToLeftWall();
-      delay(10);  // to ensure robot has already braked; TODO: time to delay TBD
-      // reset PID
-      leftPIDController.resetPID();
-      rightPIDController.resetPID();
-      // restore back the encoder counts to recover remaining distance
-      encL_count = encL;
-      encR_count = encR;
-    }
+//  if (((dist_S1 > 3.0 && dist_S1 <= 8.0 &&  dist_S2 > 3.0 && dist_S2 <= 8.0) ||
+//    (dist_S1 > 8.0 && dist_S1 <= 18.0 &&  dist_S2 > 8.0 && dist_S2 <= 18.0)) &&  // check if robot is near the wall
+//    (abs(dist_S1 - dist_S2) >= 2.5)) 
+//    {  // robot is veering too much to the side, sensors' diff is 1.5cm
+//      // recovery action
+//      md.setBrakes(BRAKE_L, BRAKE_R);
+//      // store current encoder values (before extra ticks are added for recovery action)
+//      int encL = encL_count;
+//      int encR = encR_count;
+//      // get robot to align to left wall
+//      alignToLeftWall();
+//      delay(10);  // to ensure robot has already braked; TODO: time to delay TBD
+//      // reset PID
+//      leftPIDController.resetPID();
+//      rightPIDController.resetPID();
+//      // restore back the encoder counts to recover remaining distance
+//      encL_count = encL;
+//      encR_count = encR;
+//    }
 }
 
 
@@ -169,22 +169,24 @@ void checkForAlignmentCalibration() {
   
 // align robot to be straight
   // front right
-  if ((dist_D1 >= 3.0 && dist_D1 <= 7.0 && dist_D2 >= 3.0 && dist_D2 <= 7.0) ||
-    (dist_D1 >= 3.0 && dist_D1 <= 33.0 && dist_D2 >= 3.0 && dist_D2 <= 33.0)
-  ()// only try to align when within certain range from obstacle in front
+  if (((dist_D1 >= 3.0 && dist_D1 <= 8.0 && dist_D2 >= 3.0 && dist_D2 <= 8.0) ||
+    (dist_D1 >= 8.0 && dist_D1 <= 18.0 && dist_D2 >= 8.0 && dist_D2 <= 18.0) ||
+    (dist_D1 >= 18.0 && dist_D1 <= 28.0 && dist_D2 >= 18.0 && dist_D2 <= 28.0))  // only try to align when within certain range from obstacle in front
    && abs(dist_D1 - dist_D2) > 0.8) { // TODO: distance difference threshold
     alignToFrontWall_Right();
   }
   // front left
-  else if (dist_D1 >= 3.0 && dist_D1 <= 23.0 && dist_D3 >= 3.0 && dist_D3 <= 23.0  // only try to align when within certain range from obstacle in front
-   && abs(dist_D1 - dist_D3) > 0.8) { // TODO: distance difference threshold
-    alignToFrontWall_Left();
+  else if (((dist_D1 >= 3.0 && dist_D1 <= 8.0 && dist_D3 >= 3.0 && dist_D3 <= 8.0) ||
+    (dist_D1 >= 8.0 && dist_D1 <= 18.0 && dist_D3 >= 8.0 && dist_D3 <= 18.0) ||
+    (dist_D1 >= 18.0 && dist_D1 <= 28.0 && dist_D3 >= 18.0 && dist_D3 <= 28.0))  // only try to align when within certain range from obstacle in front
+   && abs(dist_D1 - dist_D3) > 0.2) { // TODO: distance difference threshold
+      alignToFrontWall_Left();
   }
   // left side
-  else if (dist_S1 >= 3.0 && dist_S1 <= 23.0 && dist_S2 >= 3.0 && dist_S2 <= 23.0
-   && abs(dist_S1 - dist_S2) > 1.5) { // TODO: distance difference threshold
-    alignToLeftWall();
-  }
+//  else if (dist_S1 >= 3.0 && dist_S1 <= 23.0 && dist_S2 >= 3.0 && dist_S2 <= 23.0
+//   && abs(dist_S1 - dist_S2) > 1.5) { // TODO: distance difference threshold
+//    alignToLeftWall();
+//  }
 }
 
 
