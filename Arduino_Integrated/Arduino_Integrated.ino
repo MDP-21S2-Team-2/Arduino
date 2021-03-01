@@ -149,7 +149,7 @@ void robotSystem_loop() {
     case 'C': // initial calibration in starting grid
       initialGridCalibration();
       // TODO: acknowledge the command?
-      //Serial.write("K\n");
+      Serial.write("K\n");
       break;
       
     default:  // do nothing
@@ -260,5 +260,13 @@ void loop() {
 
 //  testInLoop_motorsPID();
 //  testInLoop_readingIR();
-    robotSystem_loop();
+//    robotSystem_loop();
+for (int i = 0; i < 8; ++i) {
+      moveForward(2);
+      delay(1000);
+      leftPIDController.resetPID();
+      rightPIDController.resetPID();
+      resetEnc();
+    }
+
 }

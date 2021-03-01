@@ -33,7 +33,7 @@ void checkForCrashCalibration() {
   // check if robot is aligned on the side or might crash the side
   if ((dist_S1 > 3.0 && dist_S1 < 23.0) &&  // check if robot is near the wall
     (dist_S2 > 3.0 && dist_S2 < 23.0) &&    // check if robot is near the wall
-    (abs(dist_S1 - dist_S2) >= 1.5)) 
+    (abs(dist_S1 - dist_S2) >= 2.3)) 
     {  // robot is veering too much to the side, sensors' diff is 1.5cm
       // recovery action
       md.setBrakes(BRAKE_L, BRAKE_R);
