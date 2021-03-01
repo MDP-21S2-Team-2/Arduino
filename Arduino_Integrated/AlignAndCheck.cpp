@@ -117,15 +117,17 @@ void checkForAlignmentCalibration_initial() {
   
 // align robot to be straight
   // front right
-  if (dist_D1 >= 3.0 && dist_D1 <= 33.0 && dist_D2 >= 3.0 && dist_D2 <= 33.0  // only try to align when within certain range from obstacle in front
-   && abs(dist_D1 - dist_D2) > 0.2) 
-    { // TODO: distance difference threshold
+  if ((dist_D1 >= 3.0 && dist_D1 <= 8.0 && dist_D2 >= 3.0 && dist_D2 <= 8.0) ||
+    (dist_D1 >= 8.0 && dist_D1 <= 18.0 && dist_D2 >= 8.0 && dist_D2 <= 18.0) ||
+    (dist_D1 >= 18.0 && dist_D1 <= 28.0 && dist_D2 >= 18.0 && dist_D2 <= 28.0)  // only try to align when within certain range from obstacle in front
+   && abs(dist_D1 - dist_D2) > 0.2) { // TODO: distance difference threshold
     alignToFrontWall_Right();
     }
   // front left
-  else if (dist_D1 >= 3.0 && dist_D1 <= 23.0 && dist_D3 >= 3.0 && dist_D3 <= 23.0  // only try to align when within certain range from obstacle in front
-   && abs(dist_D1 - dist_D3) > 0.2) 
-    { // TODO: distance difference threshold
+  else if ((dist_D1 >= 3.0 && dist_D1 <= 8.0 && dist_D3 >= 3.0 && dist_D3 <= 8.0) ||
+    (dist_D1 >= 8.0 && dist_D1 <= 18.0 && dist_D3 >= 8.0 && dist_D3 <= 18.0) ||
+    (dist_D1 >= 18.0 && dist_D1 <= 28.0 && dist_D3 >= 18.0 && dist_D3 <= 28.0)  // only try to align when within certain range from obstacle in front
+   && abs(dist_D1 - dist_D3) > 0.2) { // TODO: distance difference threshold
       alignToFrontWall_Left();
     }
 
@@ -167,7 +169,9 @@ void checkForAlignmentCalibration() {
   
 // align robot to be straight
   // front right
-  if (dist_D1 >= 3.0 && dist_D1 <= 33.0 && dist_D2 >= 3.0 && dist_D2 <= 33.0  // only try to align when within certain range from obstacle in front
+  if ((dist_D1 >= 3.0 && dist_D1 <= 7.0 && dist_D2 >= 3.0 && dist_D2 <= 7.0) ||
+    (dist_D1 >= 3.0 && dist_D1 <= 33.0 && dist_D2 >= 3.0 && dist_D2 <= 33.0)
+  ()// only try to align when within certain range from obstacle in front
    && abs(dist_D1 - dist_D2) > 0.8) { // TODO: distance difference threshold
     alignToFrontWall_Right();
   }
