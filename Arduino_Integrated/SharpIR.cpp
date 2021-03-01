@@ -40,12 +40,14 @@ double SharpIR::getDistance() {
       distance = 0.0000581*median*median - 0.081448*median +35.93;
     else if (median >= 263) //15-20
       distance = (0.0001827*median*median)-0.175152*median + 53.42216;
-    else if (median >= 180) //20-30
-      distance = (0.11937)+(4929.93)/(median-15.281);
-//    else if (median >= 137) //33-40  bad readings off by 1cm
-//      distance = 94.9596+(-0.516238)*(median) + (0.000854)*(median)*(median);
-    else if (median >= 153) //30-35
-      distance = -0.25*median +74.25;
+//    else if (median >= 180) //20-30
+//      distance = (0.11937)+(4929.93)/(median-15.281);
+////    else if (median >= 137) //33-40  bad readings off by 1cm
+////      distance = 94.9596+(-0.516238)*(median) + (0.000854)*(median)*(median);
+//    else if (median >= 153) //30-35
+//      distance = -0.25*median +74.25;
+    else if (median >= 157) // 20-35
+      distance = 0.9702 + 4621.915/(median-20.9586);
     else if (median >= 144) //35-40 //35 onwards is bad
       distance = 34.3551+9.2450/(median-141.46911);
     else if (median >= 105) //40-50
@@ -123,7 +125,7 @@ double SharpIR::getDistance() {
         distance = 0.001863*median*median - 1.0929*median + 205.8814;
       else if (median >= 165) // 70-75cm
         distance = -0.00128*median*median + 0.0577*median + 100.751;
-      else if (median >= 135) // 75-90cm
+      else if (median >= 130) // 75-90cm
         distance = -13.361 + 17255.81/(median+29.6083);
       else
         distance = 91.0;  // median < 135, out of range
