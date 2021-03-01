@@ -45,7 +45,7 @@ volatile unsigned long R_timeWidth = 0;
 
 // target speed for motors to reach
 //const int targetPulseWidth = 821; //rpm=100: 1067;//rpm=130: 821;  // 60 / 130 / 562.25 * 1000000.0;
-double targetRpm = 120.0;
+double targetRpm = 125.0;
 //double targetDuration = 0.46154;  // for 1 rpm
 double target_count = 0;
 int leftSign = 1;
@@ -54,6 +54,11 @@ int rightSign = 1;
 void resetEnc(){
   encL_count = 0;
   encR_count = 0;
+  encR_curr_count = 0;
+  encL_curr_count = 0;
+  // reset timeWidths
+  L_timeWidth = 0;
+  R_timeWidth = 0;
 }
 
 double calculateRpm(int pulseWidth) {
@@ -159,8 +164,10 @@ void motorL_ISR() {
 //PID leftPIDController(2.5, 1.65, 3.8, 200.0, -200); // red
 //PID rightPIDController(2.5, 1.65, 3.8, 200.0, -200.0); // right starts up faster
 
-PID leftPIDController(3.22, 1.585, 4.3, 200.0, -200);
-PID rightPIDController(3.68, 1.674, 4.3, 200.0, -200.0);
+//PID leftPIDController(3.22, 1.585, 4.3, 200.0, -200);
+//PID rightPIDController(3.68, 1.674, 4.3, 200.0, -200.0);
+PID leftPIDController(3.48, 1.625, 4.934, 200.0, -200); //red
+PID rightPIDController(3.87, 1.675, 4.85, 200.0, -200.0);
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
