@@ -260,5 +260,13 @@ void loop() {
 
 //  testInLoop_motorsPID();
 //  testInLoop_readingIR();
-    robotSystem_loop();
+//    robotSystem_loop();
+for (int i = 0; i < 8; ++i) {
+      moveForward(2);
+      delay(1000);
+      leftPIDController.resetPID();
+      rightPIDController.resetPID();
+      resetEnc();
+    }
+
 }
