@@ -12,8 +12,7 @@
 // Setting Target RPM 125 RPM
 #define targetRpm 125.0
 #define MOVE_OFFTICKS 24
-// 100 RPM
-//#define targetRpm 100.0
+
 //#define MOVE_OFFTICKS 20
 
 const float alpha = 0.3;
@@ -173,8 +172,13 @@ void robotSystem_loop() {
       break;
     case 'C': // initial calibration in starting grid
       initialGridCalibration();
-      // TODO: acknowledge the command?
-      Serial.write("K\n");
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        // acknowledge the command
+        Serial.write("K\n");
+#endif
       break;
       
     default:  // do nothing
@@ -281,27 +285,31 @@ void testInLoop_motorsPID() {
     //md.setSpeeds(-leftPIDController.computePID(L_rpm, targetRpm), rightPIDController.computePID(R_rpm, targetRpm));
   }
 }
+
+bool runProgram = true;
 void loop() {
 
 //  testInLoop_motorsPID();
 //  testInLoop_readingIR();
-    robotSystem_loop();
+//    robotSystem_loop();
 
 //    delay(1000);
-//for (int i = 1; i <= 5; ++i) {
-//      moveForward(i);
-//      delay(1000);
-//      leftPIDController.resetPID();
-//      rightPIDController.resetPID();
-//      resetEnc();
-//    }
-//
-//    rotateRight(90);
-//      delay(1000);
+if (runProgram) {
+    for (int i = 0; i < 8; ++i) {
+//      moveForward(0);
+//    delay(1500);
 //    leftPIDController.resetPID();
 //    rightPIDController.resetPID();
 //    resetEnc();
+    rotateLeft(90);
+
+    }
+    runProgram = false;
+}
+        
 //
+
+
 //    moveForward(6);
 //      delay(1000);
 //    leftPIDController.resetPID();

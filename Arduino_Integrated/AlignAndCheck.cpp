@@ -31,8 +31,8 @@ void checkForCrashCalibration() {
   //double dist_LR = right_long.getDistance();  // can use to check if veering too close to a wall on the right?
   
   // check if robot is aligned on the side or might crash the side
-//  if (((dist_S1 > 3.0 && dist_S1 <= 8.0 &&  dist_S2 > 3.0 && dist_S2 <= 8.0) ||
-//    (dist_S1 > 8.0 && dist_S1 <= 18.0 &&  dist_S2 > 8.0 && dist_S2 <= 18.0)) &&  // check if robot is near the wall
+//  if (((dist_S1 > 3.0 && dist_S1 <= 10.5 &&  dist_S2 > 3.0 && dist_S2 <= 10.5) ||
+//    (dist_S1 > 10.5 && dist_S1 <= 18.0 &&  dist_S2 > 10.5 && dist_S2 <= 18.0)) &&  // check if robot is near the wall
 //    (abs(dist_S1 - dist_S2) >= 2.5)) 
 //    {  // robot is veering too much to the side, sensors' diff is 1.5cm
 //      // recovery action
@@ -157,15 +157,15 @@ void checkForAlignmentCalibration() {
 
 // check for ideal distance from obstacle
   // check if too near to the wall in front
-  if (dist_D1 < D1_EXPECTED_DIST) { // front-mid sensor
-    alignBack_Front(SharpIR::D1, true);
-  }
-  else if (dist_D2 < D2_EXPECTED_DIST) {  // front-right sensor
-    alignBack_Front(SharpIR::D2, true);
-  }
-  else if (dist_D3 < D3_EXPECTED_DIST) {  // front-left sensor
-    alignBack_Front(SharpIR::D3, true);
-  }
+//  if (dist_D1 < D1_EXPECTED_DIST) { // front-mid sensor
+//    alignBack_Front(SharpIR::D1, true);
+//  }
+//  else if (dist_D2 < D2_EXPECTED_DIST) {  // front-right sensor
+//    alignBack_Front(SharpIR::D2, true);
+//  }
+//  else if (dist_D3 < D3_EXPECTED_DIST) {  // front-left sensor
+//    alignBack_Front(SharpIR::D3, true);
+//  }
   
 // align robot to be straight
   // front right

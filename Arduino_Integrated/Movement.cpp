@@ -25,7 +25,7 @@ volatile int encR_count = 0;
 volatile int encL_curr_count =0;
 volatile int encR_curr_count =0;
 
-PID leftPIDController(3.88, 1.695, 4.54, 200.0, -200);
+PID leftPIDController(3.68, 1.695, 4.54, 200.0, -200);
 PID rightPIDController(3.87, 1.695, 4.45, 200.0, -200.0);
 
 //PID leftPIDController(3.48, 1.625, 4.934, 200.0, -200); //red
@@ -73,8 +73,7 @@ void moveForward(int moveUnits)
       //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
 
       // read IR sensors here to check for emergency brakes
-      checkForCrashCalibration();
-      // TODO: send IR sensor data to algo?
+//      checkForCrashCalibration();
     }
   }
   if (!emergencyBrakes)
@@ -87,7 +86,14 @@ void moveForward(int moveUnits)
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
-  // TODO: check if robot is aligned
+
+#ifdef EXPLORATION_MODE
+  delay(200);
+#else // FP
+  delay(80);
+#endif
+  
+  // check if robot is aligned
 #ifdef EXPLORATION_MODE
   checkForAlignmentCalibration();
 #endif
@@ -114,43 +120,18 @@ void moveBackward(int moveUnits)
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
-}
 
-//void rotateLeft2(double angle) {
-//  // reset encoder ticks
-//  resetEnc();
-//  // Calculate target number of ticks to travel the distance,
-//  // reduce tEncodeVal by no. ticks needed for braking
-//  // was previously 4.45
-//  double tEncodeVal = 0;
-//  if (angle <= 45) {
-//    tEncodeVal = angle * 4.21;  // 4.27 works
-//  }
-//  else if (angle <= 91) {
-//  // 4.42 FKING SOLID 11 FEB 6.34V TUNING
-//    tEncodeVal += angle * 4.42;
-//  }
-//  else if (angle <= 181) {
-//    tEncodeVal += angle * 4.51;
-//  }
-//
-//  // reset prevTime to get more accurate timeWidth
-//  L_prevTime = micros();
-//  R_prevTime = micros();
-//
-//  while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
-//  {
-//    if (PID::checkPIDCompute()) {
-//      md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-//      md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-//      //md.setSpeeds(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-//    }
-//  }
-//  md.setBrakes(BRAKE_L, BRAKE_R);
-//  // reset PID
-//  leftPIDController.resetPID();
-//  rightPIDController.resetPID();
-//}
+#ifdef EXPLORATION_MODE
+  delay(200);
+#else // FP
+  delay(80);
+#endif
+
+  // check if robot is aligned
+#ifdef EXPLORATION_MODE
+  checkForAlignmentCalibration();
+#endif
+}
 
 void rotateLeft(int angle)
 {
@@ -163,7 +144,7 @@ void rotateLeft(int angle)
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle == 90)
-    tEncodeVal = 387; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
+    tEncodeVal = 384; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
   else if (angle == 180)
     tEncodeVal = 810; //angle * 4.5;  // 4.65
 
@@ -184,33 +165,20 @@ void rotateLeft(int angle)
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
+
+#ifdef EXPLORATION_MODE
+  delay(200);
+#else // FP
+  delay(80);
+#endif
+
+  // check if robot is aligned
+#ifdef EXPLORATION_MODE
+  checkForAlignmentCalibration();
+#endif
 }
 
-//void rotateRight2(double angle) // doesn't really work but I'll leave it here
-//{
-//  // reset encoder ticks
-//  resetEnc();
-//  //4.8147 exact multiplier
-//  // Calculate target number of ticks to travel the distance,
-//  // reduce tEncodeVal by no. ticks needed for braking
-//  double tEncodeVal = angle * 4.42; //4.46; for brakes: //- 35;  // 38
-//  // reset prevTime to get more accurate timeWidth
-//  L_prevTime = micros();
-//  R_prevTime = micros();
-//  while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
-//  {
-//    if (PID::checkPIDCompute()) {
-//      md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-//      md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-//      //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), -rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-//    }
-//  }
-//  md.setBrakes(BRAKE_L, BRAKE_R);
-//  
-//  // reset PID
-//  leftPIDController.resetPID();
-//  rightPIDController.resetPID();
-//}
+
 
 void rotateRight(int angle)
 {
@@ -223,7 +191,7 @@ void rotateRight(int angle)
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle == 90)
-    tEncodeVal = 384; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
+    tEncodeVal = 382; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
   else if (angle == 180)
     tEncodeVal = 806; //angle * 4.48;
 
@@ -244,4 +212,15 @@ void rotateRight(int angle)
   // reset PID
   leftPIDController.resetPID();
   rightPIDController.resetPID();
+
+#ifdef EXPLORATION_MODE
+  delay(200);
+#else // FP
+  delay(80);
+#endif
+
+  // check if robot is aligned
+#ifdef EXPLORATION_MODE
+  checkForAlignmentCalibration();
+#endif
 }
