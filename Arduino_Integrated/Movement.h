@@ -43,6 +43,7 @@ extern volatile unsigned long R_timeWidth;
 
 
 void resetEnc();
+void resetPIDControllers();
 double calculateRpm(int pulseWidth);
 void moveForward(int moveUnits);
 void moveBackward(int moveUnits);

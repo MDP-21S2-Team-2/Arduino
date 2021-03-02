@@ -11,8 +11,7 @@
 
 // Setting Target RPM 125 RPM
 #define targetRpm 125.0
-#define MOVE_OFFTICKS 24
-
+//#define MOVE_OFFTICKS 24
 //#define MOVE_OFFTICKS 20
 
 const float alpha = 0.3;
@@ -22,33 +21,33 @@ void motorR_ISR() {
   encR_count++;
   encR_curr_count++;
   //For every 10 encoder count
-   if (encR_curr_count == 1)
-    {
-      R_prevTime = micros();    
-    }
-    else if (encR_curr_count == 6)
-    {
-      R_currTime = micros();
-      R_timeWidth = alpha * (R_currTime - R_prevTime) + alphaInv * R_timeWidth;
-      encR_curr_count = 0;
-      R_prevTime = R_currTime;
-    }
+  if (encR_curr_count == 1)
+  {
+    R_prevTime = micros();
+  }
+  else if (encR_curr_count == 6)
+  {
+    R_currTime = micros();
+    R_timeWidth = alpha * (R_currTime - R_prevTime) + alphaInv * R_timeWidth;
+    encR_curr_count = 0;
+    R_prevTime = R_currTime;
+  }
 }
 
 void motorL_ISR() {
   encL_count++;
   encL_curr_count++;
-   if (encL_curr_count == 1)
-    {
-      L_prevTime = micros();    
-    }
-    else if (encL_curr_count == 6)
-    {
-      L_currTime = micros();
-      L_timeWidth = alpha * (L_currTime - L_prevTime) + alphaInv * L_timeWidth;
-      encL_curr_count = 0;
-      L_prevTime = L_currTime;
-    }
+  if (encL_curr_count == 1)
+  {
+    L_prevTime = micros();
+  }
+  else if (encL_curr_count == 6)
+  {
+    L_currTime = micros();
+    L_timeWidth = alpha * (L_currTime - L_prevTime) + alphaInv * L_timeWidth;
+    encL_curr_count = 0;
+    L_prevTime = L_currTime;
+  }
 }
 // PID controller for each motor
 // parameter list: P, I, D, Imax, Imin
@@ -91,8 +90,8 @@ void setup() {
   //md.setM2Speed(400);
 
   // set starting times
-//  L_prevTime = micros();
-//  R_prevTime = L_prevTime;
+  //  L_prevTime = micros();
+  //  R_prevTime = L_prevTime;
 }
 
 void robotSystem_loop() {
@@ -103,43 +102,90 @@ void robotSystem_loop() {
     char command = Serial.read();
     if ((command == '\r') || (command == '\n')) // newline, ignore
       return;
-    
+
     switch (command) {  // TODO: a switch case might be more efficient if the characters are sequential?
-    case 'M': // move <=10 units
-      {
-        // read next character for no. units to move
-        while (Serial.available() == 0);  // wait for next character
-        char numUnits = Serial.read();
-        moveForward(numUnits - '0');
+      case 'M': // move <=10 units
+        {
+          // read next character for no. units to move
+          while (Serial.available() == 0);  // wait for next character
+          char numUnits = Serial.read();
+          moveForward(numUnits - '0');
+          
+#ifdef EXPLORATION_MODE
+          checkForAlignmentCalibration();
+          delay(200);
+          // send sensor readings
+          sendIRSensorsReadings();
+#else // FP
+          // acknowledge the command
+          Serial.write("K\n");
+          //        delay(80);
+#endif
+        }
+        break;
+      case 'F': // move >=11 units
+        {
+          // read next character for no. units to move
+          while (Serial.available() == 0);  // wait for next character
+          char numUnits = Serial.read();
+          moveForward(numUnits - '&'); // numUnits - '0' + 10
 
 #ifdef EXPLORATION_MODE
-        // send sensor readings
-        sendIRSensorsReadings();
+          checkForAlignmentCalibration();
+          delay(200);
+          // send sensor readings
+          sendIRSensorsReadings();
 #else // FP
-        // acknowledge the command
-        Serial.write("K\n");
+          // acknowledge the command
+          Serial.write("K\n");
+          //        delay(80);
 #endif
-      }
-      break;
-    case 'F': // move >=11 units
-      {
-        // read next character for no. units to move
-        while (Serial.available() == 0);  // wait for next character
-        char numUnits = Serial.read();
-        moveForward(numUnits - '&'); // numUnits - '0' + 10
+        }
+        break;
+      case 'L': // turn left 90
+        rotateLeft(90);
 
 #ifdef EXPLORATION_MODE
+        checkForAlignmentCalibration();
+        delay(200);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
+        //        delay(80);
 #endif
-      }
-      break;
-    case 'L': // turn left 90
-      rotateLeft(90);
-      
+        break;
+      case 'R': // turn right 90
+        rotateRight(90);
+
+#ifdef EXPLORATION_MODE
+        checkForAlignmentCalibration();
+        delay(200);
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        // acknowledge the command
+        Serial.write("K\n");
+        //        delay(80);
+#endif
+        break;
+      case 'B': // turn 180
+        rotateLeft(180);
+
+#ifdef EXPLORATION_MODE
+        checkForAlignmentCalibration();
+        delay(200);
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        // acknowledge the command
+        Serial.write("K\n");
+        //        delay(80);
+#endif
+        break;
+      case 'C': // initial calibration in starting grid
+        initialGridCalibration();
 #ifdef EXPLORATION_MODE
         // send sensor readings
         sendIRSensorsReadings();
@@ -147,44 +193,12 @@ void robotSystem_loop() {
         // acknowledge the command
         Serial.write("K\n");
 #endif
-      break;
-    case 'R': // turn right 90
-      rotateRight(90);
-      
-#ifdef EXPLORATION_MODE
-        // send sensor readings
-        sendIRSensorsReadings();
-#else // FP
-        // acknowledge the command
-        Serial.write("K\n");
-#endif
-      break;
-    case 'B': // turn 180
-      rotateLeft(180);
-      
-#ifdef EXPLORATION_MODE
-        // send sensor readings
-        sendIRSensorsReadings();
-#else // FP
-        // acknowledge the command
-        Serial.write("K\n");
-#endif
-      break;
-    case 'C': // initial calibration in starting grid
-      initialGridCalibration();
-#ifdef EXPLORATION_MODE
-        // send sensor readings
-        sendIRSensorsReadings();
-#else // FP
-        // acknowledge the command
-        Serial.write("K\n");
-#endif
-      break;
-      
-    default:  // do nothing
-      break;
+        break;
+
+      default:  // do nothing
+        break;
     }
-    
+
   } // if Serial.available() end
 }
 
@@ -243,13 +257,13 @@ void testInLoop_readingIR() {
   Serial.print(" | Front Left (D3): ");
   Serial.println(front_D3.getDistance());
 
-//  Serial.print("Side, front: ");
-//  Serial.print(left_S1.getDistance());
-//  Serial.print(" | Side, back: ");
-//  Serial.println(left_S2.getDistance());
+  //  Serial.print("Side, front: ");
+  //  Serial.print(left_S1.getDistance());
+  //  Serial.print(" | Side, back: ");
+  //  Serial.println(left_S2.getDistance());
 
-//  Serial.print("Right Long: ");
-//  Serial.println(right_long.getDistance());
+  //  Serial.print("Right Long: ");
+  //  Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
   //
 }
@@ -289,33 +303,21 @@ void testInLoop_motorsPID() {
 bool runProgram = true;
 void loop() {
 
-//  testInLoop_motorsPID();
-//  testInLoop_readingIR();
-//    robotSystem_loop();
+  //  testInLoop_motorsPID();
+  //  testInLoop_readingIR();
+  robotSystem_loop();
 
-//    delay(1000);
-if (runProgram) {
-    for (int i = 0; i < 8; ++i) {
-//      moveForward(0);
-//    delay(1500);
-//    leftPIDController.resetPID();
-//    rightPIDController.resetPID();
-//    resetEnc();
-    rotateLeft(90);
-
-    }
-    runProgram = false;
-}
-        
-//
-
-
-//    moveForward(6);
-//      delay(1000);
-//    leftPIDController.resetPID();
-//    rightPIDController.resetPID();
-//    resetEnc();
-
-    
-
+  //    delay(1000);
+  //if (runProgram) {
+  //    for (int i = 0; i < 8; ++i) {
+  ////      moveForward(0);
+  ////    delay(1500);
+  ////    leftPIDController.resetPID();
+  ////    rightPIDController.resetPID();
+  ////    resetEnc();
+  //    rotateLeft(90);
+  //
+  //    }
+  //    runProgram = false;
+  //}
 }

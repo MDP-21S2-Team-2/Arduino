@@ -41,6 +41,11 @@ void resetEnc() {
   R_timeWidth = 0;
 }
 
+void resetPIDControllers() {
+  leftPIDController.resetPID();
+  rightPIDController.resetPID();
+}
+
 double calculateRpm(int pulseWidth) {
   if (pulseWidth == 0)
     return 0;
@@ -73,7 +78,9 @@ void moveForward(int moveUnits)
       //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
 
       // read IR sensors here to check for emergency brakes
-//      checkForCrashCalibration();
+#ifndef EXPLORATION_MODE  // FP
+      checkForCrashCalibration();
+#endif
     }
   }
   if (!emergencyBrakes)
@@ -84,19 +91,7 @@ void moveForward(int moveUnits)
     emergencyBrakes = false;
   }
   // reset PID
-  leftPIDController.resetPID();
-  rightPIDController.resetPID();
-
-#ifdef EXPLORATION_MODE
-  delay(200);
-#else // FP
-  delay(80);
-#endif
-  
-  // check if robot is aligned
-#ifdef EXPLORATION_MODE
-  checkForAlignmentCalibration();
-#endif
+  resetPIDControllers();
 }
 void moveBackward(int moveUnits)
 {
@@ -118,19 +113,7 @@ void moveBackward(int moveUnits)
   md.setBrakes(BRAKE_L, BRAKE_R);
   
   // reset PID
-  leftPIDController.resetPID();
-  rightPIDController.resetPID();
-
-#ifdef EXPLORATION_MODE
-  delay(200);
-#else // FP
-  delay(80);
-#endif
-
-  // check if robot is aligned
-#ifdef EXPLORATION_MODE
-  checkForAlignmentCalibration();
-#endif
+  resetPIDControllers();
 }
 
 void rotateLeft(int angle)
@@ -163,22 +146,8 @@ void rotateLeft(int angle)
   md.setBrakes(BRAKE_L, BRAKE_R);
   
   // reset PID
-  leftPIDController.resetPID();
-  rightPIDController.resetPID();
-
-#ifdef EXPLORATION_MODE
-  delay(200);
-#else // FP
-  delay(80);
-#endif
-
-  // check if robot is aligned
-#ifdef EXPLORATION_MODE
-  checkForAlignmentCalibration();
-#endif
+  resetPIDControllers();
 }
-
-
 
 void rotateRight(int angle)
 {
@@ -210,17 +179,5 @@ void rotateRight(int angle)
   md.setBrakes(BRAKE_L, BRAKE_R);
   
   // reset PID
-  leftPIDController.resetPID();
-  rightPIDController.resetPID();
-
-#ifdef EXPLORATION_MODE
-  delay(200);
-#else // FP
-  delay(80);
-#endif
-
-  // check if robot is aligned
-#ifdef EXPLORATION_MODE
-  checkForAlignmentCalibration();
-#endif
+  resetPIDControllers();
 }
