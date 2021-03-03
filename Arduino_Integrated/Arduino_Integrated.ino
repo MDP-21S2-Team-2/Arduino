@@ -230,15 +230,15 @@ void sendIRSensorsReadings() {
   byte* ptr_dist_LR = (byte*) &dist_LR;
 
   Serial.write("IR,");
-  Serial.write(ptr_dist_D1, 4);
-  Serial.write(",");
-  Serial.write(ptr_dist_D2, 4);
-  Serial.write(",");
-  Serial.write(ptr_dist_D3, 4);
+  Serial.write(ptr_dist_S2, 4);
   Serial.write(",");
   Serial.write(ptr_dist_S1, 4);
   Serial.write(",");
-  Serial.write(ptr_dist_S2, 4);
+  Serial.write(ptr_dist_D3, 4);
+  Serial.write(",");
+  Serial.write(ptr_dist_D1, 4);
+  Serial.write(",");
+  Serial.write(ptr_dist_D2, 4);
   Serial.write(",");
   Serial.write(ptr_dist_LR, 4);
   Serial.write('\n');
@@ -250,17 +250,17 @@ void sendIRSensorsReadings() {
 void testInLoop_readingIR() {
   //delay(100);
 
-  Serial.print("Front Right (D2): ");
-  Serial.print(front_D2.getDistance());
-  Serial.print(" | Front Mid (D1): ");
-  Serial.print(front_D1.getDistance());
-  Serial.print(" | Front Left (D3): ");
-  Serial.println(front_D3.getDistance());
+//  Serial.print("Front Right (D2): ");
+//  Serial.print(front_D2.getDistance());
+//  Serial.print(" | Front Mid (D1): ");
+//  Serial.print(front_D1.getDistance());
+//  Serial.print(" | Front Left (D3): ");
+//  Serial.println(front_D3.getDistance());
 
-  //  Serial.print("Side, front: ");
-  //  Serial.print(left_S1.getDistance());
-  //  Serial.print(" | Side, back: ");
-  //  Serial.println(left_S2.getDistance());
+    Serial.print("Side, front: ");
+    Serial.print(left_S1.getDistance());
+    Serial.print(" | Side, back: ");
+    Serial.println(left_S2.getDistance());
 
   //  Serial.print("Right Long: ");
   //  Serial.println(right_long.getDistance());
@@ -302,11 +302,13 @@ void testInLoop_motorsPID() {
 
 bool runProgram = true;
 void loop() {
-
+  sendIRSensorsReadings();
+  delay(500);
   //  testInLoop_motorsPID();
-  //  testInLoop_readingIR();
-  robotSystem_loop();
-
+//    testInLoop_readingIR();
+//  robotSystem_loop();
+//  initialGridCalibration();
+//  delay(5000);
   //    delay(1000);
   //if (runProgram) {
   //    for (int i = 0; i < 8; ++i) {

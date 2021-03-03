@@ -79,7 +79,7 @@ void moveForward(int moveUnits)
 
       // read IR sensors here to check for emergency brakes
 #ifndef EXPLORATION_MODE  // FP
-      checkForCrashCalibration();
+      //checkForCrashCalibration();
 #endif
     }
   }
