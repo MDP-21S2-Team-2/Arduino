@@ -442,12 +442,12 @@ void initialGridCalibration() {
   rotateLeft(90);
 
   // 5. align with wall so robot is correct distance away
-//  if (front_D1.getDistance() < 4) { // front-mid sensor
-//    alignBack_Front(SharpIR::D1, false, 4.0);
-//  }
-//  else if (front_D1.getDistance() > 4.5) {  // front-right sensor
-//    alignForward_Front(SharpIR::D2, false, 4.0);
-//  }
+  if (front_D1.getDistance() < 4) { // front-mid sensor
+    alignBack_Front(SharpIR::D1, false, 4.0);
+  }
+  else if (front_D1.getDistance() > 4.5) {  // front-right sensor
+    alignForward_Front(SharpIR::D2, false, 4.0);
+  }
 
   delay(500);
 
