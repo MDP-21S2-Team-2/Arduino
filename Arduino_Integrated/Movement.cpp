@@ -12,14 +12,15 @@ void moveForward(int moveUnits)
   resetEnc();
   
   //double tEncodeVal = tDistance / oneRevDis * 562.25 - MOVE_OFFTICKS; // Calculate target number of ticks to travel the distance & reduce tEncodeVal by no. ticks needed for braking
-  int tEncodeVal = tEncodeVal_lut[moveUnits];
-
-  // reset prevTime to get more accurate timeWidth
-//  L_prevTime = micros();
-//  R_prevTime = micros();
+  //int tEncodeVal = tEncodeVal_lut[moveUnits];
+  int numOvershoot = numOvershoot_lut[moveUnits];
+  int remainderCount = remainderCount_lut[moveUnits];
 
   // check if either motor reached the target number of ticks
-  while (!emergencyBrakes && ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal)))
+  //while (!emergencyBrakes && ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal)))
+  while (!emergencyBrakes && 
+    (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
+  )
   //while (0.5*(encL_count + encR_count) <= tEncodeVal)
   {
     if (PID::checkPIDCompute()) {
@@ -48,12 +49,15 @@ void moveBackward(int moveUnits)
   // reset encoder ticks
   resetEnc();
   //double tEncodeVal = tDistance / oneRevDis * 562.25 - MOVE_OFFTICKS; // Calculate target number of ticks to travel the distance & reduce tEncodeVal by no. ticks needed for braking
-  int tEncodeVal = tEncodeVal_lut[moveUnits];
-  // reset prevTime to get more accurate timeWidth
-//  L_prevTime = micros();
-//  R_prevTime = micros();
+  //int tEncodeVal = tEncodeVal_lut[moveUnits];
+  int numOvershoot = numOvershoot_lut[moveUnits];
+  int remainderCount = remainderCount_lut[moveUnits];
+  
   // check if either motor reached the target number of ticks
-  while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
+  //while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
+  while (!emergencyBrakes && 
+    (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) || ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
+  )
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -167,7 +171,7 @@ void rotateRight(int angle)
   //Serial.println(tEncodeVal);
 
   //while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
-  while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) || ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
+  while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));

@@ -43,8 +43,8 @@ extern volatile unsigned long R_timeWidth;
 extern PID leftPIDController;
 extern PID rightPIDController;
 
-extern const float alpha;
-extern const float alphaInv;
+const float alpha = 0.3;
+const float alphaInv = 0.7;
 
 void resetEnc();
 void resetPIDControllers();

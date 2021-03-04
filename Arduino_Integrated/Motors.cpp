@@ -20,9 +20,6 @@ PID rightPIDController(3.844, 1.685, 4.54, 200.0, -200.0);
 //Circumference of whole robot m= 58.11cm
 // 90 degree = 14.5275cm
 
-const float alpha = 0.3;
-const float alphaInv = 0.7;
-
 // Left
 volatile unsigned long L_prevTime = 0;
 volatile unsigned long L_currTime = 0;
