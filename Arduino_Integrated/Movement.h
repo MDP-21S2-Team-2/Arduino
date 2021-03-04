@@ -5,7 +5,7 @@
 #define BRAKE_R 400
 
 // comment away if doing FP
-//#define EXPLORATION_MODE
+#define EXPLORATION_MODE
 
 //Declare Variables
 extern bool emergencyBrakes;
@@ -35,7 +35,7 @@ const int remainderCount_lut[20] = {
 //double oneRevDis = 18.849556; // in cm
 
 // movement
-void moveForward(int moveUnits);
+void moveForward(int moveUnits, bool emergencyEnabled);
 void moveBackward(int moveUnits);
 // rotation
 void rotateRight(int angle);

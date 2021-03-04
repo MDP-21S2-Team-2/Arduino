@@ -6,7 +6,7 @@
 
 bool emergencyBrakes = false;
 
-void moveForward(int moveUnits)
+void moveForward(int moveUnits, bool emergencyEnabled)
 {
   // reset encoder ticks
   resetEnc();
@@ -29,9 +29,8 @@ void moveForward(int moveUnits)
       //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
 
       // read IR sensors here to check for emergency brakes
-#ifdef EXPLORATION_MODE
-//      checkForCrash();
-#endif
+    if (emergencyEnabled)
+        checkForCrash();
     }
   }
   if (!emergencyBrakes)
@@ -97,16 +96,6 @@ void rotateLeft(int angle)
   // reset encoder ticks
   resetEnc();
   
-  Serial.println("Left: ");
-  Serial.print(encL_overshootCount);
-  Serial.print(",");
-  Serial.print(encL_count);
-  Serial.print(",");
-  Serial.print(encR_overshootCount);
-  Serial.print(",");
-  Serial.println(encR_count);
-  //Serial.println(tEncodeVal);
-  
   //while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
   while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) || ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   {
@@ -117,15 +106,6 @@ void rotateLeft(int angle)
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
-  
-  Serial.print(encL_overshootCount);
-  Serial.print(",");
-  Serial.print(encL_count);
-  Serial.print(",");
-  Serial.print(encR_overshootCount);
-  Serial.print(",");
-  Serial.println(encR_count);
-  //Serial.println(tEncodeVal);
   
   // reset PID
   resetPIDControllers();
@@ -159,17 +139,6 @@ void rotateRight(int angle)
   // reset encoder ticks
   resetEnc();
   
-  Serial.println("Right: ");
-  Serial.print(encL_overshootCount);
-  Serial.print(",");
-  Serial.print(encL_count);
-  Serial.print(",");
-  Serial.print(encR_overshootCount);
-  Serial.print(",");
-  Serial.println(encR_count);
-
-  //Serial.println(tEncodeVal);
-
   //while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
   while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   {
@@ -180,15 +149,6 @@ void rotateRight(int angle)
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
-  
-  Serial.print(encL_overshootCount);
-  Serial.print(",");
-  Serial.print(encL_count);
-  Serial.print(",");
-  Serial.print(encR_overshootCount);
-  Serial.print(",");
-  Serial.println(encR_count);
-  //Serial.println(tEncodeVal);
   
   // reset PID
   resetPIDControllers();

@@ -45,7 +45,7 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          moveForward(numUnits - '0');
+          moveForward(numUnits - '0', false);
 #ifdef EXPLORATION_MODE
           delay(500);
           checkAlignmentAfterMove();
@@ -65,7 +65,47 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          moveForward(numUnits - '&'); // numUnits - '0' + 10
+          moveForward(numUnits - '&', false); // numUnits - '0' + 10
+#ifdef EXPLORATION_MODE
+          delay(500);
+          checkAlignmentAfterMove();
+          delay(500);
+          // send sensor readings
+          sendIRSensorsReadings();
+#else // FP
+          // acknowledge the command
+          Serial.write("K\n");
+          delay(80);
+#endif
+        }
+        break;
+
+      case 'E': // move <=10 units, emergency brakes enabled
+        {
+          // read next character for no. units to move
+          while (Serial.available() == 0);  // wait for next character
+          char numUnits = Serial.read();
+          moveForward(numUnits - '0', true);
+#ifdef EXPLORATION_MODE
+          delay(500);
+          checkAlignmentAfterMove();
+          delay(500);
+          // send sensor readings
+          sendIRSensorsReadings();
+#else // FP
+          // acknowledge the command
+          Serial.write("K\n");
+          delay(80);
+#endif
+        }
+        break;
+
+      case 'D': // move >=11 units, emergency brakes enabled
+        {
+          // read next character for no. units to move
+          while (Serial.available() == 0);  // wait for next character
+          char numUnits = Serial.read();
+          moveForward(numUnits - '&', true); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
           delay(500);
           checkAlignmentAfterMove();
@@ -135,13 +175,6 @@ void robotSystem_loop() {
 #endif
         break;
 
-      case 'A':
-        for (int i = 0; i < 8; ++i) {
-          rotateLeft(90);
-          delay(80);
-        }
-        break;
-
       default:  // do nothing
         break;
     }
@@ -208,24 +241,17 @@ void loop() {
 //  delay(500);
   //  testInLoop_motorsPID();
 //    testInLoop_readingIR();
-//  robotSystem_loop();
+  robotSystem_loop();
 //  initialGridCalibration();
 //  delay(5000);
   //    delay(1000);
 ////  if (runProgram) {
       //delay(500);
-    for (int i = 0; i < 3; ++i) {
-//      moveForward(0);
-      rotateRight(90);
-      delay(500);
-//      rotateLeft(90)
+//    for (int i = 0; i < 3; ++i) {
+//      moveForward(2);
 //      delay(500);
-    };
-    
-    for (int i = 0; i < 3; ++i) {
-      rotateLeft(90);
-      delay(500);
-    }
+//    };
+
 //    runProgram = false;
 //  }
 }
