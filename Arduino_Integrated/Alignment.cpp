@@ -1,11 +1,11 @@
 #include "SharpIR.h"
 #include "Movement.h"
-#include "PID.h"
-#include "AlignAndCheck.h"
+#include "Alignment.h"
 #include "Sensors.h"
+#include "Motors.h"
 
 // check for crash while robot is moving
-void checkForCrashCalibration() {
+void checkForCrash() {
   double dist_D1 = front_D1.getDistance();
   double dist_D2 = front_D2.getDistance();
   double dist_D3 = front_D3.getDistance();
@@ -46,77 +46,11 @@ void checkForCrashCalibration() {
 //    }
 }
 
+// check that robot is in the center of the grids
+void checkCentralise_Front() {
 
-// check during initialGridCalibration, as this is more accurate
-void checkForAlignmentCalibration_initial() {
-
-  // get distances
-  double dist_D1 = front_D1.getDistance();
-  double dist_D2 = front_D2.getDistance();
-  double dist_D3 = front_D3.getDistance();
-
-// check for ideal distance from obstacle
-  // check if too near to the wall in front
-  if (dist_D1 < FRONT_INITIAL_EXPECTED_DIST) { // front-mid sensor
-    alignBack_Front(SharpIR::D1, false, FRONT_INITIAL_EXPECTED_DIST);
-  }
-  else if (dist_D2 < FRONT_INITIAL_EXPECTED_DIST) {  // front-right sensor
-    alignBack_Front(SharpIR::D2, false, FRONT_INITIAL_EXPECTED_DIST);
-  }
-  else if (dist_D3 < FRONT_INITIAL_EXPECTED_DIST) {  // front-left sensor
-    alignBack_Front(SharpIR::D3, false, FRONT_INITIAL_EXPECTED_DIST);
-  }
-
-  // update distances
-  delay(100);
-  dist_D1 = front_D1.getDistance();
-  dist_D2 = front_D2.getDistance();
-  dist_D3 = front_D3.getDistance();
+  double dist_D1, dist_D2, dist_D3;
   
-  // check if too far from the wall in front
-  if (dist_D1 > FRONT_INITIAL_EXPECTED_DIST) { // front-mid sensor
-    alignForward_Front(SharpIR::D1, false, FRONT_INITIAL_EXPECTED_DIST);
-  }
-  else if (dist_D2 > FRONT_INITIAL_EXPECTED_DIST) {  // front-right sensor
-    alignForward_Front(SharpIR::D2, false, FRONT_INITIAL_EXPECTED_DIST);
-  }
-  else if (dist_D3 > FRONT_INITIAL_EXPECTED_DIST) {  // front-left sensor
-    alignForward_Front(SharpIR::D3, false, FRONT_INITIAL_EXPECTED_DIST);
-  }
-
-  // update distances
-  delay(100);
-  dist_D1 = front_D1.getDistance();
-  dist_D2 = front_D2.getDistance();
-  dist_D3 = front_D3.getDistance();
-  
-// align robot to be straight
-  // front right
-  if (((dist_D1 >= 3.0 && dist_D1 <= 8.0 && dist_D2 >= 3.0 && dist_D2 <= 8.0) ||
-    (dist_D1 >= 8.0 && dist_D1 <= 18.0 && dist_D2 >= 8.0 && dist_D2 <= 18.0) ||
-    (dist_D1 >= 18.0 && dist_D1 <= 28.0 && dist_D2 >= 18.0 && dist_D2 <= 28.0))  // only try to align when within certain range from obstacle in front
-   && abs(dist_D1 - dist_D2) > 0.2) { // TODO: distance difference threshold
-    alignToFrontWall_Right();
-    }
-  // front left
-  else if (((dist_D1 >= 3.0 && dist_D1 <= 8.0 && dist_D3 >= 3.0 && dist_D3 <= 8.0) ||
-    (dist_D1 >= 8.0 && dist_D1 <= 18.0 && dist_D3 >= 8.0 && dist_D3 <= 18.0) ||
-    (dist_D1 >= 18.0 && dist_D1 <= 28.0 && dist_D3 >= 18.0 && dist_D3 <= 28.0))  // only try to align when within certain range from obstacle in front
-   && abs(dist_D1 - dist_D3) > 0.2) { // TODO: distance difference threshold
-      alignToFrontWall_Left();
-    }
-
-  // TESTING: delay
-  delay(500);
-}
-
-// check when robot is not moving, e.g. after moving forward, after rotating
-void checkForAlignmentCalibration() {
-
-  delay(100); // allow robot to settle
-  
-  double dist_D1, dist_D2, dist_D3, dist_S1, dist_S2, dist_LR;
-
 // check for ideal distance from obstacle
   // check if too near to the wall right in front
   dist_D1 = front_D1.getDistance();
@@ -137,17 +71,22 @@ void checkForAlignmentCalibration() {
   dist_D2 = front_D2.getDistance();
   dist_D3 = front_D3.getDistance();
   
-  if (dist_D1 > FRONT_1GRID_START && dist_D1 < FRONT_1GRID_END) { // front-mid sensor
+  if (dist_D1 > (FRONT_1GRID_DIST + FLUC_THRESHOLD) && dist_D1 < FRONT_1GRID_END) { // front-mid sensor
     alignForward_Front(SharpIR::D1, true, FRONT_1GRID_DIST);
   }
-  else if (dist_D2 > FRONT_1GRID_START && dist_D2 < FRONT_1GRID_END) {  // front-right sensor
+  else if (dist_D2 > (FRONT_1GRID_DIST + FLUC_THRESHOLD) && dist_D2 < FRONT_1GRID_END) {  // front-right sensor
     alignForward_Front(SharpIR::D2, true, FRONT_1GRID_DIST);
   }
-  else if (dist_D3 > FRONT_1GRID_START && dist_D3 < FRONT_1GRID_END) {  // front-left sensor
+  else if (dist_D3 > (FRONT_1GRID_DIST + FLUC_THRESHOLD) && dist_D3 < FRONT_1GRID_END) {  // front-left sensor
     alignForward_Front(SharpIR::D3, true, FRONT_1GRID_DIST);
   }
+}
 
-//check for ideal distance in middle of 3x3 grid - only if left-side calibration not used
+void checkCentralise_Sides() {
+  
+  double dist_S1, dist_S2, dist_LR;
+
+//check for ideal distance in middle of 3x3 grid
   bool alignedWithLeft = false;
   // check if too near to the wall on left side
   dist_S1 = left_S1.getDistance();
@@ -194,7 +133,7 @@ void checkForAlignmentCalibration() {
     alignedWithLeft = true;
   }
   
-  // check if too near to the wall on right side
+  // check if too near to the wall on right side - only if left-side calibration not used
   if (!alignedWithLeft) {
     dist_LR = right_long.getDistance();
     if (dist_LR < RIGHT_1GRID_DIST) { // left-front sensor
@@ -215,12 +154,14 @@ void checkForAlignmentCalibration() {
       delay(150);
     }
   }
-  
-// align robot to be straight
-  // if front sensors can be used, use them
-  dist_D1 = front_D1.getDistance();
-  dist_D2 = front_D2.getDistance();
-  dist_D3 = front_D3.getDistance();
+}
+
+// check if robot is tilted, i.e. not straight on the grids
+void checkForTilted() {
+// if front sensors can be used, use them instead of side
+  double dist_D1 = front_D1.getDistance();
+  double dist_D2 = front_D2.getDistance();
+  double dist_D3 = front_D3.getDistance();
   if ((dist_D1 >= 2.0 && dist_D1 <= 28.0 && dist_D2 >= 2.0 && dist_D2 <= 28.0) ||
     (dist_D1 >= 2.0 && dist_D1 <= 28.0 && dist_D3 >= 2.0 && dist_D2 <= 28.0))
   {
@@ -238,10 +179,11 @@ void checkForAlignmentCalibration() {
     { // TODO: distance difference thresholds
         alignToFrontWall_Left();
     }
-  } // else, check if left side can be used for alignment
+  }
+// else, check if left side can be used for alignment
   else {
-    dist_S1 = left_S1.getDistance();
-    dist_S2 = left_S2.getDistance();
+    double dist_S1 = left_S1.getDistance();
+    double dist_S2 = left_S2.getDistance();
     if ((dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 3.0 && dist_S2 <= 8.0 && abs(dist_S1 - dist_S2) > 0.1) ||
     (dist_S1 >= 13.0 && dist_S1 <= 18.0 && dist_S2 >= 13.0 && dist_S2 <= 18.0 && abs(dist_S1 - dist_S2) > 0.5) ||
     (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && abs(dist_S1 - dist_S2) > 1.5))
@@ -272,15 +214,7 @@ void alignToLeftWall() {
       //delay(1); // 1ms
       md.setBrakes(BRAKE_L, BRAKE_R);
       checkAlignment = false;
-    } /*else if (abs(difference) <= THRESHOLD_1) {  // continue aligning at a decreasing speed
-      //motorSpeed -= 10;
-      if (difference > 0) { // tilted to the right; turn left
-        md.setSpeeds(20, 20);
-      } else {  // tilted to the left; turn right
-        md.setSpeeds(-20, -20);
-      }
-    } // greater than first threshold
-    */
+    }
     else {
       newState = (difference < 0.075) ? STATE_DIFFGT0 : STATE_DIFFLT0;
       if (currState != newState) {  // change in state
@@ -421,55 +355,4 @@ void alignForward_Front(SharpIR::sensorCode sensor, bool fast, double targetDist
     }
   } while (dist_Dx > targetDist && dist_Dx < targetDist + 5);
   md.setBrakes(BRAKE_L, BRAKE_R);
-}
-
-// function to calibrate sensors in starting grid
-void initialGridCalibration() {
-
-  // 1. rotate left for robot's front to face wall
-  rotateLeft(90);
-  
-  // 3. TBD: wait a short while (for brakes to settle?)
-  delay(500);
-  
-  // 2. align accurately with wall in front
-  checkForAlignmentCalibration_initial();
-
-  // 3. TBD: wait a short while (for brakes to settle)
-  delay(500);
-
-  // 4. turn left again to face wall behind
-  rotateLeft(90);
-
-  // 5. align with wall so robot is correct distance away
-//  if (front_D1.getDistance() < 4) { // front-mid sensor
-//    alignBack_Front(SharpIR::D1, false, 4.0);
-//  }
-//  else if (front_D1.getDistance() > 4.5) {  // front-right sensor
-//    alignForward_Front(SharpIR::D2, false, 4.0);
-//  }
-
-  delay(500);
-
-  // 6. rotate back to face the front
-  rotateRight(90);
-  delay(500);
-  rotateRight(90);
-  delay(500);
-
-  
-  double dist_S1 = left_S1.getDistance();
-  double dist_S2 = left_S2.getDistance();
-
-if ((dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 3.0 && dist_S2 <= 8.0 && abs(dist_S1 - dist_S2) > 0.1) ||
-    (dist_S1 >= 13.0 && dist_S1 <= 18.0 && dist_S2 >= 13.0 && dist_S2 <= 18.0 && abs(dist_S1 - dist_S2) > 0.5) ||
-    (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && abs(dist_S1 - dist_S2) > 1.5))
-  { // TODO: distance difference threshold
-    alignToLeftWall();
-  }
-
-  // 5. TBD: align with side sensors?
-
-  // TBD: if sensor readings are too different, do a double-check?
-
 }

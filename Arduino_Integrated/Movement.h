@@ -1,24 +1,14 @@
 #ifndef Movement_H
 #define Movement_H
-#include <Arduino.h>
-#include <DualVNH5019MotorShield.h>
-#include "PID.h"
+
 #define BRAKE_L 400
 #define BRAKE_R 400
 
 // comment away if doing FP
-//#define EXPLORATION_MODE
+#define EXPLORATION_MODE
 
 //Declare Variables
 extern bool emergencyBrakes;
-//Counts for encoder
-extern volatile int encL_count;
-extern volatile int encR_count;
-extern volatile int encL_curr_count;
-extern volatile int encR_curr_count;
-extern PID leftPIDController;
-extern PID rightPIDController;
-extern DualVNH5019MotorShield md;
 
 // pre-calculated tEncodeVal for moveForward
 const int tEncodeVal_lut[20] = {
@@ -31,25 +21,15 @@ const int tEncodeVal_lut[20] = {
 //Movement Variables
 //double oneRevDis = 18.849556; // in cm
 
-// Left
-extern volatile unsigned long L_prevTime;
-extern volatile unsigned long L_currTime;
-extern volatile unsigned long L_timeWidth;
-
-// Right
-extern volatile unsigned long R_prevTime;
-extern volatile unsigned long R_currTime;
-extern volatile unsigned long R_timeWidth;
-
-
-void resetEnc();
-void resetPIDControllers();
-double calculateRpm(int pulseWidth);
+// movement
 void moveForward(int moveUnits);
 void moveBackward(int moveUnits);
-void rotateRight2(double angle);
+// rotation
 void rotateRight(int angle);
 void rotateLeft(int angle);
-void rotateLeft2(double angle);
+// check for alignment
+void initialGridCalibration();
+void checkAlignmentAfterMove();
+void checkAlignmentAfterRotate();
 
 #endif

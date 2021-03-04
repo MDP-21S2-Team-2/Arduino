@@ -1,60 +1,10 @@
 #include "Movement.h"
 #include "PID.h"
-#include "AlignAndCheck.h"
 #include "Sensors.h"
-#include <DualVNH5019MotorShield.h>
-#define targetRpm 125.0
-#define MOVE_OFFTICKS 24
-#define BRAKE_L 400
-#define BRAKE_R 400
+#include "Motors.h"
+#include "Alignment.h"
 
 bool emergencyBrakes = false;
-DualVNH5019MotorShield md;
-// Left
-volatile unsigned long L_prevTime = 0;
-volatile unsigned long L_currTime = 0;
-volatile unsigned long L_timeWidth = 0;
-
-// Right
-volatile unsigned long R_prevTime = 0;
-volatile unsigned long R_currTime = 0;
-volatile unsigned long R_timeWidth = 0;
-
-volatile int encL_count = 0;
-volatile int encR_count = 0;
-volatile int encL_curr_count =0;
-volatile int encR_curr_count =0;
-
-PID leftPIDController(3.68, 1.695, 4.54, 200.0, -200);
-PID rightPIDController(3.87, 1.695, 4.45, 200.0, -200.0);
-
-//PID leftPIDController(3.48, 1.625, 4.934, 200.0, -200); //red
-//PID rightPIDController(3.87, 1.675, 4.85, 200.0, -200.0);
-
-void resetEnc() {
-  encL_count = 0;
-  encR_count = 0;
-  encR_curr_count = 0;
-  encL_curr_count = 0;
-  // reset timeWidths
-  L_timeWidth = 0;
-  R_timeWidth = 0;
-}
-
-void resetPIDControllers() {
-  leftPIDController.resetPID();
-  rightPIDController.resetPID();
-}
-
-double calculateRpm(int pulseWidth) {
-  if (pulseWidth == 0)
-    return 0;
-  else {
-    //return 60000000.0 / (pulseWidth  * 56.225);  // time for 1 revolution in seconds
-    return 533570.48 / pulseWidth;
-  }
-  //to get RPM, 60 / <above value>
-}
 
 void moveForward(int moveUnits)
 {
@@ -79,14 +29,14 @@ void moveForward(int moveUnits)
 
       // read IR sensors here to check for emergency brakes
 #ifndef EXPLORATION_MODE  // FP
-      //checkForCrashCalibration();
+      //checkForCrash();
 #endif
     }
   }
   if (!emergencyBrakes)
     md.setBrakes(BRAKE_L, BRAKE_R);
   if (emergencyBrakes) {
-    // TODO: perform recovery action
+    // TODO: perform recovery action?
     //Serial.write("EMERGENCY\n");
     emergencyBrakes = false;
   }
@@ -180,4 +130,75 @@ void rotateRight(int angle)
   
   // reset PID
   resetPIDControllers();
+}
+
+void checkAlignmentAfterMove() {
+  delay(100); // allow robot to settle
+
+  // ensure robot is centralised within its grids
+  checkCentralise_Front();
+  checkCentralise_Sides();
+  
+  // align robot to be straight
+  checkForTilted();
+}
+
+void checkAlignmentAfterRotate() {
+  delay(100); // allow robot to settle
+  
+  // align robot to be straight
+  checkForTilted();
+}
+
+// function to calibrate sensors in starting grid
+void initialGridCalibration() {
+
+  // 1. rotate left for robot's front to face wall
+  rotateLeft(90);
+  
+  // 3. TBD: wait a short while (for brakes to settle?)
+  delay(500);
+  
+  // 2. align accurately with wall in front
+  checkCentralise_Front();
+  checkForTilted();
+
+  // 3. TBD: wait a short while (for brakes to settle)
+  delay(500);
+
+  // 4. turn left again to face wall behind
+  rotateLeft(90);
+
+  // 5. align with wall so robot is correct distance away
+  checkCentralise_Front();
+//  if (front_D1.getDistance() < 4) { // front-mid sensor
+//    alignBack_Front(SharpIR::D1, false, 4.0);
+//  }
+//  else if (front_D1.getDistance() > 4.5) {  // front-right sensor
+//    alignForward_Front(SharpIR::D2, false, 4.0);
+//  }
+
+  delay(500);
+
+  // 6. rotate back to face the front
+  rotateRight(90);
+  delay(500);
+  rotateRight(90);
+  delay(500);
+
+  
+  double dist_S1 = left_S1.getDistance();
+  double dist_S2 = left_S2.getDistance();
+
+if ((dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 3.0 && dist_S2 <= 8.0 && abs(dist_S1 - dist_S2) > 0.1) ||
+    (dist_S1 >= 13.0 && dist_S1 <= 18.0 && dist_S2 >= 13.0 && dist_S2 <= 18.0 && abs(dist_S1 - dist_S2) > 0.5) ||
+    (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && abs(dist_S1 - dist_S2) > 1.5))
+  { // TODO: distance difference threshold
+    alignToLeftWall();
+  }
+
+  // 5. TBD: align with side sensors?
+
+  // TBD: if sensor readings are too different, do a double-check?
+
 }
