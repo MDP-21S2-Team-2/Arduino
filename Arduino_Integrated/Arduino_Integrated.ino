@@ -213,13 +213,18 @@ void loop() {
 //  delay(5000);
   //    delay(1000);
 ////  if (runProgram) {
-    for (int i = 0; i < 4; ++i) {
-      moveForward(0);
+      //delay(500);
+    for (int i = 0; i < 3; ++i) {
+//      moveForward(0);
+      rotateRight(90);
       delay(500);
-//      rotateRight(90);
-      delay(500);
-//      rotateLeft(90);
+//      rotateLeft(90)
 //      delay(500);
+    };
+    
+    for (int i = 0; i < 3; ++i) {
+      rotateLeft(90);
+      delay(500);
     }
 //    runProgram = false;
 //  }

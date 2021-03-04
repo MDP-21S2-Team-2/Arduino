@@ -33,16 +33,20 @@ volatile unsigned long R_prevTime = 0;
 volatile unsigned long R_currTime = 0;
 volatile unsigned long R_timeWidth = 0;
 
-volatile int encL_count = 0;
-volatile int encR_count = 0;
-volatile int encL_curr_count = 0;
-volatile int encR_curr_count = 0;
+volatile unsigned char encL_count = 0;
+volatile unsigned char encR_count = 0;
+volatile unsigned char encL_curr_count = 0;
+volatile unsigned char encR_curr_count = 0;
+volatile unsigned char encL_overshootCount = 0;
+volatile unsigned char encR_overshootCount = 0;
 
 void resetEnc() {
   encL_count = 0;
   encR_count = 0;
   encR_curr_count = 0;
   encL_curr_count = 0;
+  encL_overshootCount = 0;
+  encR_overshootCount = 0;
   // reset timeWidths
   L_timeWidth = 0;
   R_timeWidth = 0;
@@ -65,6 +69,8 @@ double calculateRpm(int pulseWidth) {
 
 void motorR_ISR() {
   encR_count++;
+  if (encR_count == 0)
+    encR_overshootCount++;
   encR_curr_count++;
   //For every 10 encoder count
   if (encR_curr_count == 1)
@@ -82,6 +88,8 @@ void motorR_ISR() {
 
 void motorL_ISR() {
   encL_count++;
+  if (encL_count == 0)
+    encL_overshootCount++;
   encL_curr_count++;
   if (encL_curr_count == 1)
   {

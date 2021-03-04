@@ -136,7 +136,7 @@ void checkCentralise_Sides() {
   // check if too near to the wall on right side - only if left-side calibration not used
   if (!alignedWithLeft) {
     dist_LR = right_long.getDistance();
-    if (dist_LR < RIGHT_1GRID_DIST - 1.0) { // left-front sensor
+    if (dist_LR < RIGHT_1GRID_DIST - 2.0) { // left-front sensor
       rotateRight(90);
       delay(500);
       alignBack_Front(SharpIR::D3, true, FRONT_1GRID_DIST);  // align with left sensor
@@ -145,7 +145,7 @@ void checkCentralise_Sides() {
       delay(500);
     }
     // check if too far from wall on right side
-    else if (dist_LR < RIGHT_1GRID_END) { // left-front sensor
+    else if (dist_LR > RIGHT_1GRID_END) { // left-front sensor
       rotateRight(90);
       delay(500);
       alignForward_Front(SharpIR::D3, true, FRONT_1GRID_DIST);  // align with left sensor

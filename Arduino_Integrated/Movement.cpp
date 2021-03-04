@@ -68,17 +68,24 @@ void moveBackward(int moveUnits)
 
 void rotateLeft(int angle)
 {
-  int tEncodeVal = 0;
+  //int tEncodeVal = 0;
+  int numOvershoot = 0;
+  int remainderCount = 0;
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
-  if (angle == 90)
-    tEncodeVal = 387; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
-  else if (angle == 180)
-    tEncodeVal = 810; //angle * 4.5;  // 4.65
-
+  if (angle == 90) {
+    //tEncodeVal = 387; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
+    numOvershoot = 1;
+    remainderCount = 131;
+  }
+  else if (angle == 180) {
+    //tEncodeVal = 810; //angle * 4.5;  // 4.65
+    numOvershoot = 3;
+    remainderCount = 42;
+  }
   // reset prevTime to get more accurate timeWidth
 //  L_prevTime = micros();
 //  R_prevTime = micros();
@@ -86,7 +93,18 @@ void rotateLeft(int angle)
   // reset encoder ticks
   resetEnc();
   
-  while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
+  Serial.println("Left: ");
+  Serial.print(encL_overshootCount);
+  Serial.print(",");
+  Serial.print(encL_count);
+  Serial.print(",");
+  Serial.print(encR_overshootCount);
+  Serial.print(",");
+  Serial.println(encR_count);
+  //Serial.println(tEncodeVal);
+  
+  //while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
+  while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) || ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -96,30 +114,60 @@ void rotateLeft(int angle)
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
   
+  Serial.print(encL_overshootCount);
+  Serial.print(",");
+  Serial.print(encL_count);
+  Serial.print(",");
+  Serial.print(encR_overshootCount);
+  Serial.print(",");
+  Serial.println(encR_count);
+  //Serial.println(tEncodeVal);
+  
   // reset PID
   resetPIDControllers();
 }
 
 void rotateRight(int angle)
 {
-  // reset encoder ticks
-  resetEnc();
-  int tEncodeVal = 0;
+  //int tEncodeVal = 0;
+  int numOvershoot = 0;
+  int remainderCount = 0;
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
   // reduce tEncodeVal by no. ticks needed for braking
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
-  if (angle == 90)
-    tEncodeVal = 387; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
-  else if (angle == 180)
-    tEncodeVal = 806; //angle * 4.48;
+  if (angle == 90) {
+    //tEncodeVal = 387; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
+    numOvershoot = 1;
+    remainderCount = 131;
+  }
+  else if (angle == 180) {
+    //tEncodeVal = 806; //angle * 4.48;
+    numOvershoot = 3;
+    remainderCount = 38;
+  }
 
   // reset prevTime to get more accurate timeWidth
 //  L_prevTime = micros();
 //  R_prevTime = micros();
+  
+  // reset encoder ticks
+  resetEnc();
+  
+  Serial.println("Right: ");
+  Serial.print(encL_overshootCount);
+  Serial.print(",");
+  Serial.print(encL_count);
+  Serial.print(",");
+  Serial.print(encR_overshootCount);
+  Serial.print(",");
+  Serial.println(encR_count);
 
-  while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
+  //Serial.println(tEncodeVal);
+
+  //while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
+  while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) || ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -128,6 +176,15 @@ void rotateRight(int angle)
     }
   }
   md.setBrakes(BRAKE_L, BRAKE_R);
+  
+  Serial.print(encL_overshootCount);
+  Serial.print(",");
+  Serial.print(encL_count);
+  Serial.print(",");
+  Serial.print(encR_overshootCount);
+  Serial.print(",");
+  Serial.println(encR_count);
+  //Serial.println(tEncodeVal);
   
   // reset PID
   resetPIDControllers();

@@ -22,10 +22,12 @@
 extern DualVNH5019MotorShield md;
 
 //Counts for encoder
-extern volatile int encL_count;
-extern volatile int encR_count;
-extern volatile int encL_curr_count;
-extern volatile int encR_curr_count;
+extern volatile unsigned char encL_count;
+extern volatile unsigned char encR_count;
+extern volatile unsigned char encL_curr_count;
+extern volatile unsigned char encR_curr_count;
+extern volatile unsigned char encL_overshootCount;
+extern volatile unsigned char encR_overshootCount;
 
 // Left
 extern volatile unsigned long L_prevTime;
