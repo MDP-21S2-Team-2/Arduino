@@ -11,8 +11,12 @@
 
 // Setting Target RPM 125 RPM
 #define targetRpm 125.0
+// Setting Target RPM 130 RPM
+//#define targetRpm 135.0
+
 //#define MOVE_OFFTICKS 24
 //#define MOVE_OFFTICKS 20
+
 
 // Motor shield
 extern DualVNH5019MotorShield md;

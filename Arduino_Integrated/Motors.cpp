@@ -3,8 +3,8 @@ DualVNH5019MotorShield md;
 
 // PID controller for each motor
 // parameter list: P, I, D, Imax, Imin
-PID leftPIDController(3.68, 1.695, 4.54, 200.0, -200);
-PID rightPIDController(3.87, 1.695, 4.45, 200.0, -200.0);
+PID leftPIDController(3.68, 1.693, 4.55, 200.0, -200);
+PID rightPIDController(3.844, 1.685, 4.54, 200.0, -200.0);
 
 //PID leftPIDController(3.48, 1.625, 4.934, 200.0, -200); //red
 //PID rightPIDController(3.87, 1.675, 4.85, 200.0, -200.0);

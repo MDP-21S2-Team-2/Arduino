@@ -5,17 +5,17 @@
 #define BRAKE_R 400
 
 // comment away if doing FP
-#define EXPLORATION_MODE
+//#define EXPLORATION_MODE
 
 //Declare Variables
 extern bool emergencyBrakes;
 
 // pre-calculated tEncodeVal for moveForward
 const int tEncodeVal_lut[20] = {
-  269, 569, 871, 1169, 1467, // 1-5 units
-  1766, 2064, 2362, 2661, 2959, // 6-10 units
-  3257, 3555, 3854, 4152, 4450, // 11-15 units
-  4749, 5047, 5345, 5643, 5942  // 16-20 units
+  268, 568, 866, 1165, 1462, // 1-5 units
+  1761, 2059, 2357, 2656, 2954, // 6-10 units
+  3252, 3550, 3849, 4147, 4445, // 11-15 units
+  4744, 5042, 5340, 5638, 5937  // 16-20 units
 };
 
 //Movement Variables

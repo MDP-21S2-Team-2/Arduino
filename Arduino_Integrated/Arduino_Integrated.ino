@@ -47,14 +47,15 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '0');
 #ifdef EXPLORATION_MODE
+          delay(500);
           checkAlignmentAfterMove();
-          delay(200);
+          delay(500);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          //        delay(80);
+          delay(80);
 #endif
         }
         break;
@@ -66,14 +67,15 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '&'); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
+          delay(500);
           checkAlignmentAfterMove();
-          delay(200);
+          delay(500);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          //        delay(80);
+          delay(80);
 #endif
         }
         break;
@@ -81,41 +83,44 @@ void robotSystem_loop() {
       case 'L': // turn left 90
         rotateLeft(90);
 #ifdef EXPLORATION_MODE
+        delay(500);
         checkAlignmentAfterRotate();
-        delay(200);
+        delay(500);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
-        //        delay(80);
+        delay(80);
 #endif
         break;
         
       case 'R': // turn right 90
         rotateRight(90);
 #ifdef EXPLORATION_MODE
+        delay(500);
         checkAlignmentAfterRotate();
-        delay(200);
+        delay(500);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
-        //        delay(80);
+        delay(80);
 #endif
         break;
       case 'B': // turn 180
         rotateLeft(180);
 #ifdef EXPLORATION_MODE
+        delay(500);
         checkAlignmentAfterRotate();
-        delay(200);
+        delay(500);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
-        //        delay(80);
+        delay(80);
 #endif
         break;
         
@@ -128,6 +133,13 @@ void robotSystem_loop() {
         // acknowledge the command
         Serial.write("K\n");
 #endif
+        break;
+
+      case 'A':
+        for (int i = 0; i < 8; ++i) {
+          rotateLeft(90);
+          delay(80);
+        }
         break;
 
       default:  // do nothing
@@ -196,20 +208,19 @@ void loop() {
 //  delay(500);
   //  testInLoop_motorsPID();
 //    testInLoop_readingIR();
-  robotSystem_loop();
+//  robotSystem_loop();
 //  initialGridCalibration();
 //  delay(5000);
   //    delay(1000);
-  //if (runProgram) {
-  //    for (int i = 0; i < 8; ++i) {
-  ////      moveForward(0);
-  ////    delay(1500);
-  ////    leftPIDController.resetPID();
-  ////    rightPIDController.resetPID();
-  ////    resetEnc();
-  //    rotateLeft(90);
-  //
-  //    }
-  //    runProgram = false;
-  //}
+////  if (runProgram) {
+    for (int i = 0; i < 4; ++i) {
+      moveForward(0);
+      delay(500);
+//      rotateRight(90);
+      delay(500);
+//      rotateLeft(90);
+//      delay(500);
+    }
+//    runProgram = false;
+//  }
 }

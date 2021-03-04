@@ -28,8 +28,8 @@ void moveForward(int moveUnits)
       //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
 
       // read IR sensors here to check for emergency brakes
-#ifndef EXPLORATION_MODE  // FP
-      //checkForCrash();
+#ifdef EXPLORATION_MODE
+//      checkForCrash();
 #endif
     }
   }
@@ -68,8 +68,6 @@ void moveBackward(int moveUnits)
 
 void rotateLeft(int angle)
 {
-  // reset encoder ticks
-  resetEnc();
   int tEncodeVal = 0;
   //4.8147 exact multiplier
   // Calculate target number of ticks to travel the distance,
@@ -77,7 +75,7 @@ void rotateLeft(int angle)
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle == 90)
-    tEncodeVal = 384; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
+    tEncodeVal = 387; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
   else if (angle == 180)
     tEncodeVal = 810; //angle * 4.5;  // 4.65
 
@@ -85,7 +83,10 @@ void rotateLeft(int angle)
 //  L_prevTime = micros();
 //  R_prevTime = micros();
 
-  while ((encL_count + encR_count) / 2 <= tEncodeVal)
+  // reset encoder ticks
+  resetEnc();
+  
+  while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -110,7 +111,7 @@ void rotateRight(int angle)
   // Every degree takes (1/360 *58.11 /18.84956 * 562.25) = 4.8147
   // check if either motor reached the target number of ticksif (angle <=90)
   if (angle == 90)
-    tEncodeVal = 382; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
+    tEncodeVal = 387; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
   else if (angle == 180)
     tEncodeVal = 806; //angle * 4.48;
 
@@ -118,7 +119,7 @@ void rotateRight(int angle)
 //  L_prevTime = micros();
 //  R_prevTime = micros();
 
-  while ((encL_count + encR_count) / 2 <= tEncodeVal)
+  while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -133,8 +134,6 @@ void rotateRight(int angle)
 }
 
 void checkAlignmentAfterMove() {
-  delay(100); // allow robot to settle
-
   // ensure robot is centralised within its grids
   checkCentralise_Front();
   checkCentralise_Sides();
@@ -144,8 +143,6 @@ void checkAlignmentAfterMove() {
 }
 
 void checkAlignmentAfterRotate() {
-  delay(100); // allow robot to settle
-  
   // align robot to be straight
   checkForTilted();
 }
@@ -186,13 +183,12 @@ void initialGridCalibration() {
   rotateRight(90);
   delay(500);
 
-  
   double dist_S1 = left_S1.getDistance();
   double dist_S2 = left_S2.getDistance();
 
 if ((dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 3.0 && dist_S2 <= 8.0 && abs(dist_S1 - dist_S2) > 0.1) ||
-    (dist_S1 >= 13.0 && dist_S1 <= 18.0 && dist_S2 >= 13.0 && dist_S2 <= 18.0 && abs(dist_S1 - dist_S2) > 0.5) ||
-    (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && abs(dist_S1 - dist_S2) > 1.5))
+    (dist_S1 >= 13.0 && dist_S1 <= 18.0 && dist_S2 >= 13.0 && dist_S2 <= 18.0 && abs(dist_S1 - dist_S2) > 0.3) ||
+    (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && abs(dist_S1 - dist_S2) > 0.8))
   { // TODO: distance difference threshold
     alignToLeftWall();
   }

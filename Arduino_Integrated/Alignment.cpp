@@ -91,44 +91,44 @@ void checkCentralise_Sides() {
   // check if too near to the wall on left side
   dist_S1 = left_S1.getDistance();
   dist_S2 = left_S2.getDistance();
-  if (dist_S1 < LEFT_1GRID_DIST - FLUC_THRESHOLD) { // left-front sensor
+  if (dist_S1 < LEFT_1GRID_DIST - FLUC_THRESHOLD - 0.5) { // left-front sensor
     rotateLeft(90);
-    delay(150);
+    delay(500);
     alignBack_Front(SharpIR::D2, true, FRONT_1GRID_DIST);  // align with right sensor
-    delay(100);
+    delay(300);
     rotateRight(90);
-    delay(150);
+    delay(500);
 
     alignedWithLeft = true;
   }
-  else if (dist_S2 < LEFT_1GRID_DIST - FLUC_THRESHOLD) {  // left-back sensor
+  else if (dist_S2 < LEFT_1GRID_DIST - FLUC_THRESHOLD  - 0.5) {  // left-back sensor
     rotateLeft(90);
-    delay(150);
+    delay(500);
     alignBack_Front(SharpIR::D1, true, FRONT_1GRID_DIST);  // align with middle sensor
-    delay(100);
+    delay(300);
     rotateRight(90);
-    delay(150);
+    delay(500);
 
     alignedWithLeft = true;
   }
   // check if too far from wall on left side
-  else if (dist_S1 > LEFT_1GRID_DIST + FLUC_THRESHOLD) { // left-front sensor
+  else if (dist_S1 > LEFT_1GRID_DIST + FLUC_THRESHOLD + 1.5) { // left-front sensor
     rotateLeft(90);
-    delay(150);
+    delay(500);
     alignForward_Front(SharpIR::D2, true, FRONT_1GRID_DIST);  // align with right sensor
-    delay(100);
+    delay(300);
     rotateRight(90);
-    delay(150);
+    delay(500);
 
     alignedWithLeft = true;
   }
-  else if (dist_S2 > LEFT_1GRID_DIST + FLUC_THRESHOLD) {  // left-back sensor
+  else if (dist_S2 > LEFT_1GRID_DIST + FLUC_THRESHOLD + 1.5) {  // left-back sensor
     rotateLeft(90);
-    delay(150);
+    delay(300);
     alignForward_Front(SharpIR::D1, true, FRONT_1GRID_DIST);  // align with middle sensor
-    delay(100);
+    delay(300);
     rotateRight(90);
-    delay(150);
+    delay(500);
 
     alignedWithLeft = true;
   }
@@ -136,22 +136,22 @@ void checkCentralise_Sides() {
   // check if too near to the wall on right side - only if left-side calibration not used
   if (!alignedWithLeft) {
     dist_LR = right_long.getDistance();
-    if (dist_LR < RIGHT_1GRID_DIST) { // left-front sensor
+    if (dist_LR < RIGHT_1GRID_DIST - 1.0) { // left-front sensor
       rotateRight(90);
-      delay(150);
+      delay(500);
       alignBack_Front(SharpIR::D3, true, FRONT_1GRID_DIST);  // align with left sensor
-      delay(100);
+      delay(300);
       rotateLeft(90);
-      delay(150);
+      delay(500);
     }
     // check if too far from wall on right side
     else if (dist_LR < RIGHT_1GRID_END) { // left-front sensor
       rotateRight(90);
-      delay(150);
+      delay(500);
       alignForward_Front(SharpIR::D3, true, FRONT_1GRID_DIST);  // align with left sensor
-      delay(100);
+      delay(300);
       rotateLeft(90);
-      delay(150);
+      delay(500);
     }
   }
 }
@@ -165,28 +165,31 @@ void checkForTilted() {
   if ((dist_D1 >= 2.0 && dist_D1 <= 28.0 && dist_D2 >= 2.0 && dist_D2 <= 28.0) ||
     (dist_D1 >= 2.0 && dist_D1 <= 28.0 && dist_D3 >= 2.0 && dist_D2 <= 28.0))
   {
+    double difference1 = abs(dist_D1 - dist_D2);
+    double difference2 = abs(dist_D1 - dist_D3);
     // front right
-    if ((dist_D1 >= 1.0 && dist_D1 <= 8.0 && dist_D2 >= 1.0 && dist_D2 <= 8.0 && abs(dist_D1 - dist_D2) > 0.3) ||
-      (dist_D1 >= 13.0 && dist_D1 <= 18.0 && dist_D2 >= 13.0 && dist_D2 <= 18.0 && abs(dist_D1 - dist_D2) > 0.5) ||
-      (dist_D1 >= 23.0 && dist_D1 <= 28.0 && dist_D2 >= 23.0 && dist_D2 <= 28.0 && abs(dist_D1 - dist_D2) > 0.8))  // only try to align when within certain range from obstacle in front
+    if ((dist_D1 >= 1.0 && dist_D1 <= 8.0 && dist_D2 >= 1.0 && dist_D2 <= 8.0 && difference1 > 0.3) ||
+      (dist_D1 >= 13.0 && dist_D1 <= 18.0 && dist_D2 >= 13.0 && dist_D2 <= 18.0 && difference1 > 0.5) ||
+      (dist_D1 >= 23.0 && dist_D1 <= 28.0 && dist_D2 >= 23.0 && dist_D2 <= 28.0 && difference1 > 0.8))  // only try to align when within certain range from obstacle in front
     { // TODO: distance difference thresholds
-      alignToFrontWall_Right();
+      alignToFrontWall(false);  // align with right
     }
     // front left
-    else if ((dist_D1 >= 1.0 && dist_D1 <= 8.0 && dist_D3 >= 1.0 && dist_D3 <= 8.0 && abs(dist_D1 - dist_D3) > 0.2) ||
-      (dist_D1 >= 13.0 && dist_D1 <= 18.0 && dist_D3 >= 13.0 && dist_D3 <= 18.0 && abs(dist_D1 - dist_D3) > 0.5) ||
-      (dist_D1 >= 23.0 && dist_D1 <= 28.0 && dist_D3 >= 23.0 && dist_D3 <= 28.0 && abs(dist_D1 - dist_D3) > 0.8))  // only try to align when within certain range from obstacle in front
+    else if ((dist_D1 >= 1.0 && dist_D1 <= 8.0 && dist_D3 >= 1.0 && dist_D3 <= 8.0 && difference2 > 0.2) ||
+      (dist_D1 >= 13.0 && dist_D1 <= 18.0 && dist_D3 >= 13.0 && dist_D3 <= 18.0 && difference2 > 0.5) ||
+      (dist_D1 >= 23.0 && dist_D1 <= 28.0 && dist_D3 >= 23.0 && dist_D3 <= 28.0 && difference2 > 0.8))  // only try to align when within certain range from obstacle in front
     { // TODO: distance difference thresholds
-        alignToFrontWall_Left();
+        alignToFrontWall(true); // align with left
     }
   }
 // else, check if left side can be used for alignment
   else {
     double dist_S1 = left_S1.getDistance();
     double dist_S2 = left_S2.getDistance();
-    if ((dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 3.0 && dist_S2 <= 8.0 && abs(dist_S1 - dist_S2) > 0.1) ||
-    (dist_S1 >= 13.0 && dist_S1 <= 18.0 && dist_S2 >= 13.0 && dist_S2 <= 18.0 && abs(dist_S1 - dist_S2) > 0.5) ||
-    (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && abs(dist_S1 - dist_S2) > 1.5))
+    double difference = dist_S2 - dist_S1;
+    if ((dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 2.0 && dist_S2 <= 8.0 && (difference > 0.15 || difference < 0))/* ||
+    (dist_S1 >= 13.0 && dist_S1 <= 18.0 && dist_S2 >= 13.0 && dist_S2 <= 18.0 && difference > 0.2) ||
+    (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && abs(dist_S1 - dist_S2) > 0.8)*/)
     { // TODO: distance difference threshold
       alignToLeftWall();
     }
@@ -232,9 +235,9 @@ void alignToLeftWall() {
   }
 }
 
-void alignToFrontWall_Left() {
+void alignToFrontWall(bool useLeft) {
   // use front-left (D3) and front-mid (D1) for alignment
-  double dist_D1, dist_D3, difference;
+  double dist_D1, dist_Dx, difference;
   bool checkAlignment = true;
 
   // 0: have not started moving; 1: diff > 0; 2: diff < 0
@@ -242,9 +245,9 @@ void alignToFrontWall_Left() {
   
   while (checkAlignment) {
     dist_D1 = front_D1.getDistance();
-    dist_D3 = front_D3.getDistance();
+    dist_Dx = useLeft ? front_D3.getDistance() : front_D2.getDistance();
 
-    difference = dist_D1 - dist_D3;
+    difference = useLeft ? dist_D1 - dist_Dx : dist_Dx - dist_D1;
 
     // abs: is a macro, so should be efficient
     if (abs(difference) <= THRESHOLD) { // very small gap, so stop moving
@@ -257,51 +260,14 @@ void alignToFrontWall_Left() {
       if (currState != newState) {  // change in state
         // set new speed
         if (abs(difference) > HS_THRESHOLD) {
-          if (newState == STATE_DIFFGT0)  md.setSpeeds(100, 100); // tilted to the right; turn left
-          else  md.setSpeeds(-100, -100); // tilted to the left; turn right
-        } else {
-          if (newState == STATE_DIFFGT0)  md.setSpeeds(60, 60); // tilted to the right; turn left
-          else  md.setSpeeds(-60, -60); // tilted to the left; turn right
-        }
-        currState = newState;
-      }
-    }
-  }
-}
-
-void alignToFrontWall_Right() {
-  // use front-right (D2) and front-mid (D1) for alignment
-  double dist_D1, dist_D2, difference;
-  bool checkAlignment = true;
-
-  // 0: have not started moving; 1: diff > 0; 2: diff < 0
-  char currState = 0, newState = 0;
-  
-  while (checkAlignment) {
-    dist_D1 = front_D1.getDistance();
-    dist_D2 = front_D2.getDistance();
-
-    difference = dist_D2 - dist_D1;
-
-    // abs: is a macro, so should be efficient
-    if (abs(difference) <= THRESHOLD) { // very small gap, so stop moving
-      //delay(1); // 1ms
-      md.setBrakes(BRAKE_L, BRAKE_R);
-      checkAlignment = false;
-    }
-    else {
-      newState = (difference > 0) ? STATE_DIFFGT0 : STATE_DIFFLT0;
-      if (currState != newState) {  // change in state
-        // set new speed
-        if (abs(difference) > HS_THRESHOLD) {
-          if (newState == STATE_DIFFGT0)  
+          if (newState == STATE_DIFFGT0)
             md.setSpeeds(100, 100); // tilted to the right; turn left
-          else  
+          else
             md.setSpeeds(-100, -100); // tilted to the left; turn right
         } else {
-          if (newState == STATE_DIFFGT0)  
+          if (newState == STATE_DIFFGT0)
             md.setSpeeds(60, 60); // tilted to the right; turn left
-          else  
+          else
             md.setSpeeds(-60, -60); // tilted to the left; turn right
         }
         currState = newState;

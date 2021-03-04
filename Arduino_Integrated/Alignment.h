@@ -13,10 +13,10 @@
 #define FRONT_1GRID_DIST 5.0
 #define FRONT_1GRID_START 1.8
 #define FRONT_1GRID_END 10.5
-#define LEFT_1GRID_DIST 5.0
+#define LEFT_1GRID_DIST 4.0
 #define LEFT_1GRID_START 2.0
 #define LEFT_1GRID_END 9.5
-#define RIGHT_1GRID_DIST 5.0
+#define RIGHT_1GRID_DIST 4.0
 #define RIGHT_1GRID_START 2.0
 #define RIGHT_1GRID_END 9.5
 
@@ -30,8 +30,7 @@ void checkForTilted();  // check if robot is tilted, i.e. not straight on the gr
 
 // alignment behaviour - rotation
 void alignToLeftWall();
-void alignToFrontWall_Left();
-void alignToFrontWall_Right();
+void alignToFrontWall(bool useLeft);
 // alignment behaviour - centralise
 void alignBack_Front(SharpIR::sensorCode sensor, bool fast, double targetDist);
 void alignForward_Front(SharpIR::sensorCode sensor, bool fast, double targetDist);
