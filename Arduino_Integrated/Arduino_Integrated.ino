@@ -47,15 +47,15 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '0', false);
 #ifdef EXPLORATION_MODE
-          delay(500);
+          delay(150);
           checkAlignmentAfterMove();
-          delay(500);
+          delay(150);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          delay(80);
+          delay(60);
 #endif
         }
         break;
@@ -67,15 +67,15 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '&', false); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(500);
+          delay(150);
           checkAlignmentAfterMove();
-          delay(500);
+          delay(150);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          delay(80);
+          delay(60);
 #endif
         }
         break;
@@ -87,15 +87,15 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '0', true);
 #ifdef EXPLORATION_MODE
-          delay(500);
+          delay(150);
           checkAlignmentAfterMove();
-          delay(500);
+          delay(150);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          delay(80);
+          delay(60);
 #endif
         }
         break;
@@ -107,15 +107,15 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '&', true); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(500);
+          delay(150);
           checkAlignmentAfterMove();
-          delay(500);
+          delay(150);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          delay(80);
+          delay(60);
 #endif
         }
         break;
@@ -123,44 +123,44 @@ void robotSystem_loop() {
       case 'L': // turn left 90
         rotateLeft(90);
 #ifdef EXPLORATION_MODE
-        delay(500);
+        delay(150);
         checkAlignmentAfterRotate();
-        delay(500);
+        delay(150);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
-        delay(80);
+        delay(60);
 #endif
         break;
         
       case 'R': // turn right 90
         rotateRight(90);
 #ifdef EXPLORATION_MODE
-        delay(500);
+        delay(150);
         checkAlignmentAfterRotate();
-        delay(500);
+        delay(150);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
-        delay(80);
+        delay(60);
 #endif
         break;
       case 'B': // turn 180
         rotateLeft(180);
 #ifdef EXPLORATION_MODE
-        delay(500);
+        delay(150);
         checkAlignmentAfterRotate();
-        delay(500);
+        delay(150);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
-        delay(80);
+        delay(60);
 #endif
         break;
         
@@ -185,17 +185,17 @@ void robotSystem_loop() {
 void testInLoop_readingIR() {
   //delay(100);
 
-//  Serial.print("Front Right (D2): ");
-//  Serial.print(front_D2.getDistance());
-//  Serial.print(" | Front Mid (D1): ");
-//  Serial.print(front_D1.getDistance());
-//  Serial.print(" | Front Left (D3): ");
-//  Serial.println(front_D3.getDistance());
-
-    Serial.print("Side, front: ");
-    Serial.print(left_S1.getDistance());
-    Serial.print(" | Side, back: ");
-    Serial.println(left_S2.getDistance());
+  Serial.print("Front Right (D2): ");
+  Serial.print(front_D2.getDistance());
+  Serial.print(" | Front Mid (D1): ");
+  Serial.print(front_D1.getDistance());
+  Serial.print(" | Front Left (D3): ");
+  Serial.println(front_D3.getDistance());
+//
+//    Serial.print("Side, front: ");
+//    Serial.print(left_S1.getDistance());
+//    Serial.print(" | Side, back: ");
+//    Serial.println(left_S2.getDistance());
 
   //  Serial.print("Right Long: ");
   //  Serial.println(right_long.getDistance());
@@ -239,19 +239,24 @@ bool runProgram = true;
 void loop() {
 //  sendIRSensorsReadings();
 //  delay(500);
-  //  testInLoop_motorsPID();
+//    testInLoop_motorsPID();
 //    testInLoop_readingIR();
   robotSystem_loop();
 //  initialGridCalibration();
 //  delay(5000);
   //    delay(1000);
-////  if (runProgram) {
-      //delay(500);
-//    for (int i = 0; i < 3; ++i) {
-//      testInLoop_readingIR();
-//      checkCentralise_Sides();
-//      delay(500);
-//    };
+//  if (runProgram) {
+//    initialGridCalibration();
+//    delay(2000);
+//    for (int i = 0; i < 4; ++i) {
+//      moveForward(0, false);
+//      delay(1500);
+//      rotateRight(90);
+//      delay(1500);
+////      checkAlignmentAfterMove();
+////      delay(200);
+//    }
+//    delay(1500);
 
 //    runProgram = false;
 //  }

@@ -94,7 +94,7 @@ void checkCentralise_Sides() {
   if (dist_S1 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD) { // left-front sensor
     rotateLeft(90);
     delay(500);
-    alignBack_Front(SharpIR::D2, true, LEFT_1GRID_DIST);  // align with right sensor
+    alignBack_Front(SharpIR::D2, true, FRONT_1GRID_DIST);  // align with right sensor
     delay(300);
     rotateRight(90);
     delay(500);
@@ -104,7 +104,7 @@ void checkCentralise_Sides() {
   else if (dist_S2 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD) {  // left-back sensor
     rotateLeft(90);
     delay(500);
-    alignBack_Front(SharpIR::D1, true, LEFT_1GRID_DIST);  // align with middle sensor
+    alignBack_Front(SharpIR::D1, true, FRONT_1GRID_DIST);  // align with middle sensor
     delay(300);
     rotateRight(90);
     delay(500);
@@ -115,7 +115,7 @@ void checkCentralise_Sides() {
   else if (dist_S1 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD && dist_S1 < LEFT_1GRID_END) { // left-front sensor
     rotateLeft(90);
     delay(500);
-    alignForward_Front(SharpIR::D2, true, LEFT_1GRID_DIST);  // align with right sensor
+    alignForward_Front(SharpIR::D2, true, FRONT_1GRID_DIST);  // align with right sensor
     delay(300);
     rotateRight(90);
     delay(500);
@@ -125,7 +125,7 @@ void checkCentralise_Sides() {
   else if (dist_S2 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD && dist_S2 < LEFT_1GRID_END) {  // left-back sensor
     rotateLeft(90);
     delay(300);
-    alignForward_Front(SharpIR::D1, true, LEFT_1GRID_DIST);  // align with middle sensor
+    alignForward_Front(SharpIR::D1, true, FRONT_1GRID_DIST);  // align with middle sensor
     delay(300);
     rotateRight(90);
     delay(500);
@@ -139,7 +139,7 @@ void checkCentralise_Sides() {
     if (dist_LR < RIGHT_1GRID_DIST - SIDES_DIST_THRESHOLD) { // left-front sensor
       rotateRight(90);
       delay(500);
-      alignBack_Front(SharpIR::D3, true, RIGHT_1GRID_DIST);  // align with left sensor
+      alignBack_Front(SharpIR::D3, true, FRONT_1GRID_DIST);  // align with left sensor
       delay(300);
       rotateLeft(90);
       delay(500);
@@ -148,7 +148,7 @@ void checkCentralise_Sides() {
     else if (dist_LR > RIGHT_1GRID_DIST + SIDES_DIST_THRESHOLD && dist_LR < RIGHT_1GRID_END) { // left-front sensor
       rotateRight(90);
       delay(500);
-      alignForward_Front(SharpIR::D3, true, RIGHT_1GRID_DIST);  // align with left sensor
+      alignForward_Front(SharpIR::D3, true, FRONT_1GRID_DIST);  // align with left sensor
       delay(300);
       rotateLeft(90);
       delay(500);
@@ -201,12 +201,13 @@ void alignToLeftWall() {
   
   // use side sensors for alignment
   double dist_S1, dist_S2, difference;
-  bool checkAlignment = true;
 
   // 0: have not started moving; 1: diff > 0; 2: diff < 0
   char currState = 0, newState = 0;
+
+  unsigned long startTime = millis();
   
-  while (checkAlignment) {
+  while ((millis() - startTime) < 1500) {
     dist_S1 = left_S1.getDistance();
     dist_S2 = left_S2.getDistance();
 
@@ -216,7 +217,7 @@ void alignToLeftWall() {
     if (0.075 <=difference && difference <= SIDE_THRESHOLD) { // very small gap, so stop moving
       //delay(1); // 1ms
       md.setBrakes(BRAKE_L, BRAKE_R);
-      checkAlignment = false;
+      break;
     }
     else {
       newState = (difference < 0.075) ? STATE_DIFFGT0 : STATE_DIFFLT0;
@@ -233,17 +234,19 @@ void alignToLeftWall() {
       }
     }
   }
+  md.setBrakes(BRAKE_L, BRAKE_R);
 }
 
 void alignToFrontWall(bool useLeft) {
   // use front-left (D3) and front-mid (D1) for alignment
   double dist_D1, dist_Dx, difference;
-  bool checkAlignment = true;
 
   // 0: have not started moving; 1: diff > 0; 2: diff < 0
   char currState = 0, newState = 0;
   
-  while (checkAlignment) {
+  unsigned long startTime = millis();
+  
+  while ((millis() - startTime) < 1500) {
     dist_D1 = front_D1.getDistance();
     dist_Dx = useLeft ? front_D3.getDistance() : front_D2.getDistance();
 
@@ -253,7 +256,7 @@ void alignToFrontWall(bool useLeft) {
     if (abs(difference) <= THRESHOLD) { // very small gap, so stop moving
       //delay(1); // 1ms
       md.setBrakes(BRAKE_L, BRAKE_R);
-      checkAlignment = false;
+      break;
     }
     else {
       newState = (difference > 0) ? STATE_DIFFGT0 : STATE_DIFFLT0;
@@ -274,6 +277,7 @@ void alignToFrontWall(bool useLeft) {
       }
     }
   }
+  md.setBrakes(BRAKE_L, BRAKE_R);
 }
 
 // Robot self-calibration: repositioning

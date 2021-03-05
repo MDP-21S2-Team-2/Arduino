@@ -82,7 +82,7 @@ void rotateLeft(int angle)
   if (angle == 90) {
     //tEncodeVal = 387; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
     numOvershoot = 1;
-    remainderCount = 131;
+    remainderCount = 125;
   }
   else if (angle == 180) {
     //tEncodeVal = 810; //angle * 4.5;  // 4.65
@@ -124,7 +124,7 @@ void rotateRight(int angle)
   if (angle == 90) {
     //tEncodeVal = 387; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
     numOvershoot = 1;
-    remainderCount = 131;
+    remainderCount = 128;
   }
   else if (angle == 180) {
     //tEncodeVal = 806; //angle * 4.48;
@@ -186,6 +186,7 @@ void initialGridCalibration() {
 
   // 4. turn left again to face wall behind
   rotateLeft(90);
+  delay(500);
 
   // 5. align with wall so robot is correct distance away
   checkCentralise_Front();
@@ -207,7 +208,7 @@ void initialGridCalibration() {
   double dist_S1 = left_S1.getDistance();
   double dist_S2 = left_S2.getDistance();
 
-if ((dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 3.0 && dist_S2 <= 8.0 && abs(dist_S1 - dist_S2) > 0.1) ||
+if ((dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 3.0 && dist_S2 <= 8.0 && ((dist_S2 - dist_S1) > 0.1 || (dist_S2 - dist_S1) < 0.075)) ||
     (dist_S1 >= 13.0 && dist_S1 <= 18.0 && dist_S2 >= 13.0 && dist_S2 <= 18.0 && abs(dist_S1 - dist_S2) > 0.3) ||
     (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && abs(dist_S1 - dist_S2) > 0.8))
   { // TODO: distance difference threshold
