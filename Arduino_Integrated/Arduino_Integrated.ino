@@ -248,7 +248,8 @@ void loop() {
 ////  if (runProgram) {
       //delay(500);
 //    for (int i = 0; i < 3; ++i) {
-//      moveForward(2);
+//      testInLoop_readingIR();
+//      checkCentralise_Sides();
 //      delay(500);
 //    };
 
