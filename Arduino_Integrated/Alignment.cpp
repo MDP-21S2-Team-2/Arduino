@@ -92,51 +92,43 @@ void checkCentralise_Sides() {
   dist_S1 = left_S1.getDistance();
   dist_S2 = left_S2.getDistance();
   if (dist_S1 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD) { // left-front sensor
-//    rotateLeft(90);
-//    delay(500);
-//    alignBack_Front(SharpIR::D2, true, LEFT_1GRID_DIST);  // align with right sensor
-//    delay(300);
-//    rotateRight(90);
-//    delay(500);
-
-    Serial.println("Dist_S1 < LEFT1GRID +");
+    rotateLeft(90);
+    delay(500);
+    alignBack_Front(SharpIR::D2, true, LEFT_1GRID_DIST);  // align with right sensor
+    delay(300);
+    rotateRight(90);
+    delay(500);
 
     alignedWithLeft = true;
   }
   else if (dist_S2 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD) {  // left-back sensor
-//    rotateLeft(90);
-//    delay(500);
-//    alignBack_Front(SharpIR::D1, true, LEFT_1GRID_DIST);  // align with middle sensor
-//    delay(300);
-//    rotateRight(90);
-//    delay(500);
-
-    Serial.println("Dist_S2 < LEFT1GRID + ");
+    rotateLeft(90);
+    delay(500);
+    alignBack_Front(SharpIR::D1, true, LEFT_1GRID_DIST);  // align with middle sensor
+    delay(300);
+    rotateRight(90);
+    delay(500);
     
     alignedWithLeft = true;
   }
   // check if too far from wall on left side
-  else if (dist_S1 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD) { // left-front sensor
-//    rotateLeft(90);
-//    delay(500);
-//    alignForward_Front(SharpIR::D2, true, LEFT_1GRID_DIST);  // align with right sensor
-//    delay(300);
-//    rotateRight(90);
-//    delay(500);
-
-    Serial.println("Dist_S1 > LEFT1GRID + ");
+  else if (dist_S1 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD && dist_S1 < LEFT_1GRID_END) { // left-front sensor
+    rotateLeft(90);
+    delay(500);
+    alignForward_Front(SharpIR::D2, true, LEFT_1GRID_DIST);  // align with right sensor
+    delay(300);
+    rotateRight(90);
+    delay(500);
 
     alignedWithLeft = true;
   }
-  else if (dist_S2 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD) {  // left-back sensor
-//    rotateLeft(90);
-//    delay(300);
-//    alignForward_Front(SharpIR::D1, true, LEFT_1GRID_DIST);  // align with middle sensor
-//    delay(300);
-//    rotateRight(90);
-//    delay(500);
-
-    Serial.println("Dist_S2 > LEFT1GRID");
+  else if (dist_S2 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD && dist_S2 < LEFT_1GRID_END) {  // left-back sensor
+    rotateLeft(90);
+    delay(300);
+    alignForward_Front(SharpIR::D1, true, LEFT_1GRID_DIST);  // align with middle sensor
+    delay(300);
+    rotateRight(90);
+    delay(500);
 
     alignedWithLeft = true;
   }
@@ -145,25 +137,21 @@ void checkCentralise_Sides() {
   if (!alignedWithLeft) {
     dist_LR = right_long.getDistance();
     if (dist_LR < RIGHT_1GRID_DIST - SIDES_DIST_THRESHOLD) { // left-front sensor
-//      rotateRight(90);
-//      delay(500);
-//      alignBack_Front(SharpIR::D3, true, RIGHT_1GRID_DIST);  // align with left sensor
-//      delay(300);
-//      rotateLeft(90);
-//      delay(500);
-
-      Serial.println("Dist_LR < RIGHT1GRID");
+      rotateRight(90);
+      delay(500);
+      alignBack_Front(SharpIR::D3, true, RIGHT_1GRID_DIST);  // align with left sensor
+      delay(300);
+      rotateLeft(90);
+      delay(500);
     }
     // check if too far from wall on right side
-    else if (dist_LR > RIGHT_1GRID_DIST + SIDES_DIST_THRESHOLD) { // left-front sensor
-//      rotateRight(90);
-//      delay(500);
-//      alignForward_Front(SharpIR::D3, true, RIGHT_1GRID_DIST);  // align with left sensor
-//      delay(300);
-//      rotateLeft(90);
-//      delay(500);
-
-      Serial.println("Dist_LR > RIGHT1GRID_END");
+    else if (dist_LR > RIGHT_1GRID_DIST + SIDES_DIST_THRESHOLD && dist_LR < RIGHT_1GRID_END) { // left-front sensor
+      rotateRight(90);
+      delay(500);
+      alignForward_Front(SharpIR::D3, true, RIGHT_1GRID_DIST);  // align with left sensor
+      delay(300);
+      rotateLeft(90);
+      delay(500);
     }
   }
 }
