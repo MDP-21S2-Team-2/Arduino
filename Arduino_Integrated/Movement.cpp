@@ -82,16 +82,17 @@ void rotateLeft(int angle)
   if (angle == 90) {
     //tEncodeVal = 387; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
     numOvershoot = 1;
-    remainderCount = 125;
+    remainderCount = 137; //123;
   }
   else if (angle == 180) {
     //tEncodeVal = 810; //angle * 4.5;  // 4.65
     numOvershoot = 3;
     remainderCount = 42;
   }
-  // reset prevTime to get more accurate timeWidth
-//  L_prevTime = micros();
-//  R_prevTime = micros();
+
+//#ifndef EXPLORATION_MODE
+//  remainderCount += 5;
+//#endif
 
   // reset encoder ticks
   resetEnc();
@@ -124,13 +125,17 @@ void rotateRight(int angle)
   if (angle == 90) {
     //tEncodeVal = 387; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
     numOvershoot = 1;
-    remainderCount = 128;
+    remainderCount = 138;//132;
   }
   else if (angle == 180) {
     //tEncodeVal = 806; //angle * 4.48;
     numOvershoot = 3;
     remainderCount = 38;
   }
+
+//#ifndef EXPLORATION_MODE
+//  remainderCount += 5;
+//#endif
 
   // reset prevTime to get more accurate timeWidth
 //  L_prevTime = micros();

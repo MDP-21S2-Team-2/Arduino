@@ -21,9 +21,9 @@ void setup() {
   md.init();
 
   // left
-  //md.setM1Speed(-400);
+//  md.setM1Speed(-300);
   // right
-  //md.setM2Speed(400);
+//  md.setM2Speed(270);
 
   // set starting times
   //  L_prevTime = micros();
@@ -45,7 +45,7 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          moveForward(numUnits - '0', false);
+          moveForward(numUnits - '0', true);
 #ifdef EXPLORATION_MODE
           delay(150);
           checkAlignmentAfterMove();
@@ -55,7 +55,7 @@ void robotSystem_loop() {
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          delay(60);
+//          delay(60);
 #endif
         }
         break;
@@ -65,7 +65,7 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          moveForward(numUnits - '&', false); // numUnits - '0' + 10
+          moveForward(numUnits - '&', true); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
           delay(150);
           checkAlignmentAfterMove();
@@ -75,7 +75,7 @@ void robotSystem_loop() {
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          delay(60);
+//          delay(60);
 #endif
         }
         break;
@@ -95,7 +95,7 @@ void robotSystem_loop() {
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          delay(60);
+//          delay(60);
 #endif
         }
         break;
@@ -115,7 +115,7 @@ void robotSystem_loop() {
 #else // FP
           // acknowledge the command
           Serial.write("K\n");
-          delay(60);
+//          delay(60);
 #endif
         }
         break;
@@ -131,7 +131,7 @@ void robotSystem_loop() {
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
-        delay(60);
+//        delay(60);
 #endif
         break;
         
@@ -146,7 +146,7 @@ void robotSystem_loop() {
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
-        delay(60);
+//        delay(60);
 #endif
         break;
       case 'B': // turn 180
@@ -160,7 +160,7 @@ void robotSystem_loop() {
 #else // FP
         // acknowledge the command
         Serial.write("K\n");
-        delay(60);
+//        delay(60);
 #endif
         break;
         
@@ -185,20 +185,20 @@ void robotSystem_loop() {
 void testInLoop_readingIR() {
   //delay(100);
 
-  Serial.print("Front Right (D2): ");
-  Serial.print(front_D2.getDistance());
-  Serial.print(" | Front Mid (D1): ");
-  Serial.print(front_D1.getDistance());
-  Serial.print(" | Front Left (D3): ");
-  Serial.println(front_D3.getDistance());
+//  Serial.print("Front Right (D2): ");
+//  Serial.print(front_D2.getDistance());
+//  Serial.print(" | Front Mid (D1): ");
+//  Serial.print(front_D1.getDistance());
+//  Serial.print(" | Front Left (D3): ");
+//  Serial.println(front_D3.getDistance());
 //
 //    Serial.print("Side, front: ");
 //    Serial.print(left_S1.getDistance());
 //    Serial.print(" | Side, back: ");
 //    Serial.println(left_S2.getDistance());
 
-  //  Serial.print("Right Long: ");
-  //  Serial.println(right_long.getDistance());
+    Serial.print("Right Long: ");
+    Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
   //
 }
@@ -214,6 +214,9 @@ void testInLoop_motorsPID() {
 
     double R_rpm = calculateRpm(R_timeWidth);
     double L_rpm = calculateRpm(L_timeWidth);
+
+//    double R_speed = rightPIDController.computePID(R_rpm, targetRpm);
+//    double L_speed = leftPIDController.computePID(L_rpm, targetRpm);
 
     Serial.print(R_rpm);
     Serial.print(",");
@@ -240,24 +243,72 @@ void loop() {
 //  sendIRSensorsReadings();
 //  delay(500);
 //    testInLoop_motorsPID();
-//    testInLoop_readingIR();
-  robotSystem_loop();
+    testInLoop_readingIR();
+//  robotSystem_loop();
 //  initialGridCalibration();
 //  delay(5000);
-  //    delay(1000);
+//  //    delay(1000);
 //  if (runProgram) {
-//    initialGridCalibration();
-//    delay(2000);
-//    for (int i = 0; i < 4; ++i) {
-//      moveForward(0, false);
-//      delay(1500);
-//      rotateRight(90);
-//      delay(1500);
-////      checkAlignmentAfterMove();
-////      delay(200);
-//    }
-//    delay(1500);
-
+////    initialGridCalibration();
+////    delay(2000);
+////    for (int i = 0; i < 4; ++i) {
+////      delay(500);
+////      moveForward(10, true);
+//////      rotateRight(90);
+//////      rotateLeft(90);
+////      delay(500);
+//////      checkAlignmentAfterMove();
+//////      delay(200);
+////    }
+////    delay(1500);
+//
+//  delay(500);
+//  initialGridCalibration();
+//  delay(1000);
+//
+//    moveForward(2, true);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//    rotateRight(90);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//    moveForward(5, true);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//    rotateLeft(90);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//    moveForward(9, true);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//    rotateRight(90);
+//    delay(60);
+//    moveForward(0, true);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//    rotateLeft(90);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//    moveForward(3, true);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//    rotateRight(90);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//    moveForward(4, true);
+//    delay(60);
+//    checkAlignmentAfterRotate();
+//    delay(60);
+//
 //    runProgram = false;
 //  }
 }

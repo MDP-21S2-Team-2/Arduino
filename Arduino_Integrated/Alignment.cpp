@@ -22,13 +22,12 @@ void checkForCrash() {
     }
 //  double dist_S1 = left_S1.getDistance();
 //  double dist_S2 = left_S2.getDistance();
-  //double dist_LR = right_long.getDistance();  // can use to check if veering too close to a wall on the right?
-  
-  // check if robot is aligned on the side or might crash the side
-//  if (((dist_S1 > 3.0 && dist_S1 <= 10.5 &&  dist_S2 > 3.0 && dist_S2 <= 10.5) ||
-//    (dist_S1 > 10.5 && dist_S1 <= 18.0 &&  dist_S2 > 10.5 && dist_S2 <= 18.0)) &&  // check if robot is near the wall
-//    (abs(dist_S1 - dist_S2) >= 2.5)) 
-//    {  // robot is veering too much to the side, sensors' diff is 1.5cm
+//  //double dist_LR = right_long.getDistance();  // can use to check if veering too close to a wall on the right?
+//  
+//  // check if robot is aligned on the side or might crash the side
+//    double difference = dist_S2 - dist_S1;
+//    if (dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 2.0 && dist_S2 <= 8.0 && (difference > 0.3 || difference < 0))
+//    {  // robot is veering too much to the side
 //      // recovery action
 //      md.setBrakes(BRAKE_L, BRAKE_R);
 //      // store current encoder values (before extra ticks are added for recovery action)

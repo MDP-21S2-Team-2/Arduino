@@ -18,12 +18,16 @@ class PID {
   const double _Ki;
   const double _Kd;
 
+  const int _minOut;
+  const int _maxOut;
+
   public:
     // constructor
-    PID(double P, double I, double D, double Imax, double Imin) :
+    PID(double P, double I, double D, double Imax, double Imin/*, int minOut, int maxOut*/) :
       _Kp(P), _Ki(I), _Kd(D),
       _Imax(Imax), _Imin(Imin),
       _lastValue(0.0), _sumError(0.0) {}
+      //_minOut(minOut), _maxOut(maxOut)
 
       double getLastValue() { return _lastValue; }
       double getSumError() { return _sumError; }

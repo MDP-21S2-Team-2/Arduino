@@ -3,19 +3,25 @@ DualVNH5019MotorShield md;
 
 // PID controller for each motor
 // parameter list: P, I, D, Imax, Imin
-PID leftPIDController(3.649, 1.678, 4.548, 200.0, -200);
-PID rightPIDController(3.824, 1.685, 4.49, 200.0, -200.0);
 
-//PID leftPIDController(3.48, 1.625, 4.934, 200.0, -200); //red
-//PID rightPIDController(3.87, 1.675, 4.85, 200.0, -200.0);
+// 125 RPM; battery 6.33V
+//PID leftPIDController(3.643, 1.678, 4.588, 200.0, -200);
+//PID rightPIDController(3.84, 1.720, 4.742, 200.0, -200.0);
 
-// 24 Feb target speed: 125 6.26V 1y1w
-//PID leftPIDController(3.8, 2.6, 5.2, 130.0, -130); // red
-//PID rightPIDController(3.55, 2.6, 5.3, 130.0, -130.0); // right starts up faster
+//rpm = 110, 2y, 6.4v
+PID leftPIDController(3.208, 1.45, 4.512, 200.0, -200);//red
+PID rightPIDController(3.04, 1.395, 4.5, 200.0, -200.0);
+
+// with exponential smoothing filter
+//PID leftPIDController(1.0, 1.439, 0.2, 200.0, -200);//red
+//PID rightPIDController(0.52, 1.46, 0.4, 200.0, -200.0);
+
+//PID leftPIDController(1.2, 1.4, 2.0, 200.0, -200, 0, 400);//red
+//PID rightPIDController(1.0, 1.386, 2.5, 200.0, -200.0, 0, 400);
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm
-//double rightWheelDiameter = 6.0;  // in cLLm
+//double rightWheelDiameter = 6.0;  // in cm
 //Wheel to wheel distance = 18.5cm
 //Circumference of whole robot m= 58.11cm
 // 90 degree = 14.5275cm
@@ -78,6 +84,7 @@ void motorR_ISR() {
   {
     R_currTime = micros();
     R_timeWidth = alpha * (R_currTime - R_prevTime) + alphaInv * R_timeWidth;
+//    R_timeWidth = R_currTime - R_prevTime;
     encR_curr_count = 0;
     R_prevTime = R_currTime;
   }
@@ -96,6 +103,7 @@ void motorL_ISR() {
   {
     L_currTime = micros();
     L_timeWidth = alpha * (L_currTime - L_prevTime) + alphaInv * L_timeWidth;
+//    L_timeWidth = L_currTime - L_prevTime;
     encL_curr_count = 0;
     L_prevTime = L_currTime;
   }

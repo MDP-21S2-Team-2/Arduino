@@ -1,5 +1,5 @@
 #include "PID.h"
-#define LOOPTIME 20000
+#define LOOPTIME 17500 // in micros
 unsigned long PID::_targetTime = 0;
 
 double PID::computePID(double input, double setPoint) {
