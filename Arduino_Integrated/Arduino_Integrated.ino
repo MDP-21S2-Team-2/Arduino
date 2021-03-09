@@ -4,6 +4,10 @@
 #include "Movement.h"
 #include "Alignment.h"
 
+// robot configuration (intended for FP use)
+bool enableAlignAfterMove_FP = false; // disabled by default
+bool enableEbrakes_FP = true; // enabled by default
+
 void setup() {
   // put your setup code here, to run once:
   //init encoder pins
@@ -45,7 +49,7 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          moveForward(numUnits - '0', true);
+          moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
           delay(150);
           checkAlignmentAfterMove();
@@ -53,9 +57,13 @@ void robotSystem_loop() {
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
+          if (alignAfterMove_FP) {
+            delay(60);
+            checkAlignmentAfterCommand_FP();
+          }
           // acknowledge the command
           Serial.write("K\n");
-//          delay(60);
+          delay(60);
 #endif
         }
         break;
@@ -65,7 +73,7 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          moveForward(numUnits - '&', true); // numUnits - '0' + 10
+          moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
           delay(150);
           checkAlignmentAfterMove();
@@ -73,49 +81,13 @@ void robotSystem_loop() {
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
+          if (alignAfterMove_FP) {
+            delay(60);
+            checkAlignmentAfterCommand_FP();
+          }
           // acknowledge the command
           Serial.write("K\n");
-//          delay(60);
-#endif
-        }
-        break;
-
-      case 'E': // move <=10 units, emergency brakes enabled
-        {
-          // read next character for no. units to move
-          while (Serial.available() == 0);  // wait for next character
-          char numUnits = Serial.read();
-          moveForward(numUnits - '0', true);
-#ifdef EXPLORATION_MODE
-          delay(150);
-          checkAlignmentAfterMove();
-          delay(150);
-          // send sensor readings
-          sendIRSensorsReadings();
-#else // FP
-          // acknowledge the command
-          Serial.write("K\n");
-//          delay(60);
-#endif
-        }
-        break;
-
-      case 'D': // move >=11 units, emergency brakes enabled
-        {
-          // read next character for no. units to move
-          while (Serial.available() == 0);  // wait for next character
-          char numUnits = Serial.read();
-          moveForward(numUnits - '&', true); // numUnits - '0' + 10
-#ifdef EXPLORATION_MODE
-          delay(150);
-          checkAlignmentAfterMove();
-          delay(150);
-          // send sensor readings
-          sendIRSensorsReadings();
-#else // FP
-          // acknowledge the command
-          Serial.write("K\n");
-//          delay(60);
+        delay(60);
 #endif
         }
         break;
@@ -129,9 +101,13 @@ void robotSystem_loop() {
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
+        if (alignAfterMove_FP) {
+          delay(60);
+          checkAlignmentAfterCommand_FP();
+        }
         // acknowledge the command
         Serial.write("K\n");
-//        delay(60);
+        delay(60);
 #endif
         break;
         
@@ -144,9 +120,13 @@ void robotSystem_loop() {
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
+        if (alignAfterMove_FP) {
+          delay(60);
+          checkAlignmentAfterCommand_FP();
+        }
         // acknowledge the command
         Serial.write("K\n");
-//        delay(60);
+        delay(60);
 #endif
         break;
       case 'B': // turn 180
@@ -158,9 +138,13 @@ void robotSystem_loop() {
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
+        if (alignAfterMove_FP) {
+          delay(60);
+          checkAlignmentAfterCommand_FP();
+        }
         // acknowledge the command
         Serial.write("K\n");
-//        delay(60);
+        delay(60);
 #endif
         break;
         
@@ -173,6 +157,23 @@ void robotSystem_loop() {
         // acknowledge the command
         Serial.write("K\n");
 #endif
+        break;
+
+      // robot config
+      case 'a': // enable alignment-after-move
+        enableAlignAfterMove_FP = true;
+        break;
+
+      case 'b': // disable alignment-after-move
+        enableAlignAfterMove_FP = false;
+        break;
+
+      case 'e': // enable e-brakes
+        enableEbrakes_FP = true;
+        break;
+
+      case 'f': // disable e-brakes
+        enableEbrakes_FP = false;
         break;
 
       default:  // do nothing
@@ -243,8 +244,8 @@ void loop() {
 //  sendIRSensorsReadings();
 //  delay(500);
 //    testInLoop_motorsPID();
-    testInLoop_readingIR();
-//  robotSystem_loop();
+//    testInLoop_readingIR();
+  robotSystem_loop();
 //  initialGridCalibration();
 //  delay(5000);
 //  //    delay(1000);

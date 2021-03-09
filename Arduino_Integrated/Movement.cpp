@@ -159,6 +159,11 @@ void rotateRight(int angle)
   resetPIDControllers();
 }
 
+void checkAlignmentAfterCommand_FP() {
+  // align robot to be straight
+  checkForTilted();
+}
+
 void checkAlignmentAfterMove() {
   // ensure robot is centralised within its grids
   checkCentralise_Front();

@@ -44,5 +44,6 @@ void rotateLeft(int angle);
 void initialGridCalibration();
 void checkAlignmentAfterMove();
 void checkAlignmentAfterRotate();
+void checkAlignmentAfterCommand_FP();
 
 #endif
