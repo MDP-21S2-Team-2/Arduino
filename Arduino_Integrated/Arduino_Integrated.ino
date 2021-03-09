@@ -51,9 +51,9 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(150);
+          delay(100);
           checkAlignmentAfterMove();
-          delay(150);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -75,9 +75,9 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(150);
+          delay(100);
           checkAlignmentAfterMove();
-          delay(150);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -95,9 +95,9 @@ void robotSystem_loop() {
       case 'L': // turn left 90
         rotateLeft(90);
 #ifdef EXPLORATION_MODE
-        delay(150);
+        delay(100);
         checkAlignmentAfterRotate();
-        delay(150);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -114,9 +114,9 @@ void robotSystem_loop() {
       case 'R': // turn right 90
         rotateRight(90);
 #ifdef EXPLORATION_MODE
-        delay(150);
+        delay(100);
         checkAlignmentAfterRotate();
-        delay(150);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -132,9 +132,9 @@ void robotSystem_loop() {
       case 'B': // turn 180
         rotateLeft(180);
 #ifdef EXPLORATION_MODE
-        delay(150);
+        delay(100);
         checkAlignmentAfterRotate();
-        delay(150);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
