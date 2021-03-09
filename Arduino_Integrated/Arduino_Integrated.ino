@@ -162,18 +162,42 @@ void robotSystem_loop() {
       // robot config
       case 'a': // enable alignment-after-move
         enableAlignAfterMove_FP = true;
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        Serial.write("K\n");
+#endif
         break;
 
       case 'b': // disable alignment-after-move
         enableAlignAfterMove_FP = false;
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        Serial.write("K\n");
+#endif
         break;
 
       case 'e': // enable e-brakes
         enableEbrakes_FP = true;
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        Serial.write("K\n");
+#endif
         break;
 
       case 'f': // disable e-brakes
         enableEbrakes_FP = false;
+#ifdef EXPLORATION_MODE
+        // send sensor readings
+        sendIRSensorsReadings();
+#else // FP
+        Serial.write("K\n");
+#endif
         break;
 
       default:  // do nothing
