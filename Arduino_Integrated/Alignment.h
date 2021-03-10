@@ -24,6 +24,7 @@
 
 // checking for whether robot might crash while moving
 void checkForCrash();
+void checkForCrashAndRecover(int tOvershoot, int tRemainder);
 
 // checking for alignment
 void checkCentralise_Front();  // check that robot is in the center of the grids using obstacles in front

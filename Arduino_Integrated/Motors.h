@@ -20,6 +20,9 @@
 //#define MOVE_OFFTICKS 20
 
 
+#define oneRevDis 18.849556
+
+
 // Motor shield
 extern DualVNH5019MotorShield md;
 

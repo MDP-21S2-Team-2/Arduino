@@ -4,6 +4,97 @@
 #include "Sensors.h"
 #include "Motors.h"
 
+void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
+  double dist_D1 = front_D1.getDistance();
+  double dist_D2 = front_D2.getDistance();
+  double dist_D3 = front_D3.getDistance();
+
+  // check if robot is too near to any obstacle in front, for emergency stop
+  if ((/*dist_D1 > 3.0 &&*/ dist_D1 < FRONT_1GRID_DIST + 2.0) ||  // offset to account for robot's speed
+    (/*dist_D2 > 3.0 &&*/ dist_D2 < FRONT_1GRID_DIST + 2.0) ||
+    (/*dist_D3 > 3.0 &&*/ dist_D3 < FRONT_1GRID_DIST + 2.0)) 
+    {
+      md.setBrakes(BRAKE_L, BRAKE_R);
+
+      // recovery action if necessary
+      int encL_curr = encL_overshootCount * 256 + encL_count;
+      int encR_curr = encR_overshootCount * 256 + encR_count;
+
+      int targetCount = tOvershoot * 256 + tRemainder;
+
+      // check if recovery action is necessary
+      // ~271 ticks is 1 unit (10cm), so check if at least around that much distance was not covered yet
+      if (targetCount - encL_curr > 250) {  // at least slightly less than 1 unit not covered yet
+        // 1. check which sensor blocked
+        // get readings again
+        dist_D1 = front_D1.getDistance(); // middle
+        dist_D2 = front_D2.getDistance(); // right
+        dist_D3 = front_D3.getDistance(); // left
+
+        // robot veered to the left; obstacle on the left
+        if (dist_D3 < FRONT_1GRID_DIST + 2.5) { // front-left < 7.5
+          delay(1000);
+          // 2. rotate right by >90
+          rotateRight_custom(95);
+          //rotateRight(90);
+
+          delay(1000);
+
+          // 3. move forward abit
+          if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle blocked, move forward abit more
+            moveForward_custom(10.0, false);
+          else  // just move about half a grid
+            moveForward_custom(7.0, false);
+
+          delay(1000);
+
+          // 4. rotate left
+          rotateLeft(90);
+
+          delay(1000);
+
+          // 5. move remaining
+          int remainingCount = targetCount - encL_curr;
+          double dist = oneRevDis * ((double)remainingCount / 562.25);  // in cm
+          moveForward_custom(dist, true);
+        }
+        // robot veered to the right; obstacle on the right
+        else if (dist_D2 < FRONT_1GRID_DIST + 2.5) {  // front-right < 7.5
+          delay(1000);
+          // 2. rotate left by >90
+          rotateLeft_custom(95);
+          //rotateLeft(90);
+
+          delay(1000);
+
+          // 3. move forward abit
+          if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle blocked, move forward abit more
+            moveForward_custom(10.0, false);
+          else  // just move about half a grid
+          moveForward_custom(7.0, false);
+
+          delay(1000);
+
+          // 4. rotate right
+          rotateRight(90);
+
+          delay(1000);
+
+          // 5. move remaining
+          int remainingCount = targetCount - encL_curr;
+          double dist = oneRevDis * ((double)remainingCount / 562.25);  // in cm
+          moveForward_custom(dist, true);
+        }
+          
+        // edge case: only middle blocked, not handled
+        
+      }
+      emergencyBrakes = true;
+      
+      return; // stop checking
+    }
+}
+
 // check for crash while robot is moving
 void checkForCrash() {
   double dist_D1 = front_D1.getDistance();
@@ -17,7 +108,6 @@ void checkForCrash() {
     {
       md.setBrakes(BRAKE_L, BRAKE_R);
       emergencyBrakes = true;
-      //Serial.write("EMERGENCY ");
       return; // stop checking
     }
 //  double dist_S1 = left_S1.getDistance();

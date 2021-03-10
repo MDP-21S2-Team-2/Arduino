@@ -348,7 +348,7 @@ bool runProgram = true;
 void loop() {
   //  sendIRSensorsReadings();
   //  delay(500);
-  //    testInLoop_motorsPID();
+//      testInLoop_motorsPID();
   //    testInLoop_readingIR();
 //  robotSystem_loop();
   //  initialGridCalibration();
@@ -359,7 +359,8 @@ void loop() {
   ////    delay(2000);
       for (int i = 0; i < 4; ++i) {
   //      delay(500);
-        moveInParts(3, true);
+//        moveInParts(3, true);
+        moveForward(1, true);
         delay(2000);
   //      rotateLeft(90);
   //      delay(120);

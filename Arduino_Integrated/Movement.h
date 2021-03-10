@@ -55,6 +55,10 @@ void moveBackward(int moveUnits);
 // rotation
 void rotateRight(int angle);
 void rotateLeft(int angle);
+// CUSTOM VALUES FOR MOVEMENT
+void moveForward_custom(double distance, bool emergencyEnabled);
+void rotateRight_custom(int angle);
+void rotateLeft_custom(int angle);
 // check for alignment
 void initialGridCalibration();
 void checkAlignmentAfterMove();
