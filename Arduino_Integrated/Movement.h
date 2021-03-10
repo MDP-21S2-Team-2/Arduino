@@ -5,7 +5,7 @@
 #define BRAKE_R 400
 
 // comment away if doing FP
-#define EXPLORATION_MODE
+//#define EXPLORATION_MODE
 
 //Declare Variables
 extern bool emergencyBrakes;
@@ -18,6 +18,7 @@ extern bool emergencyBrakes;
 //  4744, 5042, 5340, 5638, 5937  // 16-20 units
 //};
 
+// for 110 RPM
 const int numOvershoot_lut[20] = {
   1, 2, 3, 4, 5, // 1-5 units
   6, 8, 9, 10, 11, // 6-10 units
@@ -30,6 +31,20 @@ const int remainderCount_lut[20] = {
   182, 224, 11, 53, 95,
   138, 180, 222, 8, 51
 };
+
+// for 125 RPM
+//const int numOvershoot_lut[20] = {
+//  1, 2, 3, 4, 5, // 1-5 units
+//  6, 8, 9, 10, 11, // 6-10 units
+//  12, 13, 15, 16, 17, // 11-15 units
+//  18, 19, 20, 22, 23  // 16-20 units
+//};
+//const int remainderCount_lut[20] = {
+//  14, 58, 99, 142, 183,
+//  226, 12, 54, 97, 139,
+//  181, 223, 10, 52, 94,
+//  137, 179, 221, 7, 50
+//};
 
 //Movement Variables
 //double oneRevDis = 18.849556; // in cm

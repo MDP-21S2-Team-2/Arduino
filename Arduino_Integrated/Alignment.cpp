@@ -285,10 +285,10 @@ void alignBack_Front(SharpIR::sensorCode sensor, bool fast, double targetDist) {
   // use one of the front sensors for alignment
   double dist_Dx = 0.0;
 
-  //if (fast)
+//  if (fast)
     md.setSpeeds(80, -80);
-  //else
-  //  md.setSpeeds(60, -60);
+//  else
+//    md.setSpeeds(60, -60);
   
   do {
     switch (sensor) {
@@ -308,10 +308,10 @@ void alignForward_Front(SharpIR::sensorCode sensor, bool fast, double targetDist
   // use one of the front sensors for alignment
   double dist_Dx = 0.0;
 
-  //if (fast)
+//  if (fast)
     md.setSpeeds(-80, 80);
-  //else
-  //  md.setSpeeds(-60, 60);
+//  else
+//    md.setSpeeds(-60, 60);
   
   do {
     switch (sensor) {

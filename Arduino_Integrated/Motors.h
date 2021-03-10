@@ -10,9 +10,9 @@
 #define RightMotorA 3 // E1A
 
 // Setting Target RPM 110 RPM
-#define targetRpm 110.0
+//#define targetRpm 110.0
 // Setting Target RPM 125 RPM
-//#define targetRpm 125.0
+#define targetRpm 125.0
 // Setting Target RPM 130 RPM
 //#define targetRpm 135.0
 
