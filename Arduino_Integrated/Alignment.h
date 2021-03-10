@@ -8,16 +8,17 @@
 #define THRESHOLD 0.05  // for alignment when front is tilted
 #define FLUC_THRESHOLD 0.2  // threshold for sensor readings to fluctuate
 #define SIDES_DIST_THRESHOLD 1.0 // threshold for deciding how different sensor readings should be from target distance before calibrating (centralise sides)
+#define LR_SIDES_DIST_THRESHOLD 1.2 // threshold for deciding how different sensor readings should be from target distance before calibrating (centralise sides)
 #define SIDE_THRESHOLD 0.1  // for alignment when left side is tilted
 #define HS_THRESHOLD 0.8  // high-speed threshold
 
 #define FRONT_1GRID_DIST 5.0
 #define FRONT_1GRID_START 1.8
 #define FRONT_1GRID_END 10.5
-#define LEFT_1GRID_DIST 6.0
+#define LEFT_1GRID_DIST 4.75
 #define LEFT_1GRID_START 3.0
 #define LEFT_1GRID_END 9.5
-#define RIGHT_1GRID_DIST 3.0
+#define RIGHT_1GRID_DIST 4.7
 #define RIGHT_1GRID_START 2.0
 #define RIGHT_1GRID_END 9.5
 

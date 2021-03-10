@@ -216,11 +216,11 @@ void testInLoop_readingIR() {
 //  Serial.print(front_D1.getDistance());
 //  Serial.print(" | Front Left (D3): ");
 //  Serial.println(front_D3.getDistance());
-//
-//    Serial.print("Side, front: ");
-//    Serial.print(left_S1.getDistance());
-//    Serial.print(" | Side, back: ");
-//    Serial.println(left_S2.getDistance());
+
+    Serial.print("Side, front: ");
+    Serial.print(left_S1.getDistance());
+    Serial.print(" | Side, back: ");
+    Serial.println(left_S2.getDistance());
 
     Serial.print("Right Long: ");
     Serial.println(right_long.getDistance());
@@ -268,7 +268,7 @@ void loop() {
 //  sendIRSensorsReadings();
 //  delay(500);
 //    testInLoop_motorsPID();
-//    testInLoop_readingIR();
+    testInLoop_readingIR();
 //  robotSystem_loop();
 //  initialGridCalibration();
 //  delay(5000);
@@ -277,11 +277,14 @@ void loop() {
 ////    initialGridCalibration();
 ////    delay(2000);
 //    for (int i = 0; i < 4; ++i) {
-////      delay(500);
+//      delay(500);
 //      moveForward(9, true);
 //      rotateRight(90);
 //      rotateLeft(90);
-//      delay(500);
+//      checkCentralise_Sides();
+//      delay(5000);
+//      for (int ii = 0;i<11; i++){
+//      sendIRSensorsReadings();}
 //////      checkAlignmentAfterMove();
 //////      delay(200);
 //    }
@@ -290,58 +293,63 @@ void loop() {
 //  delay(500);
 //  initialGridCalibration();
 //  delay(1000);
-//
-    moveForward(6, true);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    rotateRight(90);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    moveForward(2, true);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    rotateLeft(90);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    moveForward(3, true);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    rotateRight(90);
-    delay(40);
-    moveForward(1, true);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    rotateLeft(90);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    moveForward(4, true);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    rotateRight(90);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    moveForward(6, true);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    rotateLeft(90);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-    moveForward(2, true);
-    delay(40);
-    checkAlignmentAfterRotate();
-    delay(40);
-//
+
+    initialGridCalibration();
+    delay(60);
+    moveForward(15, true);
+    delay(60);
+
+//    moveForward(6, true);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    rotateRight(90);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    moveForward(2, true);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    rotateLeft(90);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    moveForward(3, true);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    rotateRight(90);
+//    delay(40);
+//    moveForward(1, true);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    rotateLeft(90);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    moveForward(4, true);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    rotateRight(90);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    moveForward(6, true);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    rotateLeft(90);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+//    moveForward(2, true);
+//    delay(40);
+//    checkAlignmentAfterRotate();
+//    delay(40);
+////
     runProgram = false;
   }
 }
