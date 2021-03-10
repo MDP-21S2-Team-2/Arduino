@@ -12,9 +12,9 @@
 // Setting Target RPM 110 RPM
 //#define targetRpm 110.0
 // Setting Target RPM 125 RPM
-#define targetRpm 125.0
-// Setting Target RPM 130 RPM
-//#define targetRpm 135.0
+//#define targetRpm 125.0
+// Setting Target RPM 120 RPM
+#define targetRpm 120.0
 
 //#define MOVE_OFFTICKS 24
 //#define MOVE_OFFTICKS 20
