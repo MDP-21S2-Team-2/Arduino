@@ -51,7 +51,7 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(100);
+          delay(60);
           checkAlignmentAfterMove();
           delay(60);
           // send sensor readings
@@ -75,7 +75,7 @@ void robotSystem_loop() {
           char numUnits = Serial.read();
           moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(100);
+          delay(60);
           checkAlignmentAfterMove();
           delay(60);
           // send sensor readings
@@ -95,7 +95,7 @@ void robotSystem_loop() {
       case 'L': // turn left 90
         rotateLeft(90);
 #ifdef EXPLORATION_MODE
-        delay(100);
+        delay(60);
         checkAlignmentAfterRotate();
         delay(60);
         // send sensor readings
@@ -114,7 +114,7 @@ void robotSystem_loop() {
       case 'R': // turn right 90
         rotateRight(90);
 #ifdef EXPLORATION_MODE
-        delay(100);
+        delay(60);
         checkAlignmentAfterRotate();
         delay(60);
         // send sensor readings
@@ -132,7 +132,7 @@ void robotSystem_loop() {
       case 'B': // turn 180
         rotateLeft(180);
 #ifdef EXPLORATION_MODE
-        delay(100);
+        delay(60);
         checkAlignmentAfterRotate();
         delay(60);
         // send sensor readings
@@ -269,71 +269,79 @@ void loop() {
 //  delay(500);
 //    testInLoop_motorsPID();
 //    testInLoop_readingIR();
-  robotSystem_loop();
+//  robotSystem_loop();
 //  initialGridCalibration();
 //  delay(5000);
 //  //    delay(1000);
-//  if (runProgram) {
+  if (runProgram) {
 ////    initialGridCalibration();
 ////    delay(2000);
-////    for (int i = 0; i < 4; ++i) {
+//    for (int i = 0; i < 4; ++i) {
 ////      delay(500);
-////      moveForward(10, true);
-//////      rotateRight(90);
-//////      rotateLeft(90);
-////      delay(500);
+//      moveForward(9, true);
+//      rotateRight(90);
+//      rotateLeft(90);
+//      delay(500);
 //////      checkAlignmentAfterMove();
 //////      delay(200);
-////    }
+//    }
 ////    delay(1500);
 //
 //  delay(500);
 //  initialGridCalibration();
 //  delay(1000);
 //
-//    moveForward(2, true);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
-//    rotateRight(90);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
-//    moveForward(5, true);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
-//    rotateLeft(90);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
-//    moveForward(9, true);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
-//    rotateRight(90);
-//    delay(60);
-//    moveForward(0, true);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
-//    rotateLeft(90);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
-//    moveForward(3, true);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
-//    rotateRight(90);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
-//    moveForward(4, true);
-//    delay(60);
-//    checkAlignmentAfterRotate();
-//    delay(60);
+    moveForward(6, true);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    rotateRight(90);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    moveForward(2, true);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    rotateLeft(90);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    moveForward(3, true);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    rotateRight(90);
+    delay(40);
+    moveForward(1, true);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    rotateLeft(90);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    moveForward(4, true);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    rotateRight(90);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    moveForward(6, true);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    rotateLeft(90);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
+    moveForward(2, true);
+    delay(40);
+    checkAlignmentAfterRotate();
+    delay(40);
 //
-//    runProgram = false;
-//  }
+    runProgram = false;
+  }
 }

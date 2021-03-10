@@ -125,7 +125,7 @@ void rotateRight(int angle)
   if (angle == 90) {
     //tEncodeVal = 387; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
     numOvershoot = 1;
-    remainderCount = 138;//132;
+    remainderCount = 141;//132;
   }
   else if (angle == 180) {
     //tEncodeVal = 806; //angle * 4.48;

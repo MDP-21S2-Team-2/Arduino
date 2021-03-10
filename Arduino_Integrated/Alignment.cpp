@@ -206,7 +206,7 @@ void alignToLeftWall() {
 
   unsigned long startTime = millis();
   
-  while ((millis() - startTime) < 1500) {
+  while ((millis() - startTime) < 500) {
     dist_S1 = left_S1.getDistance();
     dist_S2 = left_S2.getDistance();
 
@@ -245,7 +245,7 @@ void alignToFrontWall(bool useLeft) {
   
   unsigned long startTime = millis();
   
-  while ((millis() - startTime) < 1500) {
+  while ((millis() - startTime) < 500) {
     dist_D1 = front_D1.getDistance();
     dist_Dx = useLeft ? front_D3.getDistance() : front_D2.getDistance();
 

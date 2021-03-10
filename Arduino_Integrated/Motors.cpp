@@ -10,7 +10,7 @@ DualVNH5019MotorShield md;
 
 //rpm = 110, 2y, 6.4v
 PID leftPIDController(3.208, 1.45, 4.512, 200.0, -200);//red
-PID rightPIDController(3.04, 1.395, 4.5, 200.0, -200.0);
+PID rightPIDController(3.1, 1.395, 4.5, 200.0, -200.0); // P: 3.04
 
 // with exponential smoothing filter
 //PID leftPIDController(1.0, 1.439, 0.2, 200.0, -200);//red
