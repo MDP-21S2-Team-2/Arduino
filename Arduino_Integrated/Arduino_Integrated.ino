@@ -5,7 +5,7 @@
 #include "Alignment.h"
 
 // robot configuration (intended for FP use)
-bool enableAlignAfterMove_FP = false; // enabled by default
+bool enableAlignAfterMove_FP = true; // enabled by default
 bool enableEbrakes_FP = true; // enabled by default
 bool enableMoveInParts_FP = false; // disabled by default
 int numParts_FP = 3;  // max no. units to move at a time
@@ -83,8 +83,8 @@ void robotSystem_loop() {
 #else // FP
           if (enableAlignAfterMove_FP) {
             delay(60);
-            //            checkAlignmentAfterCommand_FP();
-            checkAlignmentAfterMove();
+            checkAlignmentAfterCommand_FP();
+//            checkAlignmentAfterMove();
           }
           // acknowledge the command
           Serial.write("K\n");
@@ -112,8 +112,8 @@ void robotSystem_loop() {
 #else // FP
           if (enableAlignAfterMove_FP) {
             delay(60);
-            //            checkAlignmentAfterCommand_FP();
-            checkAlignmentAfterMove();
+            checkAlignmentAfterCommand_FP();
+//            checkAlignmentAfterMove();
           }
           // acknowledge the command
           Serial.write("K\n");
@@ -181,12 +181,12 @@ void robotSystem_loop() {
 #else // FP
         if (enableAlignAfterMove_FP) {
           delay(60);
-          //          checkAlignmentAfterCommand_FP();
-          checkAlignmentAfterRotate();
+          checkAlignmentAfterCommand_FP();
+//          checkAlignmentAfterRotate();
         }
         // acknowledge the command
         Serial.write("K\n");
-        delay(80);
+        delay(60);
 #endif
         break;
 
@@ -201,12 +201,12 @@ void robotSystem_loop() {
 #else // FP
         if (enableAlignAfterMove_FP) {
           delay(60);
-          //          checkAlignmentAfterCommand_FP();
-          checkAlignmentAfterRotate();
+          checkAlignmentAfterCommand_FP();
+//          checkAlignmentAfterRotate();
         }
         // acknowledge the command
         Serial.write("K\n");
-        delay(80);
+        delay(60);
 #endif
         break;
       case 'B': // turn 180
@@ -220,12 +220,12 @@ void robotSystem_loop() {
 #else // FP
         if (enableAlignAfterMove_FP) {
           delay(60);
-          //          checkAlignmentAfterCommand_FP();
-          checkAlignmentAfterRotate();
+          checkAlignmentAfterCommand_FP();
+//          checkAlignmentAfterRotate();
         }
         // acknowledge the command
         Serial.write("K\n");
-        delay(80);
+        delay(60);
 #endif
         break;
 
@@ -349,7 +349,7 @@ void loop() {
   //  sendIRSensorsReadings();
   //  delay(500);
 //      testInLoop_motorsPID();
-  //    testInLoop_readingIR();
+//      testInLoop_readingIR();
   robotSystem_loop();
   //  initialGridCalibration();
   //  delay(5000);

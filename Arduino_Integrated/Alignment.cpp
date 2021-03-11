@@ -42,9 +42,9 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
 
           // 3. move forward abit
           if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle was also blocked, move forward abit more
-            moveForward_custom(10.0, false);
+            moveForward_custom(11.0, true);
           else  // just move about half a grid
-            moveForward_custom(7.0, false);
+            moveForward_custom(8.0, true);
 
           delay(80);
 
@@ -68,9 +68,9 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
 
           // 3. move forward abit
           if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle was also blocked, move forward abit more
-            moveForward_custom(10.0, false);
+            moveForward_custom(11.0, true);
           else  // just move about half a grid
-            moveForward_custom(7.0, false);
+            moveForward_custom(8.0, true);
 
           delay(80);
 
