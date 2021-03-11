@@ -24,34 +24,34 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
 
       // check if recovery action is necessary
       // ~271 ticks is 1 unit (10cm), so check if at least around that much distance was not covered yet
-      if (targetCount - encL_curr > 250) {  // at least slightly less than 1 unit not covered yet
+      if (targetCount - encL_curr > 200) {  // at least slightly less than 1 unit not covered yet
         // 1. check which sensor blocked
+        delay(500);
         // get readings again
         dist_D1 = front_D1.getDistance(); // middle
         dist_D2 = front_D2.getDistance(); // right
         dist_D3 = front_D3.getDistance(); // left
 
         // robot veered to the left; obstacle on the left
-        if (dist_D3 < FRONT_1GRID_DIST + 2.5) { // front-left < 7.5
-          delay(1000);
+        if (dist_D3 < FRONT_1GRID_DIST + 2.5 && dist_D2 > FRONT_1GRID_END) { // front-left < 7.5; front-right not blocked
           // 2. rotate right by >90
-          rotateRight_custom(95);
+          rotateRight_custom(90, 8);
           //rotateRight(90);
 
-          delay(1000);
+          delay(200);
 
           // 3. move forward abit
-          if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle blocked, move forward abit more
+          if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle was also blocked, move forward abit more
             moveForward_custom(10.0, false);
           else  // just move about half a grid
             moveForward_custom(7.0, false);
 
-          delay(1000);
+          delay(200);
 
           // 4. rotate left
           rotateLeft(90);
 
-          delay(1000);
+          delay(200);
 
           // 5. move remaining
           int remainingCount = targetCount - encL_curr;
@@ -59,26 +59,26 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
           moveForward_custom(dist, true);
         }
         // robot veered to the right; obstacle on the right
-        else if (dist_D2 < FRONT_1GRID_DIST + 2.5) {  // front-right < 7.5
-          delay(1000);
+        else if (dist_D2 < FRONT_1GRID_DIST + 2.5 && dist_D3 > FRONT_1GRID_END) {  // front-right < 7.5; front-left not blocked
+          delay(200);
           // 2. rotate left by >90
-          rotateLeft_custom(95);
+          rotateLeft_custom(90, 8);
           //rotateLeft(90);
 
-          delay(1000);
+          delay(200);
 
           // 3. move forward abit
-          if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle blocked, move forward abit more
+          if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle was also blocked, move forward abit more
             moveForward_custom(10.0, false);
           else  // just move about half a grid
           moveForward_custom(7.0, false);
 
-          delay(1000);
+          delay(200);
 
           // 4. rotate right
           rotateRight(90);
 
-          delay(1000);
+          delay(200);
 
           // 5. move remaining
           int remainingCount = targetCount - encL_curr;
@@ -86,7 +86,9 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
           moveForward_custom(dist, true);
         }
           
-        // edge case: only middle blocked, not handled
+        // edge case: only middle blocked or all sensors blocked; not being handled
+        // idea: save the current readings, wait for next command to come in which has to be a rotation,
+        // then execute the recovery right after that rotation
         
       }
       emergencyBrakes = true;
@@ -125,7 +127,7 @@ void checkForCrash() {
 //      int encR = encR_count;
 //      // get robot to align to left wall
 //      alignToLeftWall();
-//      delay(10);  // to ensure robot has already braked; TODO: time to delay TBD
+//      delay(60);  // to ensure robot has already braked; TODO: time to delay TBD
 //      // reset PID
 //      leftPIDController.resetPID();
 //      rightPIDController.resetPID();

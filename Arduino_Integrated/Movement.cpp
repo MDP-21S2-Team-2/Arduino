@@ -270,15 +270,16 @@ void moveForward_custom(double distance, bool emergencyEnabled)
   resetPIDControllers();
 }
 
-void rotateRight_custom(int angle)
+void rotateRight_custom(int angle, int tickOffset)
 {
-  int tEncodeVal = angle * 4.3; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
-  int numOvershoot = tEncodeVal / 256;
-  int remainderCount = tEncodeVal % 256;
-//  if (angle == 90) {
-//    numOvershoot = 1;
-//    remainderCount = 142;//132;
-//  }
+//  int tEncodeVal = angle * 4.3; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
+//  int numOvershoot = tEncodeVal / 256;
+//  int remainderCount = tEncodeVal % 256;
+  if (angle == 90) {
+    numOvershoot = 1;
+    remainderCount = 142;//132;
+  }
+  remainderCount += tickOffset;
   
   // reset encoder ticks
   resetEnc();
@@ -297,21 +298,16 @@ void rotateRight_custom(int angle)
   resetPIDControllers();
 }
 
-void rotateLeft_custom(int angle)
+void rotateLeft_custom(int angle, int tickOffset)
 {
-  int tEncodeVal = angle * 4.3; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
-  int numOvershoot = tEncodeVal / 256;
-  int remainderCount = tEncodeVal % 256;
-//  if (angle == 90) {
-//    //tEncodeVal = 387; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
-//    numOvershoot = 1;
-//    remainderCount = 139;//target 125: 127;// target 110: 139; //123;
-//  }
-//  else if (angle == 180) {
-//    //tEncodeVal = 810; //angle * 4.5;  // 4.65
-//    numOvershoot = 3;
-//    remainderCount = 42;
-//  }
+//  int tEncodeVal = angle * 4.3; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
+//  int numOvershoot = tEncodeVal / 256;
+//  int remainderCount = tEncodeVal % 256;
+  if (angle == 90) {
+    numOvershoot = 1;
+    remainderCount = 139;//target 125: 127;// target 110: 139; //123;
+  }
+  remainderCount += tickOffset;
 
   // reset encoder ticks
   resetEnc();

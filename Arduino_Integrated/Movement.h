@@ -57,8 +57,8 @@ void rotateRight(int angle);
 void rotateLeft(int angle);
 // CUSTOM VALUES FOR MOVEMENT
 void moveForward_custom(double distance, bool emergencyEnabled);
-void rotateRight_custom(int angle);
-void rotateLeft_custom(int angle);
+void rotateRight_custom(int angle, int tickOffset);
+void rotateLeft_custom(int angle, int tickOffset);
 // check for alignment
 void initialGridCalibration();
 void checkAlignmentAfterMove();

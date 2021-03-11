@@ -360,8 +360,8 @@ void loop() {
       for (int i = 0; i < 4; ++i) {
   //      delay(500);
 //        moveInParts(3, true);
-        moveForward(1, true);
-        delay(2000);
+        moveForward(0, true);
+        delay(1000);
   //      rotateLeft(90);
   //      delay(120);
   //      rotateLeft(90);
