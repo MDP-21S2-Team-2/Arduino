@@ -26,7 +26,7 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
       // ~271 ticks is 1 unit (10cm), so check if at least around that much distance was not covered yet
       if (targetCount - encL_curr > 200) {  // at least slightly less than 1 unit not covered yet
         // 1. check which sensor blocked
-        delay(500);
+        delay(150);
         // get readings again
         dist_D1 = front_D1.getDistance(); // middle
         dist_D2 = front_D2.getDistance(); // right
@@ -38,7 +38,7 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
           rotateRight_custom(90, 8);
           //rotateRight(90);
 
-          delay(200);
+          delay(80);
 
           // 3. move forward abit
           if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle was also blocked, move forward abit more
@@ -46,12 +46,12 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
           else  // just move about half a grid
             moveForward_custom(7.0, false);
 
-          delay(200);
+          delay(80);
 
           // 4. rotate left
           rotateLeft(90);
 
-          delay(200);
+          delay(80);
 
           // 5. move remaining
           int remainingCount = targetCount - encL_curr;
@@ -60,25 +60,24 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
         }
         // robot veered to the right; obstacle on the right
         else if (dist_D2 < FRONT_1GRID_DIST + 2.5 && dist_D3 > FRONT_1GRID_END) {  // front-right < 7.5; front-left not blocked
-          delay(200);
           // 2. rotate left by >90
           rotateLeft_custom(90, 8);
           //rotateLeft(90);
 
-          delay(200);
+          delay(80);
 
           // 3. move forward abit
           if (dist_D1 < FRONT_1GRID_DIST + 2.5) // if middle was also blocked, move forward abit more
             moveForward_custom(10.0, false);
           else  // just move about half a grid
-          moveForward_custom(7.0, false);
+            moveForward_custom(7.0, false);
 
-          delay(200);
+          delay(80);
 
           // 4. rotate right
           rotateRight(90);
 
-          delay(200);
+          delay(80);
 
           // 5. move remaining
           int remainingCount = targetCount - encL_curr;
@@ -315,8 +314,8 @@ void alignToLeftWall() {
       if (currState != newState) {  // change in state
         // set new speed
         if (abs(difference) > HS_THRESHOLD) {
-          if (newState == STATE_DIFFGT0)  md.setSpeeds(100, 100); // tilted to the right; turn left
-          else  md.setSpeeds(-100, -100); // tilted to the left; turn right
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(110, 110); // tilted to the right; turn left
+          else  md.setSpeeds(-110, -110); // tilted to the left; turn right
         } else {
           if (newState == STATE_DIFFGT0)  md.setSpeeds(60, 60); // tilted to the right; turn left
           else  md.setSpeeds(-60, -60); // tilted to the left; turn right
@@ -355,9 +354,9 @@ void alignToFrontWall(bool useLeft) {
         // set new speed
         if (abs(difference) > HS_THRESHOLD) {
           if (newState == STATE_DIFFGT0)
-            md.setSpeeds(100, 100); // tilted to the right; turn left
+            md.setSpeeds(110, 110); // tilted to the right; turn left
           else
-            md.setSpeeds(-100, -100); // tilted to the left; turn right
+            md.setSpeeds(-110, -110); // tilted to the left; turn right
         } else {
           if (newState == STATE_DIFFGT0)
             md.setSpeeds(60, 60); // tilted to the right; turn left
@@ -378,7 +377,7 @@ void alignBack_Front(SharpIR::sensorCode sensor, bool fast, double targetDist) {
   double dist_Dx = 0.0;
 
 //  if (fast)
-    md.setSpeeds(80, -80);
+    md.setSpeeds(85, -85);
 //  else
 //    md.setSpeeds(60, -60);
   
@@ -401,7 +400,7 @@ void alignForward_Front(SharpIR::sensorCode sensor, bool fast, double targetDist
   double dist_Dx = 0.0;
 
 //  if (fast)
-    md.setSpeeds(-80, 80);
+    md.setSpeeds(-85, 85);
 //  else
 //    md.setSpeeds(-60, 60);
   

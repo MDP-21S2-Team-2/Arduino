@@ -5,7 +5,7 @@
 #include "Alignment.h"
 
 // robot configuration (intended for FP use)
-bool enableAlignAfterMove_FP = true; // enabled by default
+bool enableAlignAfterMove_FP = false; // enabled by default
 bool enableEbrakes_FP = true; // enabled by default
 bool enableMoveInParts_FP = false; // disabled by default
 int numParts_FP = 3;  // max no. units to move at a time
@@ -350,19 +350,21 @@ void loop() {
   //  delay(500);
 //      testInLoop_motorsPID();
   //    testInLoop_readingIR();
-//  robotSystem_loop();
+  robotSystem_loop();
   //  initialGridCalibration();
   //  delay(5000);
   //  //    delay(1000);
   //  if (runProgram) {
   ////    initialGridCalibration();
   ////    delay(2000);
-      for (int i = 0; i < 4; ++i) {
+//      for (int i = 0; i < 4; ++i) {
   //      delay(500);
 //        moveInParts(3, true);
-        moveForward(0, true);
-        delay(1000);
-  //      rotateLeft(90);
+//        moveForward(6, true);
+//        rotateLeft(90);
+//        rotateRight(90);
+//        delay(2000);
+//        rotateLeft(90);
   //      delay(120);
   //      rotateLeft(90);
   //      delay(120);
@@ -374,7 +376,7 @@ void loop() {
   //      sendIRSensorsReadings();}
   //////      checkAlignmentAfterMove();
   //////      delay(200);
-      }
+//      }
   //    delay(1000);
   ////    delay(1500);
   //
