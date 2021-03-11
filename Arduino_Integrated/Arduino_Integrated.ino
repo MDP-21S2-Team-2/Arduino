@@ -186,14 +186,14 @@ void robotSystem_loop() {
         }
         // acknowledge the command
         Serial.write("K\n");
-        delay(60);
+        delay(80);
 #endif
         break;
 
       case 'R': // turn right 90
         rotateRight(90);
 #ifdef EXPLORATION_MODE
-        delay(60);
+        delay(80);
         checkAlignmentAfterRotate();
         delay(60);
         // send sensor readings
@@ -206,7 +206,7 @@ void robotSystem_loop() {
         }
         // acknowledge the command
         Serial.write("K\n");
-        delay(60);
+        delay(80);
 #endif
         break;
       case 'B': // turn 180
@@ -225,7 +225,7 @@ void robotSystem_loop() {
         }
         // acknowledge the command
         Serial.write("K\n");
-        delay(60);
+        delay(80);
 #endif
         break;
 
@@ -354,7 +354,7 @@ void loop() {
   //  initialGridCalibration();
   //  delay(5000);
   //  //    delay(1000);
-  //  if (runProgram) {
+//    if (runProgram) {
   ////    initialGridCalibration();
   ////    delay(2000);
 //      for (int i = 0; i < 4; ++i) {
@@ -393,9 +393,11 @@ void loop() {
   //    delay(500);
   //    for (int j = 0; j < 4; ++j) {
   //      for (int i = 0; i < 4; ++i) {
-  //moveForward(4, true);
+//  rotateRight(90);
+//  delay(80);
+//  moveForward(9, true);
   //        rotateRight(90);
-  //        delay(500);
+//          delay(500);
   //        rotateRight(90);
   //        delay(60);
   //        checkAlignmentAfterMove();
@@ -407,6 +409,6 @@ void loop() {
   //      delay(100);
   //    }
 
-  //    runProgram = false;
-  //  }
+//      runProgram = false;
+//    }
 }
