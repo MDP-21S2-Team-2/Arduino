@@ -7,7 +7,7 @@
 // robot configuration (intended for FP use)
 bool enableAlignAfterMove_FP = true; // enabled by default
 bool enableEbrakes_FP = true; // enabled by default
-bool enableMoveInParts_FP = false; // disabled by default
+bool enableMoveInParts = false; // disabled by default
 int numParts_FP = 3;  // max no. units to move at a time
 
 void setup() {
@@ -69,15 +69,15 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          if (enableMoveInParts_FP) {
+          if (enableMoveInParts) {
             moveInParts(numUnits - '0' + 1, enableEbrakes_FP);
           }
           else
             moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(60);
+          delay(70);
           checkAlignmentAfterMove();
-          delay(60);
+          delay(70);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -98,15 +98,15 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          if (enableMoveInParts_FP) {
+          if (enableMoveInParts) {
             moveInParts(numUnits - '&' + 1, enableEbrakes_FP);
           }
           else
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(60);
+          delay(70);
           checkAlignmentAfterMove();
-          delay(60);
+          delay(70);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -127,15 +127,15 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          if (enableMoveInParts_FP) {
+          if (enableMoveInParts) {
             moveInParts(numUnits - '0' + 1, enableEbrakes_FP);
           }
           else
           moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(60);
+          delay(70);
           checkAlignmentAfterMove();
-          delay(60);
+          delay(70);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -151,15 +151,15 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
-          if (enableMoveInParts_FP) {
+          if (enableMoveInParts) {
             moveInParts(numUnits - '&' + 1, enableEbrakes_FP);
           }
           else
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(60);
+          delay(70);
           checkAlignmentAfterMove();
-          delay(60);
+          delay(70);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -170,12 +170,31 @@ void robotSystem_loop() {
         }
         break;
 
+      case 'W': // move until reach wall/obstacle
+        {
+          moveForward();
+          int units = computeUnitsMoved();
+          // send no. units moved
+          sendUnitsMoved(units);
+#ifdef EXPLORATION_MODE
+          delay(70);
+          checkAlignmentAfterMove();
+          delay(70);
+          // send sensor readings
+          sendIRSensorsReadings();
+#else // FP
+          Serial.write("K\n");
+          delay(60);    
+#endif
+        }
+      break;
+
       case 'L': // turn left 90
         rotateLeft(90);
 #ifdef EXPLORATION_MODE
-        delay(60);
+        delay(70);
         checkAlignmentAfterRotate();
-        delay(60);
+        delay(70);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -193,9 +212,9 @@ void robotSystem_loop() {
       case 'R': // turn right 90
         rotateRight(90);
 #ifdef EXPLORATION_MODE
-        delay(80);
+        delay(70);
         checkAlignmentAfterRotate();
-        delay(60);
+        delay(70);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -212,9 +231,9 @@ void robotSystem_loop() {
       case 'B': // turn 180
         rotateLeft(180);
 #ifdef EXPLORATION_MODE
-        delay(60);
+        delay(70);
         checkAlignmentAfterRotate();
-        delay(60);
+        delay(70);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -240,47 +259,6 @@ void robotSystem_loop() {
 #endif
         break;
 
-      // robot config
-      case 'a': // enable alignment-after-move
-        enableAlignAfterMove_FP = true;
-#ifdef EXPLORATION_MODE
-        // send sensor readings
-        sendIRSensorsReadings();
-#else // FP
-        Serial.write("K\n");
-#endif
-        break;
-
-      case 'b': // disable alignment-after-move
-        enableAlignAfterMove_FP = false;
-#ifdef EXPLORATION_MODE
-        // send sensor readings
-        sendIRSensorsReadings();
-#else // FP
-        Serial.write("K\n");
-#endif
-        break;
-
-      case 'e': // enable e-brakes
-        enableEbrakes_FP = true;
-#ifdef EXPLORATION_MODE
-        // send sensor readings
-        sendIRSensorsReadings();
-#else // FP
-        Serial.write("K\n");
-#endif
-        break;
-
-      case 'f': // disable e-brakes
-        enableEbrakes_FP = false;
-#ifdef EXPLORATION_MODE
-        // send sensor readings
-        sendIRSensorsReadings();
-#else // FP
-        Serial.write("K\n");
-#endif
-        break;
-
       default:  // do nothing
         break;
     }
@@ -298,15 +276,15 @@ void testInLoop_readingIR() {
   Serial.print(" | Front Left (D3): ");
   Serial.println(front_D3.getDistance());
 
-  //    Serial.print("Side, front: ");
-  //    Serial.print(left_S1.getDistance());
-  //    Serial.print(" | Side, back: ");
-  //    Serial.println(left_S2.getDistance());
-  //
-  //    Serial.print("Right Long: ");
-  //    Serial.println(right_long.getDistance());
+  Serial.print("Side, front: ");
+  Serial.print(left_S1.getDistance());
+  Serial.print(" | Side, back: ");
+  Serial.println(left_S2.getDistance());
+
+  Serial.print("Right Long: ");
+  Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
-  //
+  
 }
 
 void testInLoop_motorsPID() {
@@ -346,69 +324,37 @@ void testInLoop_motorsPID() {
 
 bool runProgram = true;
 void loop() {
-  //  sendIRSensorsReadings();
-  //  delay(500);
 //      testInLoop_motorsPID();
 //      testInLoop_readingIR();
   robotSystem_loop();
-  //  initialGridCalibration();
-  //  delay(5000);
-  //  //    delay(1000);
+//    for (int i = 0; i < 4; ++i) {
+//      rotateLeft(90);
+//      delay(140);
+//    }
+
 //    if (runProgram) {
-  ////    initialGridCalibration();
-  ////    delay(2000);
-//      for (int i = 0; i < 4; ++i) {
-  //      delay(500);
-//        moveInParts(3, true);
-//        moveForward(6, true);
-//        rotateLeft(90);
-//        rotateRight(90);
-//        delay(2000);
-//        rotateLeft(90);
-  //      delay(120);
-  //      rotateLeft(90);
-  //      delay(120);
-  //      moveForward(0, true);
-  //      rotateLeft(90);
-  //      checkCentralise_Sides();
-  //      delay(60);
-  //      for (int ii = 0;i<11; i++){
-  //      sendIRSensorsReadings();}
-  //////      checkAlignmentAfterMove();
-  //////      delay(200);
-//      }
-  //    delay(1000);
-  ////    delay(1500);
-  //
-  //  delay(500);
-  //  initialGridCalibration();
-  //  delay(1000);
-
-  //    initialGridCalibration();
-  //    delay(500);
-  //    rotateLeft(90);
-  //    delay(200);
-  //    checkForTilted();
-
-  //    delay(500);
-  //    for (int j = 0; j < 4; ++j) {
-  //      for (int i = 0; i < 4; ++i) {
-//  rotateRight(90);
-//  delay(80);
-//  moveForward(9, true);
-  //        rotateRight(90);
-//          delay(500);
-  //        rotateRight(90);
-  //        delay(60);
-  //        checkAlignmentAfterMove();
-  //        delay(100);
-  //      }
-  //      rotateRight(90);
-  //      delay(100);
-  //      checkAlignmentAfterMove();
-  //      delay(100);
-  //    }
-
 //      runProgram = false;
+//
+//      moveForward(0, true);
+//      sendIRSensorsReadings();
+//      delay(70);
+//      checkAlignmentAfterMove();
+//      sendIRSensorsReadings();
+//      delay(70);
+
+      
+//      moveForward();
+//      int units = computeUnitsMoved();
+//      // print no. ticks moved
+//      int ticks = encL_overshootCount * 256 + encL_count;
+//      Serial.print("Ticks: ");
+//      Serial.println(ticks);
+//      delay(1000);
+//      // send no. grids moved
+//      Serial.print("Units: ");
+//      Serial.println(units);
+//      delay(70);
+//      checkAlignmentAfterMove();
+//      delay(70);
 //    }
 }

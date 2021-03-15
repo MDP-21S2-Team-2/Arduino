@@ -37,4 +37,17 @@ void sendIRSensorsReadings() {
   Serial.write(",");
   Serial.write(ptr_dist_LR, 4);
   Serial.write('\n');
+
+//  Serial.write("IR,");
+//  Serial.print(dist_S2);
+//  Serial.write(",");
+//  Serial.print(dist_S1);
+//  Serial.write(",");
+//  Serial.print(dist_D3);
+//  Serial.write(",");
+//  Serial.print(dist_D1);
+//  Serial.write(",");
+//  Serial.print(dist_D2);
+//  Serial.write(",");
+//  Serial.println(dist_LR);
 }

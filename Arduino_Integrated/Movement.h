@@ -5,7 +5,7 @@
 #define BRAKE_R 400
 
 // comment away if doing FP
-//#define EXPLORATION_MODE
+#define EXPLORATION_MODE
 
 //Declare Variables
 extern bool emergencyBrakes;
@@ -19,20 +19,6 @@ extern bool emergencyBrakes;
 //};
 
 // for 110 RPM
-const int numOvershoot_lut[20] = {
-  1, 2, 3, 4, 5, // 1-5 units
-  6, 8, 9, 10, 11, // 6-10 units
-  12, 13, 15, 16, 17, // 11-15 units
-  18, 19, 20, 22, 23  // 16-20 units
-};
-const int remainderCount_lut[20] = {
-  15, 59, 100, 143, 185,
-  228, 15, 57, 100, 142,
-  184, 226, 13, 55, 97,
-  140, 182, 224, 10, 53
-};
-
-// for 125 RPM
 //const int numOvershoot_lut[20] = {
 //  1, 2, 3, 4, 5, // 1-5 units
 //  6, 8, 9, 10, 11, // 6-10 units
@@ -40,14 +26,25 @@ const int remainderCount_lut[20] = {
 //  18, 19, 20, 22, 23  // 16-20 units
 //};
 //const int remainderCount_lut[20] = {
-//  14, 58, 99, 142, 183,
-//  226, 12, 54, 97, 139,
-//  181, 223, 10, 52, 94,
-//  137, 179, 221, 7, 50
+//  15, 59, 100, 143, 185,
+//  228, 15, 57, 100, 142,
+//  184, 226, 13, 55, 97,
+//  140, 182, 224, 10, 53
 //};
 
-//Movement Variables
-//double oneRevDis = 18.849556; // in cm
+// for 120 RPM
+const int numOvershoot_lut[20] = {
+  1, 2, 3, 4, 5, // 1-5 units
+  6, 8, 9, 10, 11, // 6-10 units
+  12, 13, 15, 16, 17, // 11-15 units
+  18, 19, 20, 22, 23  // 16-20 units
+};
+const int remainderCount_lut[20] = {
+  14, 58, 99, 142, 183,
+  226, 12, 54, 97, 139,
+  181, 223, 10, 52, 94,
+  137, 179, 221, 7, 50
+};
 
 // movement
 void moveForward(int moveUnits, bool emergencyEnabled);
@@ -59,6 +56,8 @@ void rotateLeft(int angle);
 void moveForward_custom(double distance, bool emergencyEnabled);
 void rotateRight_custom(int angle, int tickOffset);
 void rotateLeft_custom(int angle, int tickOffset);
+// new movement comamnds
+void moveForward();
 // check for alignment
 void initialGridCalibration();
 void checkAlignmentAfterMove();

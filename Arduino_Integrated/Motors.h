@@ -9,18 +9,16 @@
 #define LeftMotorA 11 // E2A
 #define RightMotorA 3 // E1A
 
+#define targetRpm TARGETRPM_120
+
 // Setting Target RPM 110 RPM
-#define targetRpm 110.0
-// Setting Target RPM 125 RPM
-//#define targetRpm 125.0
+#define TARGETRPM_110 110
 // Setting Target RPM 120 RPM
-//#define targetRpm 120.0
+#define TARGETRPM_120 120
 
-//#define MOVE_OFFTICKS 24
-//#define MOVE_OFFTICKS 20
-
-
-#define oneRevDis 18.849556
+#define MOVE_OFFTICKS 24  // 120 RPM
+//#define MOVE_OFFTICKS 20  // 100 RPM
+#define ONEREVDIST 18.849556
 
 
 // Motor shield
@@ -58,5 +56,9 @@ double calculateRpm(int pulseWidth);
 // ISR routines for motor encoder
 void motorR_ISR();
 void motorL_ISR();
+
+// compute no. units moved forward
+int computeUnitsMoved();
+void sendUnitsMoved(int units);
 
 #endif
