@@ -259,6 +259,24 @@ void robotSystem_loop() {
 #endif
         break;
 
+      case 'X': // testing
+      {
+        initialGridCalibration(); // NOTE: make initial grid calibration end towards a certain direction, if robot cannot move straight for long distances
+        delay(200);
+        moveForward();
+        int units = computeUnitsMoved();
+        // print no. ticks moved
+        int ticks = encL_overshootCount * 256 + encL_count;
+        Serial.print("Ticks: ");
+        Serial.println(ticks);
+        // send no. grids moved
+        Serial.print("Units: ");
+        Serial.println(units);
+        delay(70);
+        checkAlignmentAfterMove();
+        delay(70);
+      }
+
       default:  // do nothing
         break;
     }
@@ -326,35 +344,19 @@ bool runProgram = true;
 void loop() {
 //      testInLoop_motorsPID();
 //      testInLoop_readingIR();
-  robotSystem_loop();
-//    for (int i = 0; i < 4; ++i) {
-//      rotateLeft(90);
-//      delay(140);
-//    }
+//  robotSystem_loop();
+    for (int i = 0; i < 4; ++i) {
+      //rotateLeft(90);
+      //rotateRight(90);
+      //moveForward(0, false);
+      //delay(140);
+      rotateLeft(180);
+      delay(140);
+    }
+    delay(1500);
 
-//    if (runProgram) {
-//      runProgram = false;
-//
-//      moveForward(0, true);
-//      sendIRSensorsReadings();
-//      delay(70);
-//      checkAlignmentAfterMove();
-//      sendIRSensorsReadings();
-//      delay(70);
-
-      
-//      moveForward();
-//      int units = computeUnitsMoved();
-//      // print no. ticks moved
-//      int ticks = encL_overshootCount * 256 + encL_count;
-//      Serial.print("Ticks: ");
-//      Serial.println(ticks);
-//      delay(1000);
-//      // send no. grids moved
-//      Serial.print("Units: ");
-//      Serial.println(units);
-//      delay(70);
-//      checkAlignmentAfterMove();
-//      delay(70);
-//    }
+//  if (runProgram) {
+//    runProgram = false;
+//    moveForward(15, false);
+//  }
 }

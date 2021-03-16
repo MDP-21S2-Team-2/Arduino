@@ -103,9 +103,9 @@ void checkForCrash() {
   double dist_D3 = front_D3.getDistance();
 
   // check if robot is too near to any obstacle in front, for emergency stop
-  if ((/*dist_D1 > 3.0 &&*/ dist_D1 < FRONT_1GRID_DIST + 2.0) ||  // offset to account for robot's speed
-    (/*dist_D2 > 3.0 &&*/ dist_D2 < FRONT_1GRID_DIST + 2.0) ||
-    (/*dist_D3 > 3.0 &&*/ dist_D3 < FRONT_1GRID_DIST + 2.0)) 
+  if ((/*dist_D1 > 3.0 &&*/ dist_D1 < FRONT_1GRID_DIST + 3.0) ||  // offset to account for robot's speed
+    (/*dist_D2 > 3.0 &&*/ dist_D2 < FRONT_1GRID_DIST + 3.0) ||
+    (/*dist_D3 > 3.0 &&*/ dist_D3 < FRONT_1GRID_DIST + 3.0)) 
     {
       md.setBrakes(BRAKE_L, BRAKE_R);
       emergencyBrakes = true;
@@ -183,42 +183,42 @@ void checkCentralise_Sides() {
   dist_S2 = left_S2.getDistance();
   if (dist_S1 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD) { // S1 sensor < 3.75
     rotateLeft(90);
-    delay(500);
+    delay(70);
     alignBack_Front(SharpIR::D2, true, FRONT_1GRID_DIST);  // align with right sensor
-    delay(300);
+    delay(40);
     rotateRight(90);
-    delay(500);
+    delay(70);
 
     alignedWithLeft = true;
   }
   else if (dist_S2 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD) {  // S2 sensor < 3.75
     rotateLeft(90);
-    delay(500);
+    delay(70);
     alignBack_Front(SharpIR::D1, true, FRONT_1GRID_DIST);  // align with middle sensor
-    delay(300);
+    delay(40);
     rotateRight(90);
-    delay(500);
+    delay(70);
     
     alignedWithLeft = true;
   }
   // check if too far from wall on left side
   else if (dist_S1 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S1 < LEFT_1GRID_END) { // S1 sensor > 6.25
     rotateLeft(90);
-    delay(500);
+    delay(70);
     alignForward_Front(SharpIR::D2, true, FRONT_1GRID_DIST);  // align with right sensor
-    delay(300);
+    delay(40);
     rotateRight(90);
-    delay(500);
+    delay(70);
 
     alignedWithLeft = true;
   }
   else if (dist_S2 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S2 < LEFT_1GRID_END) {  // S2 sensor > 6.25
     rotateLeft(90);
-    delay(300);
+    delay(70);
     alignForward_Front(SharpIR::D1, true, FRONT_1GRID_DIST);  // align with middle sensor
-    delay(300);
+    delay(40);
     rotateRight(90);
-    delay(500);
+    delay(70);
 
     alignedWithLeft = true;
   }
@@ -228,20 +228,20 @@ void checkCentralise_Sides() {
     dist_LR = right_long.getDistance();
     if (dist_LR < RIGHT_1GRID_DIST - LR_SIDES_DIST_THRESHOLD) { // right LR sensor < 3.5
       rotateRight(90);
-      delay(500);
+      delay(70);
       alignBack_Front(SharpIR::D3, true, FRONT_1GRID_DIST);  // align with left sensor
-      delay(300);
+      delay(40);
       rotateLeft(90);
-      delay(500);
+      delay(70);
     }
     // check if too far from wall on right side
     else if (dist_LR > RIGHT_1GRID_DIST + LR_SIDES_DIST_THRESHOLD+0.5 && dist_LR < RIGHT_1GRID_END) { // right LR sensor > 6.4
       rotateRight(90);
-      delay(500);
+      delay(70);
       alignForward_Front(SharpIR::D3, true, FRONT_1GRID_DIST);  // align with left sensor
-      delay(300);
+      delay(40);
       rotateLeft(90);
-      delay(500);
+      delay(70);
     }
   }
 }
@@ -377,7 +377,7 @@ void alignBack_Front(SharpIR::sensorCode sensor, bool fast, double targetDist) {
   double dist_Dx = 0.0;
 
 //  if (fast)
-    md.setSpeeds(80, -80);
+    md.setSpeeds(120, -120);
 //  else
 //    md.setSpeeds(60, -60);
   
@@ -400,7 +400,7 @@ void alignForward_Front(SharpIR::sensorCode sensor, bool fast, double targetDist
   double dist_Dx = 0.0;
 
 //  if (fast)
-    md.setSpeeds(-80, 80);
+    md.setSpeeds(-120, 120);
 //  else
 //    md.setSpeeds(-60, 60);
   

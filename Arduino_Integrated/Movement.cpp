@@ -90,7 +90,7 @@ void rotateLeft(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 136;//target 125: 127;// target 110: 139; //123;
 #elif targetRpm == TARGETRPM_120
-    remainderCount = 131;
+    remainderCount = 129;
 #endif
   }
   else if (angle == 180) {
@@ -141,7 +141,7 @@ void rotateRight(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 137;//132;
 #elif targetRpm == TARGETRPM_120
-    remainderCount = 131;
+    remainderCount = 138;
 #endif
   }
   else if (angle == 180) {
@@ -157,10 +157,6 @@ void rotateRight(int angle)
 //#ifndef EXPLORATION_MODE
 //  remainderCount += 5;
 //#endif
-
-  // reset prevTime to get more accurate timeWidth
-//  L_prevTime = micros();
-//  R_prevTime = micros();
   
   // reset encoder ticks
   resetEnc();
