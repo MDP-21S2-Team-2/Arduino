@@ -182,9 +182,19 @@ void checkAlignmentAfterCommand_FP() {
 }
 
 void checkAlignmentAfterMove() {
+  
+  // align robot to be straight
+  checkForTilted();
+  delay(50);
+  
   // ensure robot is centralised within its grids
   checkCentralise_Front();
-  checkCentralise_Sides();
+  delay(50);
+  if (canCheckCentralise_Sides) {
+    checkCentralise_Sides();
+    delay(50);
+  }
+  canCheckCentralise_Sides = false;
   
   // align robot to be straight
   checkForTilted();
