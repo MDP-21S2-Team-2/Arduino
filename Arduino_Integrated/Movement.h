@@ -47,7 +47,7 @@ const int remainderCount_lut[20] = {
 };
 
 // movement
-void moveForward(int moveUnits, bool emergencyEnabled);
+bool moveForward(int moveUnits, bool emergencyEnabled, unsigned int additionalTicks = 0);
 void moveBackward(int moveUnits);
 // rotation
 void rotateRight(int angle);

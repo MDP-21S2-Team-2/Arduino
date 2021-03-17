@@ -6,7 +6,7 @@
 
 bool emergencyBrakes = false;
 
-void moveForward(int moveUnits, bool emergencyEnabled)
+bool moveForward(int moveUnits, bool emergencyEnabled, unsigned int additionalTicks = 0)
 {
   // reset encoder ticks
   resetEnc();
@@ -15,6 +15,14 @@ void moveForward(int moveUnits, bool emergencyEnabled)
   //int tEncodeVal = tEncodeVal_lut[moveUnits];
   int numOvershoot = numOvershoot_lut[moveUnits];
   int remainderCount = remainderCount_lut[moveUnits];
+  // add additional ticks (if any)
+  if (additionalTicks > 0) {
+    int initialRemainder = remainderCount;
+    remainderCount += additionalTicks;
+    if (remainderCount <= initialRemainder) {  // overflow
+      ++numOvershoot;
+    }
+  }
 
   // check if either motor reached the target number of ticks
   //while (!emergencyBrakes && ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal)))
@@ -31,7 +39,8 @@ void moveForward(int moveUnits, bool emergencyEnabled)
       // read IR sensors here to check for emergency brakes
       if (emergencyEnabled) {
   #ifdef EXPLORATION_MODE
-          checkForCrash();
+          //checkForCrash();
+          checkForCrashAndRecover(numOvershoot, remainderCount);
   #else
           checkForCrashAndRecover(numOvershoot, remainderCount);
   #endif
@@ -40,6 +49,7 @@ void moveForward(int moveUnits, bool emergencyEnabled)
   }
   if (!emergencyBrakes)
     md.setBrakes(BRAKE_L, BRAKE_R);
+  bool eBraked = emergencyBrakes; // true if emergencyBrakes was triggered
   if (emergencyBrakes) {
     // TODO: perform recovery action?
     //Serial.write("EMERGENCY\n");
@@ -47,6 +57,8 @@ void moveForward(int moveUnits, bool emergencyEnabled)
   }
   // reset PID
   resetPIDControllers();
+
+  return eBraked;
 }
 void moveBackward(int moveUnits)
 {
@@ -292,9 +304,10 @@ void moveForward_custom(double distance, bool emergencyEnabled)
     // read IR sensors here to check for emergency brakes
       if (emergencyEnabled) {
   #ifdef EXPLORATION_MODE
-          checkForCrash();
-  #else
+          //checkForCrash();
           checkForCrashAndRecover(numOvershoot, remainderCount);
+  #else
+          //checkForCrashAndRecover(numOvershoot, remainderCount);
   #endif
       }
     }

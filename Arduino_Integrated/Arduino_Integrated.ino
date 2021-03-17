@@ -9,6 +9,7 @@ bool enableAlignAfterMove_FP = true; // enabled by default
 bool enableEbrakes_FP = true; // enabled by default
 bool enableMoveInParts = true; // disabled by default
 int numParts_FP = 3;  // max no. units to move at a time
+int numParts_W = 5; // max no. units to move at a time
 
 void setup() {
   // put your setup code here, to run once:
@@ -38,19 +39,20 @@ void setup() {
 
 // move a no. of units at a time
 // targetUnits = 0: 1 unit, targetUnits = 1: 2 units, ... targetUnits = 3: 4 units, targetUnits = 4: 5 units
-void moveInParts(int targetUnits, bool enableEbrakes) {
+void moveInParts(int targetUnits, bool enableEbrakes, int additionalTicks = 0) {
+  int ticksPerUnit = additionalTicks / targetUnits;
   while (targetUnits >= numParts_FP) {
-    moveForward(numParts_FP - 1, enableEbrakes);
+    moveForward(numParts_FP - 1, enableEbrakes, numParts_FP*ticksPerUnit);
     targetUnits -= numParts_FP;
     if (enableAlignAfterMove_FP) {
-      delay(60);
-      //            checkAlignmentAfterCommand_FP();
+      delay(70);
+      //checkAlignmentAfterCommand_FP();
       checkAlignmentAfterMove();
     }
-    delay(60);
+    delay(70);
   }
   if (targetUnits > 0) {  // still have a smaller part to move
-    moveForward(targetUnits - 1, enableEbrakes);
+    moveForward(targetUnits - 1, enableEbrakes, targetUnits*ticksPerUnit);
   }
 }
 
@@ -172,10 +174,23 @@ void robotSystem_loop() {
 
       case 'W': // move until reach wall/obstacle
         {
-          moveForward();
-          int units = computeUnitsMoved();
+          //moveForward();
+          bool stopped = false;
+          int unitsMoved = 0;
+          while (!stopped) {
+            stopped = moveForward(numParts_W - 1, true);
+            if (stopped)
+              unitsMoved += computeUnitsMoved();
+            else {
+              unitsMoved += numParts_W;
+              // check alignment & calibration
+              delay(70);
+              checkAlignmentAfterMove();
+              delay(70);
+            }
+          }
           // send no. units moved
-          sendUnitsMoved(units);
+          sendUnitsMoved(unitsMoved);
 #ifdef EXPLORATION_MODE
           delay(70);
           checkAlignmentAfterMove();
@@ -187,7 +202,37 @@ void robotSystem_loop() {
           delay(60);    
 #endif
         }
-      break;
+        break;
+
+      case 'S': // move with additional ticks to overcome skid
+        {
+          // read next character for no. units to move
+          while (Serial.available() == 0);  // wait for next character
+          char numUnits = Serial.read();
+          int additionalTicks = 0;  // ADDITIONAL TICKS
+          if (enableMoveInParts) {
+            moveInParts(numUnits - '0' + 1, enableEbrakes_FP, additionalTicks);
+          }
+          else
+            moveForward(numUnits - '0', enableEbrakes_FP, additionalTicks);
+#ifdef EXPLORATION_MODE
+          delay(70);
+          checkAlignmentAfterMove();
+          delay(70);
+          // send sensor readings
+          sendIRSensorsReadings();
+#else // FP
+          if (enableAlignAfterMove_FP) {
+            delay(60);
+            checkAlignmentAfterCommand_FP();
+//            checkAlignmentAfterMove();
+          }
+          // acknowledge the command
+          Serial.write("K\n");
+          delay(60);
+#endif
+        }
+        break;
 
       case 'L': // turn left 90
         rotateLeft(90);
@@ -258,9 +303,6 @@ void robotSystem_loop() {
         Serial.write("K\n");
 #endif
         break;
-
-      case 'S': // stop
-         break;
 
       case 'X': // testing
       {

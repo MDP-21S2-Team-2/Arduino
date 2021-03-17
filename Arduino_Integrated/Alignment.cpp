@@ -420,7 +420,7 @@ void alignBack_Front(SharpIR::sensorCode sensor, double targetDist) {
   double dist_Dx = 0.0;
 
 //  if (fast)
-    md.setSpeeds(120, -120);
+    md.setSpeeds(100, -100);
 //  else
 //    md.setSpeeds(60, -60);
   
@@ -443,7 +443,7 @@ void alignForward_Front(SharpIR::sensorCode sensor, double targetDist) {
   double dist_Dx = 0.0;
 
 //  if (fast)
-    md.setSpeeds(-120, 120);
+    md.setSpeeds(-100, 100);
 //  else
 //    md.setSpeeds(-60, 60);
   
