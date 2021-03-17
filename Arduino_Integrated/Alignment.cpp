@@ -37,7 +37,7 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
         // robot veered to the left; obstacle on the left
         if (dist_D3 < FRONT_1GRID_DIST + 2.5 && dist_D2 > FRONT_1GRID_END) { // front-left < 7.5; front-right not blocked
           // 2. rotate right by >90
-          rotateRight_custom(90, 8);
+          rotateRight_custom(90, 12);
           //rotateRight(90);
 
           delay(80);
@@ -63,7 +63,7 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
         // robot veered to the right; obstacle on the right
         else if (dist_D2 < FRONT_1GRID_DIST + 2.5 && dist_D3 > FRONT_1GRID_END) {  // front-right < 7.5; front-left not blocked
           // 2. rotate left by >90
-          rotateLeft_custom(90, 8);
+          rotateLeft_custom(90, 12);
           //rotateLeft(90);
 
           delay(80);

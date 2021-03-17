@@ -6,7 +6,7 @@
 
 bool emergencyBrakes = false;
 
-bool moveForward(int moveUnits, bool emergencyEnabled, unsigned int additionalTicks = 0)
+bool moveForward(int moveUnits, bool emergencyEnabled, bool crashRecovery = true, unsigned int additionalTicks = 0)
 {
   // reset encoder ticks
   resetEnc();
@@ -39,8 +39,10 @@ bool moveForward(int moveUnits, bool emergencyEnabled, unsigned int additionalTi
       // read IR sensors here to check for emergency brakes
       if (emergencyEnabled) {
   #ifdef EXPLORATION_MODE
-          //checkForCrash();
-          checkForCrashAndRecover(numOvershoot, remainderCount);
+          if (crashRecovery)
+            checkForCrashAndRecover(numOvershoot, remainderCount);
+          else
+            checkForCrash();
   #else
           checkForCrashAndRecover(numOvershoot, remainderCount);
   #endif
@@ -332,7 +334,11 @@ void rotateRight_custom(int angle, int tickOffset)
   int remainderCount = 0;
   if (angle == 90) {
     numOvershoot = 1;
-    remainderCount = 142;//132;
+#if targetRpm == TARGETRPM_110
+    remainderCount = 137;//132;
+#elif targetRpm == TARGETRPM_120
+    remainderCount = 138;
+#endif
   }
   remainderCount += tickOffset;
   
@@ -362,7 +368,11 @@ void rotateLeft_custom(int angle, int tickOffset)
   int remainderCount = 0;
   if (angle == 90) {
     numOvershoot = 1;
-    remainderCount = 139;//target 125: 127;// target 110: 139; //123;
+#if targetRpm == TARGETRPM_110
+    remainderCount = 136;//target 125: 127;// target 110: 139; //123;
+#elif targetRpm == TARGETRPM_120
+    remainderCount = 129;
+#endif
   }
   remainderCount += tickOffset;
 

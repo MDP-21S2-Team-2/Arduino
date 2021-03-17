@@ -42,7 +42,7 @@ void setup() {
 void moveInParts(int targetUnits, bool enableEbrakes, int additionalTicks = 0) {
   int ticksPerUnit = additionalTicks / targetUnits;
   while (targetUnits >= numParts_FP) {
-    moveForward(numParts_FP - 1, enableEbrakes, numParts_FP*ticksPerUnit);
+    moveForward(numParts_FP - 1, enableEbrakes, true, numParts_FP*ticksPerUnit);
     targetUnits -= numParts_FP;
     if (enableAlignAfterMove_FP) {
       delay(70);
@@ -178,7 +178,7 @@ void robotSystem_loop() {
           bool stopped = false;
           int unitsMoved = 0;
           while (!stopped) {
-            stopped = moveForward(numParts_W - 1, true);
+            stopped = moveForward(numParts_W - 1, true, false);
             if (stopped)
               unitsMoved += computeUnitsMoved();
             else {
@@ -214,7 +214,7 @@ void robotSystem_loop() {
             moveInParts(numUnits - '0' + 1, enableEbrakes_FP, additionalTicks);
           }
           else
-            moveForward(numUnits - '0', enableEbrakes_FP, additionalTicks);
+            moveForward(numUnits - '0', enableEbrakes_FP, true, additionalTicks);
 #ifdef EXPLORATION_MODE
           delay(70);
           checkAlignmentAfterMove();

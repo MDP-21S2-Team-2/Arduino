@@ -47,7 +47,7 @@ const int remainderCount_lut[20] = {
 };
 
 // movement
-bool moveForward(int moveUnits, bool emergencyEnabled, unsigned int additionalTicks = 0);
+bool moveForward(int moveUnits, bool emergencyEnabled, bool crashRecovery = true, unsigned int additionalTicks = 0);
 void moveBackward(int moveUnits);
 // rotation
 void rotateRight(int angle);
@@ -56,7 +56,7 @@ void rotateLeft(int angle);
 void moveForward_custom(double distance, bool emergencyEnabled);
 void rotateRight_custom(int angle, int tickOffset);
 void rotateLeft_custom(int angle, int tickOffset);
-// new movement comamnds
+// new movement commands
 void moveForward();
 // check for alignment
 void initialGridCalibration();
