@@ -18,33 +18,35 @@ extern bool emergencyBrakes;
 //  4744, 5042, 5340, 5638, 5937  // 16-20 units
 //};
 
-// for 110 RPM
-//const int numOvershoot_lut[20] = {
-//  1, 2, 3, 4, 5, // 1-5 units
-//  6, 8, 9, 10, 11, // 6-10 units
-//  12, 13, 15, 16, 17, // 11-15 units
-//  18, 19, 20, 22, 23  // 16-20 units
-//};
-//const int remainderCount_lut[20] = {
-//  15, 59, 100, 143, 185,
-//  228, 15, 57, 100, 142,
-//  184, 226, 13, 55, 97,
-//  140, 182, 224, 10, 53
-//};
-
-// for 120 RPM
-const int numOvershoot_lut[20] = {
-  1, 2, 3, 4, 5, // 1-5 units
-  6, 8, 9, 10, 11, // 6-10 units
-  12, 13, 15, 16, 17, // 11-15 units
-  18, 19, 20, 22, 23  // 16-20 units
-};
-const int remainderCount_lut[20] = {
-  18, 62, 104, 147, 189,
-  231, 17, 59, 102, 144,
-  186, 228, 15, 57, 99,
-  142, 184, 226, 12, 55
-};
+#if targetRpm == TARGETRPM_110
+  // for 110 RPM
+  const int numOvershoot_lut[20] = {
+    1, 2, 3, 4, 5, // 1-5 units
+    6, 8, 9, 10, 11, // 6-10 units
+    12, 13, 15, 16, 17, // 11-15 units
+    18, 19, 20, 22, 23  // 16-20 units
+  };
+  const int remainderCount_lut[20] = {
+    15, 59, 100, 143, 185,
+    228, 15, 57, 100, 142,
+    184, 226, 13, 55, 97,
+    140, 182, 224, 10, 53
+  };
+#elif targetRpm == TARGETRPM_120
+  // for 120 RPM
+  const int numOvershoot_lut[20] = {
+    1, 2, 3, 4, 5, // 1-5 units
+    6, 8, 9, 10, 11, // 6-10 units
+    12, 13, 15, 16, 17, // 11-15 units
+    18, 19, 20, 22, 23  // 16-20 units
+  };
+  const int remainderCount_lut[20] = {
+    19, 62, 102, 147, 189, //move 3 units changed from 104 to 102
+    231, 17, 59, 102, 144,
+    186, 228, 15, 57, 99,
+    142, 184, 226, 12, 55
+  };
+#endif
 
 // movement
 bool moveForward(int moveUnits, bool emergencyEnabled, bool crashRecovery = true, unsigned int additionalTicks = 0);

@@ -9,7 +9,9 @@ bool enableAlignAfterMove_FP = true; // enabled by default
 bool enableEbrakes_FP = true; // enabled by default
 bool enableMoveInParts = true; // disabled by default
 int numParts_FP = 3;  // max no. units to move at a time
-int numParts_W = 5; // max no. units to move at a time
+int numParts_W = 3; // max no. units to move at a time
+
+bool stopRunning = false; // stop running for IR
 
 void setup() {
   // put your setup code here, to run once:
@@ -45,18 +47,22 @@ void moveInParts(int targetUnits, bool enableEbrakes, int additionalTicks = 0) {
     moveForward(numParts_FP - 1, enableEbrakes, true, numParts_FP*ticksPerUnit);
     targetUnits -= numParts_FP;
     if (enableAlignAfterMove_FP) {
-      delay(70);
+      delay(140);
       //checkAlignmentAfterCommand_FP();
       checkAlignmentAfterMove();
     }
-    delay(70);
+    delay(90);
   }
   if (targetUnits > 0) {  // still have a smaller part to move
     moveForward(targetUnits - 1, enableEbrakes, true, targetUnits*ticksPerUnit);
+    delay(30);
   }
 }
 
 void robotSystem_loop() {
+
+  if (stopRunning)
+    return;
 
   if (Serial.available() > 0) { // new command
     // read incoming line
@@ -77,7 +83,7 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(70);
+          delay(130);
           checkAlignmentAfterMove();
           delay(70);
           // send sensor readings
@@ -106,7 +112,7 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(70);
+          delay(130);
           checkAlignmentAfterMove();
           delay(70);
           // send sensor readings
@@ -135,7 +141,7 @@ void robotSystem_loop() {
           else
           moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(70);
+          delay(130);
           checkAlignmentAfterMove();
           delay(70);
           // send sensor readings
@@ -159,7 +165,7 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(70);
+          delay(130);
           checkAlignmentAfterMove();
           delay(70);
           // send sensor readings
@@ -184,7 +190,7 @@ void robotSystem_loop() {
             else {
               unitsMoved += numParts_W;
               // check alignment & calibration
-              delay(70);
+              delay(130);
               checkAlignmentAfterMove();
               delay(70);
             }
@@ -192,7 +198,7 @@ void robotSystem_loop() {
           // send no. units moved
           sendUnitsMoved(unitsMoved);
 #ifdef EXPLORATION_MODE
-          delay(70);
+          delay(130);
           checkAlignmentAfterMove();
           delay(70);
           // send sensor readings
@@ -216,7 +222,7 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '0', enableEbrakes_FP, true, additionalTicks);
 #ifdef EXPLORATION_MODE
-          delay(70);
+          delay(130);
           checkAlignmentAfterMove();
           delay(70);
           // send sensor readings
@@ -237,7 +243,7 @@ void robotSystem_loop() {
       case 'L': // turn left 90
         rotateLeft(90);
 #ifdef EXPLORATION_MODE
-        delay(80);
+        delay(140);
         checkAlignmentAfterRotate();
         delay(70);
         // send sensor readings
@@ -257,7 +263,7 @@ void robotSystem_loop() {
       case 'R': // turn right 90
         rotateRight(90);
 #ifdef EXPLORATION_MODE
-        delay(80);
+        delay(140);
         checkAlignmentAfterRotate();
         delay(70);
         // send sensor readings
@@ -276,7 +282,7 @@ void robotSystem_loop() {
       case 'B': // turn 180
         rotateLeft(180);
 #ifdef EXPLORATION_MODE
-        delay(90);
+        delay(150);
         checkAlignmentAfterRotate();
         delay(70);
         // send sensor readings
@@ -295,6 +301,7 @@ void robotSystem_loop() {
 
       case 'C': // initial calibration in starting grid
         initialGridCalibration();
+        stopRunning = false;
 #ifdef EXPLORATION_MODE
         // send sensor readings
         sendIRSensorsReadings();
@@ -304,23 +311,9 @@ void robotSystem_loop() {
 #endif
         break;
 
-      case 'X': // testing
-      {
-        initialGridCalibration(); // NOTE: make initial grid calibration end towards a certain direction, if robot cannot move straight for long distances
-        delay(200);
-        moveForward();
-        int units = computeUnitsMoved();
-        // print no. ticks moved
-        int ticks = encL_overshootCount * 256 + encL_count;
-        Serial.print("Ticks: ");
-        Serial.println(ticks);
-        // send no. grids moved
-        Serial.print("Units: ");
-        Serial.println(units);
-        delay(70);
-        checkAlignmentAfterMove();
-        delay(70);
-      }
+      case 'T': // stop
+        stopRunning = true;
+        break;
 
       default:  // do nothing
         break;
@@ -332,20 +325,20 @@ void robotSystem_loop() {
 void testInLoop_readingIR() {
   delay(200);
 
-  Serial.print("Front Right (D2): ");
-  Serial.print(front_D2.getDistance());
-  Serial.print(" | Front Mid (D1): ");
-  Serial.print(front_D1.getDistance());
-  Serial.print(" | Front Left (D3): ");
-  Serial.println(front_D3.getDistance());
+//  Serial.print("Front Right (D2): ");
+//  Serial.print(front_D2.getDistance());
+//  Serial.print(" | Front Mid (D1): ");
+//  Serial.print(front_D1.getDistance());
+//  Serial.print(" | Front Left (D3): ");
+//  Serial.println(front_D3.getDistance());
 
   Serial.print("Side, front: ");
   Serial.print(left_S1.getDistance());
   Serial.print(" | Side, back: ");
   Serial.println(left_S2.getDistance());
 
-//  Serial.print("Right Long: ");
-//  Serial.println(right_long.getDistance());
+  Serial.print("Right Long: ");
+  Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
   
 }
@@ -387,19 +380,20 @@ void testInLoop_motorsPID() {
 
 bool runProgram = true;
 void loop() {
-//      testInLoop_motorsPID();
-//      testInLoop_readingIR();
+//  testInLoop_motorsPID();
+//  testInLoop_readingIR();
   robotSystem_loop();
+//  delay(1000);
 //    for (int i = 0; i < 4; ++i) {
-      //rotateLeft(90);
-      //rotateRight(90);
-      //moveForward(0, false);
-      //delay(140);
+//      rotateLeft(90);
 //      rotateLeft(180);
+//      rotateRight(90);
+//      delay(200);
+//      moveForward(2, true);
 //      delay(140);
 //    }
   //initialGridCalibration();
-//  moveForward(0, true);
+//  moveForward(3, true);
 //  delay(70);
 //  checkAlignmentAfterMove();
 //  delay(1500);

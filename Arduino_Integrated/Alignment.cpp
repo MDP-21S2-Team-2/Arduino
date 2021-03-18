@@ -35,7 +35,7 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
         dist_D3 = front_D3.getDistance(); // left
 
         // robot veered to the left; obstacle on the left
-        if (dist_D3 < FRONT_1GRID_DIST + 2.5 && dist_D2 > FRONT_1GRID_END) { // front-left < 7.5; front-right not blocked
+        if (dist_D3 < FRONT_1GRID_DIST + 2.5 && dist_D2 > FRONT_1GRID_END+1.0) { // front-left < 7.5; front-right not blocked
           // 2. rotate right by >90
           rotateRight_custom(90, 12);
           //rotateRight(90);
@@ -61,7 +61,7 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
           moveForward_custom(dist, true);
         }
         // robot veered to the right; obstacle on the right
-        else if (dist_D2 < FRONT_1GRID_DIST + 2.5 && dist_D3 > FRONT_1GRID_END) {  // front-right < 7.5; front-left not blocked
+        else if (dist_D2 < FRONT_1GRID_DIST + 2.5 && dist_D3 > FRONT_1GRID_END+1.0) {  // front-right < 7.5; front-left not blocked
           // 2. rotate left by >90
           rotateLeft_custom(90, 12);
           //rotateLeft(90);
@@ -185,13 +185,19 @@ void checkCentralise_Sides() {
   double dist_S1, dist_S2, dist_LR;
 
 //check for ideal distance in middle of 3x3 grid
-  bool alignedWithLeft = false;
+  //bool alignedWithLeft = false;
+  bool checkedLeft = false;
   // check if too near or too far to the wall on left side
   dist_S1 = left_S1.getDistance();
   dist_S2 = left_S2.getDistance();
+
+  if ((dist_S1 < LEFT_1GRID_END) || (dist_S2 < LEFT_1GRID_END)) {
+    checkedLeft = true;
+  }
+  
   if ((dist_S1 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD)
     //|| (dist_S1 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S1 < LEFT_1GRID_END)
-  ) { // S1 sensor < 3.75
+  ) { // S1 sensor < 3.9 //3.75
     rotateLeft(90);
     delay(100);
     alignBack_Front(SharpIR::D2, LEFT_1GRID_DIST);  // align with right sensor
@@ -200,11 +206,11 @@ void checkCentralise_Sides() {
     rotateRight(90);
     delay(100);
 
-    alignedWithLeft = true;
+    //alignedWithLeft = true;
   }
   else if ((dist_S2 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD)
     //|| (dist_S2 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S2 < LEFT_1GRID_END)
-  ) {  // S2 sensor < 3.75
+  ) {  // S2 sensor < 3.9 //3.75
     rotateLeft(90);
     delay(100);
     alignBack_Front(SharpIR::D1, LEFT_1GRID_DIST);  // align with middle sensor
@@ -213,10 +219,10 @@ void checkCentralise_Sides() {
     rotateRight(90);
     delay(100);
     
-    alignedWithLeft = true;
+    //alignedWithLeft = true;
   }
   // check if too far from wall on left side
-  else if (dist_S1 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S1 < LEFT_1GRID_END) { // S1 sensor > 6.25
+  else if (dist_S1 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S1 < LEFT_1GRID_END) { // S1 sensor > 6.4 //6.25
     rotateLeft(90);
     delay(70);
     alignForward_Front(SharpIR::D2, LEFT_1GRID_DIST);  // align with right sensor
@@ -225,9 +231,9 @@ void checkCentralise_Sides() {
     rotateRight(90);
     delay(70);
 
-    alignedWithLeft = true;
+    //alignedWithLeft = true;
   }
-  else if (dist_S2 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S2 < LEFT_1GRID_END) {  // S2 sensor > 6.25
+  else if (dist_S2 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S2 < LEFT_1GRID_END) {  // S2 sensor > 6.4 //6.25
     rotateLeft(90);
     delay(70);
     alignForward_Front(SharpIR::D1, LEFT_1GRID_DIST);  // align with middle sensor
@@ -236,11 +242,12 @@ void checkCentralise_Sides() {
     rotateRight(90);
     delay(70);
 
-    alignedWithLeft = true;
+    //alignedWithLeft = true;
   }
   
   // check if too near or too far to the wall on right side - only if left-side calibration not used
-  if (!alignedWithLeft) {
+  //if (!alignedWithLeft) {
+  if (!checkedLeft) {
     dist_LR = right_long.getDistance();
     if ((dist_LR < RIGHT_1GRID_DIST - LR_SIDES_DIST_THRESHOLD)
       //|| (dist_LR > RIGHT_1GRID_DIST + LR_SIDES_DIST_THRESHOLD+0.5 && dist_LR < RIGHT_1GRID_END)
@@ -273,10 +280,10 @@ void checkForTilted() {
   double dist_D2 = front_D2.getDistance();
   double dist_D3 = front_D3.getDistance();
 
-  if ((dist_D1 >= 1.0 && dist_D1 <= 7.5 && dist_D2 >= 1.0 && dist_D2 <= 7.5) ||
+  if ((dist_D1 >= 1.0 && dist_D1 <= 8.5 && dist_D2 >= 1.0 && dist_D2 <= 8.5) ||
     (dist_D1 >= 13.0 && dist_D1 <= 18.0 && dist_D2 >= 13.0 && dist_D2 <= 18.0) ||
     //|| (dist_D1 >= 23.0 && dist_D1 <= 28.0 && dist_D2 >= 23.0 && dist_D2 <= 28.0)
-    (dist_D1 >= 1.0 && dist_D1 <= 7.5 && dist_D3 >= 1.0 && dist_D3 <= 7.5) ||
+    (dist_D1 >= 1.0 && dist_D1 <= 8.5 && dist_D3 >= 1.0 && dist_D3 <= 8.5) ||
     (dist_D1 >= 13.0 && dist_D1 <= 18.0 && dist_D3 >= 13.0 && dist_D3 <= 18.0)
     //|| (dist_D1 >= 23.0 && dist_D1 <= 28.0 && dist_D3 >= 23.0 && dist_D3 <= 28.0
   ) {
@@ -288,8 +295,8 @@ void checkForTilted() {
   double difference1 = abs(dist_D1 - dist_D2);
   double difference2 = abs(dist_D1 - dist_D3);
   // front right
-  if ((dist_D1 >= 1.0 && dist_D1 <= 8.0 && dist_D2 >= 1.0 && dist_D2 <= 8.0 && difference1 > 0.3) ||
-    (dist_D1 >= 13.0 && dist_D1 <= 18.0 && dist_D2 >= 13.0 && dist_D2 <= 18.0 && difference1 > 0.5)
+  if ((dist_D1 >= 1.0 && dist_D1 <= 8.5 && dist_D2 >= 1.0 && dist_D2 <= 8.5 && difference1 > 0.3) ||
+    (dist_D1 >= 12.0 && dist_D1 <= 18.0 && dist_D2 >= 12.0 && dist_D2 <= 18.0 && difference1 > 0.5)
     //|| (dist_D1 >= 23.0 && dist_D1 <= 28.0 && dist_D2 >= 23.0 && dist_D2 <= 28.0 && difference1 > 0.8)
   )  // only try to align when within certain range from obstacle in front
   { // TODO: distance difference thresholds
@@ -297,8 +304,8 @@ void checkForTilted() {
     alignedWithFront = true;
   }
   // front left
-  else if ((dist_D1 >= 1.0 && dist_D1 <= 8.0 && dist_D3 >= 1.0 && dist_D3 <= 8.0 && difference2 > 0.2) ||
-    (dist_D1 >= 13.0 && dist_D1 <= 18.0 && dist_D3 >= 13.0 && dist_D3 <= 18.0 && difference2 > 0.5)
+  else if ((dist_D1 >= 1.0 && dist_D1 <= 8.5 && dist_D3 >= 1.0 && dist_D3 <= 8.5 && difference2 > 0.2) ||
+    (dist_D1 >= 12.0 && dist_D1 <= 18.0 && dist_D3 >= 12.0 && dist_D3 <= 18.0 && difference2 > 0.5)
     //|| (dist_D1 >= 23.0 && dist_D1 <= 28.0 && dist_D3 >= 23.0 && dist_D3 <= 28.0 && difference2 > 0.8)
   )  // only try to align when within certain range from obstacle in front
   { // TODO: distance difference thresholds
@@ -318,8 +325,8 @@ void checkForTilted() {
       canCheckCentralise_Sides = true;
     }
     
-    if ((dist_S1 >= 1.8 && dist_S1 <= 8.0 && dist_S2 >= 1.8 && dist_S2 <= 8.0 && (difference > 0.15 || difference < 0)) ||  // by right, difference should be around >0.15
-    (dist_S1 >= 12.0 && dist_S1 <= 18.0 && dist_S2 >= 12.0 && dist_S2 <= 18.0 && (difference > 0.25 || difference < 0))  // difference originally listed as >0.2
+    if ((dist_S1 >= 1.8 && dist_S1 <= 8.0 && dist_S2 >= 1.8 && dist_S2 <= 8.0 && ((difference > 0.15 && difference < 5.5) || (difference < 0 && difference > -5.5))) ||  // by right, difference should be around >0.15
+    (dist_S1 >= 12.0 && dist_S1 <= 18.0 && dist_S2 >= 12.0 && dist_S2 <= 18.0 && ((difference > 0.25 && difference < 5.5) || (difference < 0 && difference > -5.5)))  // difference originally listed as >0.2
     //|| (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && (difference > 0.3 || difference < 0))
     ) { // TODO: distance difference threshold
       alignToLeftWall();
@@ -357,8 +364,8 @@ void alignToLeftWall() {
       if (currState != newState) {  // change in state
         // set new speed
         if (abs(difference) > HS_THRESHOLD) {
-          if (newState == STATE_DIFFGT0)  md.setSpeeds(110, 110); // tilted to the right; turn left
-          else  md.setSpeeds(-110, -110); // tilted to the left; turn right
+          if (newState == STATE_DIFFGT0)  md.setSpeeds(100, 100); // tilted to the right; turn left
+          else  md.setSpeeds(-100, -100); // tilted to the left; turn right
         } else {
           if (newState == STATE_DIFFGT0)  md.setSpeeds(60, 60); // tilted to the right; turn left
           else  md.setSpeeds(-60, -60); // tilted to the left; turn right
@@ -397,9 +404,9 @@ void alignToFrontWall(bool useLeft) {
         // set new speed
         if (abs(difference) > HS_THRESHOLD) {
           if (newState == STATE_DIFFGT0)
-            md.setSpeeds(110, 110); // tilted to the right; turn left
+            md.setSpeeds(100, 100); // tilted to the right; turn left
           else
-            md.setSpeeds(-110, -110); // tilted to the left; turn right
+            md.setSpeeds(-100, -100); // tilted to the left; turn right
         } else {
           if (newState == STATE_DIFFGT0)
             md.setSpeeds(60, 60); // tilted to the right; turn left
@@ -418,9 +425,11 @@ void alignBack_Front(SharpIR::sensorCode sensor, double targetDist) {
   
   // use one of the front sensors for alignment
   double dist_Dx = 0.0;
+  
+  unsigned long startTime = millis();
 
 //  if (fast)
-    md.setSpeeds(100, -100);
+    md.setSpeeds(80, -80);
 //  else
 //    md.setSpeeds(60, -60);
   
@@ -433,7 +442,7 @@ void alignBack_Front(SharpIR::sensorCode sensor, double targetDist) {
     case SharpIR::D3: dist_Dx = front_D3.getDistance();
       break;
     }
-  } while (dist_Dx < targetDist && dist_Dx > targetDist - 5);
+  } while (dist_Dx < targetDist && dist_Dx > targetDist - 5 && (millis() - startTime) < 500);
   md.setBrakes(BRAKE_L, BRAKE_R);
 }
 
@@ -441,9 +450,11 @@ void alignForward_Front(SharpIR::sensorCode sensor, double targetDist) {
   
   // use one of the front sensors for alignment
   double dist_Dx = 0.0;
+  
+  unsigned long startTime = millis();
 
 //  if (fast)
-    md.setSpeeds(-100, 100);
+    md.setSpeeds(-80, 80);
 //  else
 //    md.setSpeeds(-60, 60);
   
@@ -456,7 +467,7 @@ void alignForward_Front(SharpIR::sensorCode sensor, double targetDist) {
     case SharpIR::D3: dist_Dx = front_D3.getDistance();
       break;
     }
-  } while (dist_Dx > targetDist && dist_Dx < targetDist + 5);
+  } while (dist_Dx > targetDist && dist_Dx < targetDist + 5 && (millis() - startTime) < 500);
   md.setBrakes(BRAKE_L, BRAKE_R);
 }
 

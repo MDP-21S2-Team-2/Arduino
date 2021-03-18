@@ -104,7 +104,7 @@ void rotateLeft(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 136;//target 125: 127;// target 110: 139; //123;
 #elif targetRpm == TARGETRPM_120
-    remainderCount = 129;
+    remainderCount = 130;
 #endif
   }
   else if (angle == 180) {
@@ -113,7 +113,7 @@ void rotateLeft(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 41;
 #elif targetRpm == TARGETRPM_120
-  remainderCount = 37;
+  remainderCount = 39;
 #endif
   }
 
@@ -155,7 +155,7 @@ void rotateRight(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 137;//132;
 #elif targetRpm == TARGETRPM_120
-    remainderCount = 138;
+    remainderCount = 140;
 #endif
   }
   else if (angle == 180) {
@@ -204,11 +204,11 @@ void checkAlignmentAfterMove() {
   // ensure robot is centralised within its grids
   checkCentralise_Front();
   delay(50);
-  if (canCheckCentralise_Sides) {
+  //if (canCheckCentralise_Sides) {
     checkCentralise_Sides();
     delay(50);
-  }
-  canCheckCentralise_Sides = false;
+  //}
+  //canCheckCentralise_Sides = false;
   
   // align robot to be straight
   checkForTilted();
