@@ -52,7 +52,7 @@ void moveInParts(int targetUnits, bool enableEbrakes, int additionalTicks = 0) {
     delay(70);
   }
   if (targetUnits > 0) {  // still have a smaller part to move
-    moveForward(targetUnits - 1, enableEbrakes, targetUnits*ticksPerUnit);
+    moveForward(targetUnits - 1, enableEbrakes, true, targetUnits*ticksPerUnit);
   }
 }
 
