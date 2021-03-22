@@ -6,7 +6,7 @@
 
 bool emergencyBrakes = false;
 
-void moveForward(int moveUnits, bool emergencyEnabled)
+bool moveForward(int moveUnits, bool emergencyEnabled, bool crashRecovery = true, unsigned int additionalTicks = 0)
 {
   // reset encoder ticks
   resetEnc();
@@ -15,6 +15,14 @@ void moveForward(int moveUnits, bool emergencyEnabled)
   //int tEncodeVal = tEncodeVal_lut[moveUnits];
   int numOvershoot = numOvershoot_lut[moveUnits];
   int remainderCount = remainderCount_lut[moveUnits];
+  // add additional ticks (if any)
+  if (additionalTicks > 0) {
+    int initialRemainder = remainderCount;
+    remainderCount += additionalTicks;
+    if (remainderCount <= initialRemainder) {  // overflow
+      ++numOvershoot;
+    }
+  }
 
   // check if either motor reached the target number of ticks
   //while (!emergencyBrakes && ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal)))
@@ -31,7 +39,10 @@ void moveForward(int moveUnits, bool emergencyEnabled)
       // read IR sensors here to check for emergency brakes
       if (emergencyEnabled) {
   #ifdef EXPLORATION_MODE
-          checkForCrash();
+          if (crashRecovery)
+            checkForCrashAndRecover(numOvershoot, remainderCount);
+          else
+            checkForCrash();
   #else
           checkForCrashAndRecover(numOvershoot, remainderCount);
   #endif
@@ -40,6 +51,7 @@ void moveForward(int moveUnits, bool emergencyEnabled)
   }
   if (!emergencyBrakes)
     md.setBrakes(BRAKE_L, BRAKE_R);
+  bool eBraked = emergencyBrakes; // true if emergencyBrakes was triggered
   if (emergencyBrakes) {
     // TODO: perform recovery action?
     //Serial.write("EMERGENCY\n");
@@ -47,6 +59,8 @@ void moveForward(int moveUnits, bool emergencyEnabled)
   }
   // reset PID
   resetPIDControllers();
+
+  return eBraked;
 }
 void moveBackward(int moveUnits)
 {
@@ -90,7 +104,7 @@ void rotateLeft(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 136;//target 125: 127;// target 110: 139; //123;
 #elif targetRpm == TARGETRPM_120
-    remainderCount = 129;
+    remainderCount = 130;
 #endif
   }
   else if (angle == 180) {
@@ -99,7 +113,7 @@ void rotateLeft(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 41;
 #elif targetRpm == TARGETRPM_120
-  remainderCount = 37;
+  remainderCount = 39;
 #endif
   }
 
@@ -141,7 +155,7 @@ void rotateRight(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 137;//132;
 #elif targetRpm == TARGETRPM_120
-    remainderCount = 138;
+    remainderCount = 140;
 #endif
   }
   else if (angle == 180) {
@@ -182,9 +196,19 @@ void checkAlignmentAfterCommand_FP() {
 }
 
 void checkAlignmentAfterMove() {
+  
+  // align robot to be straight
+  checkForTilted();
+  delay(50);
+  
   // ensure robot is centralised within its grids
   checkCentralise_Front();
-  checkCentralise_Sides();
+  delay(50);
+  //if (canCheckCentralise_Sides) {
+    checkCentralise_Sides();
+    delay(50);
+  //}
+  //canCheckCentralise_Sides = false;
   
   // align robot to be straight
   checkForTilted();
@@ -282,9 +306,10 @@ void moveForward_custom(double distance, bool emergencyEnabled)
     // read IR sensors here to check for emergency brakes
       if (emergencyEnabled) {
   #ifdef EXPLORATION_MODE
-          checkForCrash();
-  #else
+          //checkForCrash();
           checkForCrashAndRecover(numOvershoot, remainderCount);
+  #else
+          //checkForCrashAndRecover(numOvershoot, remainderCount);
   #endif
       }
     }
@@ -309,7 +334,11 @@ void rotateRight_custom(int angle, int tickOffset)
   int remainderCount = 0;
   if (angle == 90) {
     numOvershoot = 1;
-    remainderCount = 142;//132;
+#if targetRpm == TARGETRPM_110
+    remainderCount = 137;//132;
+#elif targetRpm == TARGETRPM_120
+    remainderCount = 138;
+#endif
   }
   remainderCount += tickOffset;
   
@@ -339,7 +368,11 @@ void rotateLeft_custom(int angle, int tickOffset)
   int remainderCount = 0;
   if (angle == 90) {
     numOvershoot = 1;
-    remainderCount = 139;//target 125: 127;// target 110: 139; //123;
+#if targetRpm == TARGETRPM_110
+    remainderCount = 136;//target 125: 127;// target 110: 139; //123;
+#elif targetRpm == TARGETRPM_120
+    remainderCount = 129;
+#endif
   }
   remainderCount += tickOffset;
 

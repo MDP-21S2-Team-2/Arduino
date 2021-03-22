@@ -4,13 +4,17 @@ DualVNH5019MotorShield md;
 // PID controller for each motor
 // parameter list: P, I, D, Imax, Imin
 
-//rpm = 110, 1y1w, 6.35-36V
-//PID leftPIDController(3.3, 1.447, 4.532, 200.0, -200);//red
-//PID rightPIDController(3.1, 1.41, 4.5, 200.0, -200.0); // P: 3.04 for 6.42V
-
-//rpm = 120, 1y1w, 6.36V - cardboard added
-PID leftPIDController(3.62, 1.58, 4.86, 200.0, -200);//red
-PID rightPIDController(3.45, 1.62, 4.75, 200.0, -200.0);
+#if targetRpm == TARGETRPM_110
+  //rpm = 110, 1y1w, 6.35-36V
+  PID leftPIDController(3.3, 1.447, 4.532, 200.0, -200);//red
+  PID rightPIDController(3.1, 1.41, 4.5, 200.0, -200.0); // P: 3.04 for 6.42V
+#elif targetRpm == TARGETRPM_120
+  //rpm = 120, 1y1w, 6.36V - cardboard added
+  // 6.38V - 2y
+  // 6.43V - 1y1w, 6.4V after turned on
+  PID leftPIDController(3.72, 1.58, 4.86, 200.0, -200);//red
+  PID rightPIDController(3.5, 1.545, 4.8, 200.0, -200.0);
+#endif
 
 // Distance Function
 //double leftWheelDiameter = 6.0;   // in cm

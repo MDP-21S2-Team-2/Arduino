@@ -27,7 +27,7 @@ double SharpIR::getDistance() {
   //Serial.println("Median of medians");
 #endif
 
-  //return median;
+//  return median;
 
   switch( sensorType )
   {
@@ -90,8 +90,8 @@ double SharpIR::getDistance() {
           distance = -3.0558688 + 6792.5041/(median+41.38636);
       else if (median >= 185) // 20-27.5
           distance = 5.9462277 + 2785.5943/(median - 55.769522);
-      else if (median >= 125)
-          distance = 0.5984254 + 4970.4133/median;
+      else if (median >= 125) // 27.5-40cm
+          distance = 94.7958 - 0.58736*median + 0.001206*(median*median);
       else if (median >= 101) // 40-47.5cm
         distance = 79.0625 - 0.3125*median;
       else
