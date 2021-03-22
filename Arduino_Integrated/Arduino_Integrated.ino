@@ -183,12 +183,16 @@ void robotSystem_loop() {
           //moveForward();
           bool stopped = false;
           int unitsMoved = 0;
+          int currUnitsMoved = 0;
           while (!stopped) {
-            stopped = moveForward(numParts_W - 1, true, false);
+            //stopped = moveForward(numParts_W - 1, true, false, 0, true);
+            stopped = moveForward_W(numParts_W - 1, &currUnitsMoved );
             if (stopped)
               unitsMoved += computeUnitsMoved();
             else {
               unitsMoved += numParts_W;
+              if (currUnitsMoved  < numParts_W)
+                sendRightSensorReadings();
               // check alignment & calibration
               delay(130);
               checkAlignmentAfterMove();
@@ -299,6 +303,28 @@ void robotSystem_loop() {
 #endif
         break;
 
+      case 'm': // partial step forward
+        moveForward_custom(4.0, true);
+#ifdef EXPLORATION_MODE
+        delay(120);
+        checkAlignmentAfterRotate();
+        delay(70);
+        // send sensor readings
+        sendIRSensorsReadings();
+#endif
+        break;
+
+      case 'b': // partial step backward
+        moveBackward_custom(4.0);
+#ifdef EXPLORATION_MODE
+        delay(120);
+        checkAlignmentAfterRotate();
+        delay(70);
+        // send sensor readings
+        sendIRSensorsReadings();
+#endif
+        break;
+
       case 'C': // initial calibration in starting grid
         initialGridCalibration();
         stopRunning = false;
@@ -332,11 +358,11 @@ void testInLoop_readingIR() {
 //  Serial.print(" | Front Left (D3): ");
 //  Serial.println(front_D3.getDistance());
 
-  Serial.print("Side, front: ");
-  Serial.print(left_S1.getDistance());
-  Serial.print(" | Side, back: ");
-  Serial.println(left_S2.getDistance());
-
+//  Serial.print("Side, front: ");
+//  Serial.print(left_S1.getDistance());
+//  Serial.print(" | Side, back: ");
+//  Serial.println(left_S2.getDistance());
+//
   Serial.print("Right Long: ");
   Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
@@ -389,17 +415,17 @@ void loop() {
 //      rotateLeft(180);
 //      rotateRight(90);
 //      delay(200);
-//      moveForward(2, true);
+//      moveForward(0, true);
 //      delay(140);
 //    }
-  //initialGridCalibration();
+
 //  moveForward(3, true);
 //  delay(70);
 //  checkAlignmentAfterMove();
 //  delay(1500);
 
 //  if (runProgram) {
+//    initialGridCalibration();
 //    runProgram = false;
-//    moveForward(9, true);
 //  }
 }

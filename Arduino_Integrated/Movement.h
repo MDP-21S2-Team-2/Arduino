@@ -32,6 +32,15 @@ extern bool emergencyBrakes;
     184, 226, 13, 55, 97,
     140, 182, 224, 10, 53
   };
+  
+  // for checking LR - 4 ticks less than actual ticks required to cover the distance
+  const int total_lut[20] = {
+  267, 567, 864,  // 1-3 units
+  1165, 1462, // 4-5 units
+  1761, 2059, 2357, 2656, 2954, // 6-10 units
+  3252, 3550, 3849, 4147, 4445, // 11-15 units
+  4744, 5042, 5340, 5638, 5937  // 16-20 units
+  };
 #elif targetRpm == TARGETRPM_120
   // for 120 RPM
   const int numOvershoot_lut[20] = {
@@ -46,6 +55,15 @@ extern bool emergencyBrakes;
     186, 228, 15, 57, 99,
     142, 184, 226, 12, 55
   };
+
+  // for checking LR - 4 ticks less than actual ticks required to cover the distance
+  const int total_lut[20] = {
+  271, 570, 866,  // 1-3 units
+  1165, 1462, // 1-5 units
+  1761, 2059, 2357, 2656, 2954, // 6-10 units
+  3252, 3550, 3849, 4147, 4445, // 11-15 units
+  4744, 5042, 5340, 5638, 5937  // 16-20 units
+  };
 #endif
 
 // movement
@@ -56,10 +74,12 @@ void rotateRight(int angle);
 void rotateLeft(int angle);
 // CUSTOM VALUES FOR MOVEMENT
 void moveForward_custom(double distance, bool emergencyEnabled);
+void moveBackward_custom(double distance);
 void rotateRight_custom(int angle, int tickOffset);
 void rotateLeft_custom(int angle, int tickOffset);
 // new movement commands
-void moveForward();
+void moveForward(); // for rushing along wall
+bool moveForward_W(int moveUnits, int *currStep); // for rushing along wall - Exp
 // check for alignment
 void initialGridCalibration();
 void checkAlignmentAfterMove();

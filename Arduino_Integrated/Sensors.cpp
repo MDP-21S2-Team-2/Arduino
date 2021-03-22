@@ -51,3 +51,15 @@ void sendIRSensorsReadings() {
 //  Serial.write(",");
 //  Serial.println(dist_LR);
 }
+
+void sendRightSensorReadings() {
+  
+  double dist_LR = right_long.getDistance();
+  byte* ptr_dist_LR = (byte*) &dist_LR;
+  
+  Serial.write("LR,");
+  Serial.write(ptr_dist_LR, 4);
+  Serial.write('\n');
+  
+//  Serial.println(dist_LR);
+}
