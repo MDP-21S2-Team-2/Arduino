@@ -9,7 +9,7 @@ bool enableAlignAfterMove_FP = true; // enabled by default
 bool enableEbrakes_FP = true; // enabled by default
 bool enableMoveInParts = true; // disabled by default
 int numParts_FP = 3;  // max no. units to move at a time
-int numParts_W = 3; // max no. units to move at a time
+int numParts_W = 4; // max no. units to move at a time
 
 bool stopRunning = false; // stop running for IR
 
@@ -83,9 +83,9 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(110);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -112,9 +112,9 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(110);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -141,9 +141,9 @@ void robotSystem_loop() {
           else
           moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(110);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -165,9 +165,9 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(110);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -194,17 +194,17 @@ void robotSystem_loop() {
               if (currUnitsMoved  < numParts_W)
                 sendRightSensorReadings();
               // check alignment & calibration
-              delay(130);
+              delay(110);
               checkAlignmentAfterMove();
-              delay(70);
+              delay(60);
             }
           }
           // send no. units moved
           sendUnitsMoved(unitsMoved);
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(110);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -226,9 +226,9 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '0', enableEbrakes_FP, true, additionalTicks);
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(110);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -247,9 +247,9 @@ void robotSystem_loop() {
       case 'L': // turn left 90
         rotateLeft(90);
 #ifdef EXPLORATION_MODE
-        delay(140);
+        delay(120);
         checkAlignmentAfterRotate();
-        delay(70);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -267,9 +267,9 @@ void robotSystem_loop() {
       case 'R': // turn right 90
         rotateRight(90);
 #ifdef EXPLORATION_MODE
-        delay(140);
+        delay(120);
         checkAlignmentAfterRotate();
-        delay(70);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -286,9 +286,9 @@ void robotSystem_loop() {
       case 'B': // turn 180
         rotateLeft(180);
 #ifdef EXPLORATION_MODE
-        delay(150);
+        delay(130);
         checkAlignmentAfterRotate();
-        delay(70);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -306,9 +306,9 @@ void robotSystem_loop() {
       case 'm': // partial step forward
         moveForward_custom(4.0, true);
 #ifdef EXPLORATION_MODE
-        delay(120);
+        delay(100);
         checkAlignmentAfterRotate();
-        delay(70);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #endif
@@ -317,9 +317,9 @@ void robotSystem_loop() {
       case 'b': // partial step backward
         moveBackward_custom(4.0);
 #ifdef EXPLORATION_MODE
-        delay(120);
+        delay(100);
         checkAlignmentAfterRotate();
-        delay(70);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #endif
