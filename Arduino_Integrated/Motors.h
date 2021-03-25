@@ -9,12 +9,15 @@
 #define LeftMotorA 11 // E2A
 #define RightMotorA 3 // E1A
 
-#define targetRpm TARGETRPM_120
+//#define targetRpm TARGETRPM_120
+#define targetRpm TARGETRPM_125
 
 // Setting Target RPM 110 RPM
 #define TARGETRPM_110 110
 // Setting Target RPM 120 RPM
 #define TARGETRPM_120 120
+// Setting Target RPM 125 RPM
+#define TARGETRPM_125 125
 
 #define MOVE_OFFTICKS 24  // 120 RPM
 //#define MOVE_OFFTICKS 20  // 100 RPM

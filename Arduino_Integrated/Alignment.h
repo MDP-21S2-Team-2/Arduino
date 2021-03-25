@@ -22,7 +22,8 @@
 #define RIGHT_1GRID_START 2.0
 #define RIGHT_1GRID_END 8.5
 
-extern bool canCheckCentralise_Sides;  // only centralise sides if alignment is possible
+//extern bool canCheckCentralise_Sides;  // only centralise sides if alignment is possible
+extern bool didCentralise;  // robot did centralise so align again
 
 // checking for whether robot might crash while moving
 void checkForCrash();
@@ -34,8 +35,8 @@ void checkCentralise_Sides();  // check that robot is in the center of the grids
 void checkForTilted();  // check if robot is tilted, i.e. not straight on the grids
 
 // alignment behaviour - rotation
-void alignToLeftWall();
-void alignToFrontWall(bool useLeft);
+void alignToLeftWall(double distDiff = 0.0);
+void alignToFrontWall(bool useLeft, double distDiff = 0.0);
 // alignment behaviour - centralise
 void alignBack_Front(SharpIR::sensorCode sensor, double targetDist);
 void alignForward_Front(SharpIR::sensorCode sensor, double targetDist);

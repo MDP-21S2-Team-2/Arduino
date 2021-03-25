@@ -64,6 +64,29 @@ extern bool emergencyBrakes;
   3252, 3550, 3849, 4147, 4445, // 11-15 units
   4744, 5042, 5340, 5638, 5937  // 16-20 units
   };
+#elif targetRpm == TARGETRPM_125
+  // for 120 RPM
+  const int numOvershoot_lut[20] = {
+    1, 2, 3, 4, 5, // 1-5 units
+    6, 8, 9, 10, 11, // 6-10 units
+    12, 13, 15, 16, 17, // 11-15 units
+    18, 19, 20, 22, 23  // 16-20 units
+  };
+  const int remainderCount_lut[20] = {
+    18, 61, 101, 146, 189, //move 3 units changed from 104 to 102
+    231, 17, 59, 102, 144,
+    186, 228, 15, 57, 99,
+    142, 184, 226, 12, 55
+  };
+
+  // for checking LR - 4 ticks less than actual ticks required to cover the distance
+  const int total_lut[20] = {
+  270, 569, 865,  // 1-3 units
+  1164, 1462, // 1-5 units
+  1761, 2059, 2357, 2656, 2954, // 6-10 units
+  3252, 3550, 3849, 4147, 4445, // 11-15 units
+  4744, 5042, 5340, 5638, 5937  // 16-20 units
+  };
 #endif
 
 // movement

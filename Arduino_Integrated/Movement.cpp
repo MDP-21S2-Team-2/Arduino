@@ -105,6 +105,8 @@ void rotateLeft(int angle)
     remainderCount = 136;//target 125: 127;// target 110: 139; //123;
 #elif targetRpm == TARGETRPM_120
     remainderCount = 130;
+#elif targetRpm == TARGETRPM_125
+    remainderCount = 136;
 #endif
   }
   else if (angle == 180) {
@@ -114,6 +116,8 @@ void rotateLeft(int angle)
     remainderCount = 41;
 #elif targetRpm == TARGETRPM_120
   remainderCount = 39;
+#elif targetRpm == TARGETRPM_125
+    remainderCount = 41;
 #endif
   }
 
@@ -125,7 +129,7 @@ void rotateLeft(int angle)
   resetEnc();
   
   //while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
-  while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) || ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
+  while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -156,6 +160,8 @@ void rotateRight(int angle)
     remainderCount = 137;//132;
 #elif targetRpm == TARGETRPM_120
     remainderCount = 140;
+#elif targetRpm == TARGETRPM_125
+    remainderCount = 132;
 #endif
   }
   else if (angle == 180) {
@@ -164,6 +170,8 @@ void rotateRight(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 38;
 #elif targetRpm == TARGETRPM_120
+    remainderCount = 36;
+#elif targetRpm == TARGETRPM_125
     remainderCount = 36;
 #endif
   }
@@ -211,7 +219,10 @@ void checkAlignmentAfterMove() {
   //canCheckCentralise_Sides = false;
   
   // align robot to be straight
-  checkForTilted();
+  if (didCentralise) {
+    checkForTilted();
+    didCentralise = false;
+  }
 }
 
 void checkAlignmentAfterRotate() {
@@ -361,6 +372,8 @@ void rotateRight_custom(int angle, int tickOffset)
     remainderCount = 137;//132;
 #elif targetRpm == TARGETRPM_120
     remainderCount = 138;
+#elif targetRpm == TARGETRPM_125
+    remainderCount = 138;
 #endif
   }
   remainderCount += tickOffset;
@@ -394,6 +407,8 @@ void rotateLeft_custom(int angle, int tickOffset)
 #if targetRpm == TARGETRPM_110
     remainderCount = 136;//target 125: 127;// target 110: 139; //123;
 #elif targetRpm == TARGETRPM_120
+    remainderCount = 129;
+#elif targetRpm == TARGETRPM_125
     remainderCount = 129;
 #endif
   }
