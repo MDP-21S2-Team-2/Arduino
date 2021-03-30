@@ -10,7 +10,7 @@ bool moveForward(int moveUnits, bool emergencyEnabled, bool crashRecovery = true
 {
   // reset encoder ticks
   resetEnc();
-  
+
   //double tEncodeVal = tDistance / oneRevDis * 562.25 - MOVE_OFFTICKS; // Calculate target number of ticks to travel the distance & reduce tEncodeVal by no. ticks needed for braking
   //int tEncodeVal = tEncodeVal_lut[moveUnits];
   int numOvershoot = numOvershoot_lut[moveUnits];
@@ -105,6 +105,8 @@ void rotateLeft(int angle)
     remainderCount = 136;//target 125: 127;// target 110: 139; //123;
 #elif targetRpm == TARGETRPM_120
     remainderCount = 130;
+#elif targetRpm == TARGETRPM_125
+    remainderCount = 136;
 #endif
   }
   else if (angle == 180) {
@@ -114,6 +116,8 @@ void rotateLeft(int angle)
     remainderCount = 41;
 #elif targetRpm == TARGETRPM_120
   remainderCount = 39;
+#elif targetRpm == TARGETRPM_125
+    remainderCount = 41;
 #endif
   }
 
@@ -125,7 +129,7 @@ void rotateLeft(int angle)
   resetEnc();
   
   //while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
-  while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) || ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
+  while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
@@ -156,6 +160,8 @@ void rotateRight(int angle)
     remainderCount = 137;//132;
 #elif targetRpm == TARGETRPM_120
     remainderCount = 140;
+#elif targetRpm == TARGETRPM_125
+    remainderCount = 132;
 #endif
   }
   else if (angle == 180) {
@@ -164,6 +170,8 @@ void rotateRight(int angle)
 #if targetRpm == TARGETRPM_110
     remainderCount = 38;
 #elif targetRpm == TARGETRPM_120
+    remainderCount = 36;
+#elif targetRpm == TARGETRPM_125
     remainderCount = 36;
 #endif
   }
@@ -211,7 +219,10 @@ void checkAlignmentAfterMove() {
   //canCheckCentralise_Sides = false;
   
   // align robot to be straight
-  checkForTilted();
+  if (didCentralise) {
+    checkForTilted();
+    didCentralise = false;
+  }
 }
 
 void checkAlignmentAfterRotate() {
@@ -325,6 +336,29 @@ void moveForward_custom(double distance, bool emergencyEnabled)
   resetPIDControllers();
 }
 
+void moveBackward_custom(double distance) {
+  
+  // reset encoder ticks
+  resetEnc();
+  // calculate ticks required for movement
+  int tEncodeVal = distance / ONEREVDIST * 562.25 - MOVE_OFFTICKS;
+  int numOvershoot = tEncodeVal / 256;
+  int remainderCount = tEncodeVal % 256;
+  
+  // check if either motor reached the target number of ticks
+  while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) || ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
+  {
+    if (PID::checkPIDCompute()) {
+      md.setM1Speed(leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      md.setM2Speed(-rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+    }
+  }
+  md.setBrakes(BRAKE_L, BRAKE_R);
+  
+  // reset PID
+  resetPIDControllers();
+}
+
 void rotateRight_custom(int angle, int tickOffset)
 {
 //  int tEncodeVal = angle * 4.3; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
@@ -337,6 +371,8 @@ void rotateRight_custom(int angle, int tickOffset)
 #if targetRpm == TARGETRPM_110
     remainderCount = 137;//132;
 #elif targetRpm == TARGETRPM_120
+    remainderCount = 138;
+#elif targetRpm == TARGETRPM_125
     remainderCount = 138;
 #endif
   }
@@ -372,6 +408,8 @@ void rotateLeft_custom(int angle, int tickOffset)
     remainderCount = 136;//target 125: 127;// target 110: 139; //123;
 #elif targetRpm == TARGETRPM_120
     remainderCount = 129;
+#elif targetRpm == TARGETRPM_125
+    remainderCount = 129;
 #endif
   }
   remainderCount += tickOffset;
@@ -397,12 +435,22 @@ void moveForward() {
   // reset encoder ticks
   resetEnc();
 
+  // TODO: make use of this to move an extra step
+  int currStep = 0;
+
   // check if either motor reached the target number of ticks
   while (!emergencyBrakes)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+
+      // read right sensor
+      int currTicks = encL_overshootCount * 256 + encL_count;
+      if (currTicks >= total_lut[currStep]) {
+        sendRightSensorReadings();
+        ++currStep;
+      }
 
       // read IR sensors here to check for emergency brakes
       checkForCrash();
@@ -413,4 +461,49 @@ void moveForward() {
 
   // reset PID
   resetPIDControllers();
+}
+
+
+// W move forward
+bool moveForward_W(int moveUnits, int *currStep)
+{
+  // reset encoder ticks
+  resetEnc();
+  // make use of this to move an extra step
+  *currStep = 0;
+
+  int numOvershoot = numOvershoot_lut[moveUnits];
+  int remainderCount = remainderCount_lut[moveUnits];
+
+  // check if either motor reached the target number of ticks
+  //while (!emergencyBrakes && ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal)))
+  while (!emergencyBrakes && 
+    (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
+  )
+  //while (0.5*(encL_count + encR_count) <= tEncodeVal)
+  {
+    if (PID::checkPIDCompute()) {
+      md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
+      md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+      //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
+
+      // read right sensor
+      int currTicks = encL_overshootCount * 256 + encL_count;
+      if (currTicks >= total_lut[*currStep]) {
+        sendRightSensorReadings();
+        ++(*currStep);
+      }
+
+      // read IR sensors here to check for emergency brakes
+      checkForCrash();
+    }
+  }
+  if (!emergencyBrakes)
+    md.setBrakes(BRAKE_L, BRAKE_R);
+  bool eBraked = emergencyBrakes; // true if emergencyBrakes was triggered
+  emergencyBrakes = false;
+  // reset PID
+  resetPIDControllers();
+
+  return eBraked;
 }

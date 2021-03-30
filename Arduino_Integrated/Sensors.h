@@ -11,5 +11,6 @@ extern SharpIR left_S2; // PS4, side back
 extern SharpIR right_long; // PS6, long range
 
 void sendIRSensorsReadings();
+void sendRightSensorReadings();
 
 #endif

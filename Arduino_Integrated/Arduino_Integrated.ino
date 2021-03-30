@@ -8,8 +8,8 @@
 bool enableAlignAfterMove_FP = true; // enabled by default
 bool enableEbrakes_FP = true; // enabled by default
 bool enableMoveInParts = true; // disabled by default
-int numParts_FP = 3;  // max no. units to move at a time
-int numParts_W = 3; // max no. units to move at a time
+int numParts_FP = 2;  // max no. units to move at a time
+int numParts_W = 4; // max no. units to move at a time
 
 bool stopRunning = false; // stop running for IR
 
@@ -47,15 +47,15 @@ void moveInParts(int targetUnits, bool enableEbrakes, int additionalTicks = 0) {
     moveForward(numParts_FP - 1, enableEbrakes, true, numParts_FP*ticksPerUnit);
     targetUnits -= numParts_FP;
     if (enableAlignAfterMove_FP) {
-      delay(140);
+      delay(120);
       //checkAlignmentAfterCommand_FP();
       checkAlignmentAfterMove();
     }
-    delay(90);
+    delay(60);
   }
   if (targetUnits > 0) {  // still have a smaller part to move
     moveForward(targetUnits - 1, enableEbrakes, true, targetUnits*ticksPerUnit);
-    delay(30);
+    delay(20);
   }
 }
 
@@ -83,9 +83,9 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(120);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -112,9 +112,9 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(120);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -141,9 +141,9 @@ void robotSystem_loop() {
           else
           moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(120);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -165,9 +165,9 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(120);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -183,24 +183,28 @@ void robotSystem_loop() {
           //moveForward();
           bool stopped = false;
           int unitsMoved = 0;
+          int currUnitsMoved = 0;
           while (!stopped) {
-            stopped = moveForward(numParts_W - 1, true, false);
+            //stopped = moveForward(numParts_W - 1, true, false, 0, true);
+            stopped = moveForward_W(numParts_W - 1, &currUnitsMoved );
             if (stopped)
               unitsMoved += computeUnitsMoved();
             else {
               unitsMoved += numParts_W;
+              if (currUnitsMoved  < numParts_W)
+                sendRightSensorReadings();
               // check alignment & calibration
-              delay(130);
+              delay(120);
               checkAlignmentAfterMove();
-              delay(70);
+              delay(60);
             }
           }
           // send no. units moved
           sendUnitsMoved(unitsMoved);
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(120);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -222,9 +226,9 @@ void robotSystem_loop() {
           else
             moveForward(numUnits - '0', enableEbrakes_FP, true, additionalTicks);
 #ifdef EXPLORATION_MODE
-          delay(130);
+          delay(120);
           checkAlignmentAfterMove();
-          delay(70);
+          delay(60);
           // send sensor readings
           sendIRSensorsReadings();
 #else // FP
@@ -243,9 +247,9 @@ void robotSystem_loop() {
       case 'L': // turn left 90
         rotateLeft(90);
 #ifdef EXPLORATION_MODE
-        delay(140);
+        delay(130);
         checkAlignmentAfterRotate();
-        delay(70);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -263,9 +267,9 @@ void robotSystem_loop() {
       case 'R': // turn right 90
         rotateRight(90);
 #ifdef EXPLORATION_MODE
-        delay(140);
+        delay(130);
         checkAlignmentAfterRotate();
-        delay(70);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -282,9 +286,9 @@ void robotSystem_loop() {
       case 'B': // turn 180
         rotateLeft(180);
 #ifdef EXPLORATION_MODE
-        delay(150);
+        delay(140);
         checkAlignmentAfterRotate();
-        delay(70);
+        delay(60);
         // send sensor readings
         sendIRSensorsReadings();
 #else // FP
@@ -296,6 +300,28 @@ void robotSystem_loop() {
         // acknowledge the command
         Serial.write("K\n");
         delay(60);
+#endif
+        break;
+
+      case 'm': // partial step forward
+        moveForward_custom(4.0, true);
+#ifdef EXPLORATION_MODE
+        delay(110);
+        checkAlignmentAfterRotate();
+        delay(60);
+        // send sensor readings
+        sendIRSensorsReadings();
+#endif
+        break;
+
+      case 'b': // partial step backward
+        moveBackward_custom(4.0);
+#ifdef EXPLORATION_MODE
+        delay(110);
+        checkAlignmentAfterRotate();
+        delay(60);
+        // send sensor readings
+        sendIRSensorsReadings();
 #endif
         break;
 
@@ -337,8 +363,8 @@ void testInLoop_readingIR() {
   Serial.print(" | Side, back: ");
   Serial.println(left_S2.getDistance());
 
-  Serial.print("Right Long: ");
-  Serial.println(right_long.getDistance());
+//  Serial.print("Right Long: ");
+//  Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
   
 }
@@ -389,17 +415,36 @@ void loop() {
 //      rotateLeft(180);
 //      rotateRight(90);
 //      delay(200);
-//      moveForward(2, true);
+//      moveForward(0, true);
 //      delay(140);
 //    }
-  //initialGridCalibration();
+
 //  moveForward(3, true);
 //  delay(70);
 //  checkAlignmentAfterMove();
 //  delay(1500);
 
 //  if (runProgram) {
+//    initialGridCalibration();
 //    runProgram = false;
-//    moveForward(9, true);
+//  }
+
+//  while (true) {
+//    moveForward(1, enableEbrakes_FP);
+//    delay(130);
+    
+//    moveForward(1, enableEbrakes_FP);
+//    delay(130);
+
+//    for (int i = 0; i < 4; ++i) {
+//    moveForward(3, enableEbrakes_FP);
+//    delay(130);
+//      rotateRight(90);
+//      rotateLeft(180);
+//      rotateRight(90);
+//      delay(200);
+//    }
+
+//    delay(1000);
 //  }
 }
