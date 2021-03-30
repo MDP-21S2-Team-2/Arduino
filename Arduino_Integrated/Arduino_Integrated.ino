@@ -4,17 +4,16 @@
 #include "Movement.h"
 #include "Alignment.h"
 
-// robot configuration (intended for FP use)
+// robot configuration
 bool enableAlignAfterMove_FP = true; // enabled by default
 bool enableEbrakes_FP = true; // enabled by default
 bool enableMoveInParts = true; // disabled by default
 int numParts_FP = 2;  // max no. units to move at a time
 int numParts_W = 4; // max no. units to move at a time
 
-bool stopRunning = false; // stop running for IR
+bool stopRunning = false; // stop running (backup)
 
 void setup() {
-  // put your setup code here, to run once:
   //init encoder pins
   //(default is input so technically not needed)
   //pinMode(LeftMotorA, INPUT);
@@ -28,15 +27,6 @@ void setup() {
   Serial.begin(115200);
   // init motor drivers
   md.init();
-
-  // left
-  //  md.setM1Speed(-300);
-  // right
-  //  md.setM2Speed(270);
-
-  // set starting times
-  //  L_prevTime = micros();
-  //  R_prevTime = L_prevTime;
 }
 
 // move a no. of units at a time
@@ -71,7 +61,7 @@ void robotSystem_loop() {
     if ((command == '\r') || (command == '\n')) // newline, ignore
       return;
 
-    switch (command) {  // TODO: a switch case might be more efficient if the characters are sequential?
+    switch (command) {
       case 'M': // move <=10 units
         {
           // read next character for no. units to move
@@ -303,7 +293,7 @@ void robotSystem_loop() {
 #endif
         break;
 
-      case 'm': // partial step forward
+      case 'm': // partial step forward - not used
         moveForward_custom(4.0, true);
 #ifdef EXPLORATION_MODE
         delay(110);
@@ -314,7 +304,7 @@ void robotSystem_loop() {
 #endif
         break;
 
-      case 'b': // partial step backward
+      case 'b': // partial step backward - not used
         moveBackward_custom(4.0);
 #ifdef EXPLORATION_MODE
         delay(110);
@@ -337,7 +327,7 @@ void robotSystem_loop() {
 #endif
         break;
 
-      case 'T': // stop
+      case 'T': // stop running (backup)
         stopRunning = true;
         break;
 
@@ -348,103 +338,47 @@ void robotSystem_loop() {
   } // if Serial.available() end
 }
 
+// For testing only
 void testInLoop_readingIR() {
-  delay(200);
-
-//  Serial.print("Front Right (D2): ");
-//  Serial.print(front_D2.getDistance());
-//  Serial.print(" | Front Mid (D1): ");
-//  Serial.print(front_D1.getDistance());
-//  Serial.print(" | Front Left (D3): ");
-//  Serial.println(front_D3.getDistance());
+  Serial.print("Front Right (D2): ");
+  Serial.print(front_D2.getDistance());
+  Serial.print(" | Front Mid (D1): ");
+  Serial.print(front_D1.getDistance());
+  Serial.print(" | Front Left (D3): ");
+  Serial.println(front_D3.getDistance());
 
   Serial.print("Side, front: ");
   Serial.print(left_S1.getDistance());
   Serial.print(" | Side, back: ");
   Serial.println(left_S2.getDistance());
 
-//  Serial.print("Right Long: ");
-//  Serial.println(right_long.getDistance());
+  Serial.print("Right Long: ");
+  Serial.println(right_long.getDistance());
   delay(20);  // frequency = ?
   
 }
 
+// For testing only
 void testInLoop_motorsPID() {
   if (PID::checkPIDCompute()) {
-    // send RPM of left motor
-    //R_rpm = calculateRpm_R_v2();
-    //Serial.println(60 / R_rpm);
-
     //Serial.println(R_timeWidth);
     //Serial.println(R_timeWidth);
 
     double R_rpm = calculateRpm(R_timeWidth);
     double L_rpm = calculateRpm(L_timeWidth);
 
-    //    double R_speed = rightPIDController.computePID(R_rpm, targetRpm);
-    //    double L_speed = leftPIDController.computePID(L_rpm, targetRpm);
-
     Serial.print(R_rpm);
     Serial.print(",");
     Serial.println(L_rpm);
-    //Serial.print(leftPIDController.getLastValue());
-    //Serial.write(",");
-    //Serial.print(leftPIDController.getSumError());
-    //Serial.write(",");
-    //Serial.print(rightPIDController.getLastValue());
-    //Serial.write(",");
-    //Serial.println(rightPIDController.getSumError());
 
-    //md.setM1Speed(-350);
-    //md.setM2Speed(350);
     // update motor speed with PID controller
     md.setM1Speed(-leftPIDController.computePID(L_rpm, targetRpm));
     md.setM2Speed(rightPIDController.computePID(R_rpm, targetRpm));
-    //md.setSpeeds(-leftPIDController.computePID(L_rpm, targetRpm), rightPIDController.computePID(R_rpm, targetRpm));
   }
 }
 
-bool runProgram = true;
 void loop() {
 //  testInLoop_motorsPID();
 //  testInLoop_readingIR();
   robotSystem_loop();
-//  delay(1000);
-//    for (int i = 0; i < 4; ++i) {
-//      rotateLeft(90);
-//      rotateLeft(180);
-//      rotateRight(90);
-//      delay(200);
-//      moveForward(0, true);
-//      delay(140);
-//    }
-
-//  moveForward(3, true);
-//  delay(70);
-//  checkAlignmentAfterMove();
-//  delay(1500);
-
-//  if (runProgram) {
-//    initialGridCalibration();
-//    runProgram = false;
-//  }
-
-//  while (true) {
-//    moveForward(1, enableEbrakes_FP);
-//    delay(130);
-    
-//    moveForward(1, enableEbrakes_FP);
-//    delay(130);
-
-//    for (int i = 0; i < 4; ++i) {
-//    moveForward(3, enableEbrakes_FP);
-//    delay(130);
-//      rotateRight(90);
-//      rotateLeft(180);
-//      rotateRight(90);
-//      delay(200);
-//    }
-
-//    delay(1000);
-//  }
 }

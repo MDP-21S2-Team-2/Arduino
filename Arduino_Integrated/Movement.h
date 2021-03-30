@@ -101,7 +101,6 @@ void moveBackward_custom(double distance);
 void rotateRight_custom(int angle, int tickOffset);
 void rotateLeft_custom(int angle, int tickOffset);
 // new movement commands
-void moveForward(); // for rushing along wall
 bool moveForward_W(int moveUnits, int *currStep); // for rushing along wall - Exp
 // check for alignment
 void initialGridCalibration();

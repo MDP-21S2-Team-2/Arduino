@@ -114,29 +114,6 @@ void checkForCrash() {
       emergencyBrakes = true;
       return; // stop checking
     }
-//  double dist_S1 = left_S1.getDistance();
-//  double dist_S2 = left_S2.getDistance();
-//  //double dist_LR = right_long.getDistance();  // can use to check if veering too close to a wall on the right?
-//  
-//  // check if robot is aligned on the side or might crash the side
-//    double difference = dist_S2 - dist_S1;
-//    if (dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 2.0 && dist_S2 <= 8.0 && (difference > 0.3 || difference < 0))
-//    {  // robot is veering too much to the side
-//      // recovery action
-//      md.setBrakes(BRAKE_L, BRAKE_R);
-//      // store current encoder values (before extra ticks are added for recovery action)
-//      int encL = encL_count;
-//      int encR = encR_count;
-//      // get robot to align to left wall
-//      alignToLeftWall();
-//      delay(60);  // to ensure robot has already braked; TODO: time to delay TBD
-//      // reset PID
-//      leftPIDController.resetPID();
-//      rightPIDController.resetPID();
-//      // restore back the encoder counts to recover remaining distance
-//      encL_count = encL;
-//      encR_count = encR;
-//    }
 }
 
 // check that robot is in the center of the grids
@@ -527,53 +504,3 @@ void alignForward_Front(SharpIR::sensorCode sensor, double targetDist) {
   } while (dist_Dx > targetDist && dist_Dx < targetDist + 5 && (millis() - startTime) < 400);
   md.setBrakes(BRAKE_L, BRAKE_R);
 }
-
-/*void align_Front(SharpIR::sensorCode sensor, double targetDist) {
-  
-  // use one of the front sensors for alignment
-  double dist_Dx = 0.0;
-  double difference;
-
-  // 0: have not started moving; 1: dist_Dx < targetDist (too near); 2: dist_Dx > targetDist (too far)
-  char currState = 0, newState = 0;
-
-  unsigned long startTime = millis();
-  
-  while ((millis() - startTime) < 1000) {
-    switch (sensor) {
-    case SharpIR::D1: dist_Dx = front_D1.getDistance();
-      break;
-    case SharpIR::D2: dist_Dx = front_D2.getDistance();
-      break;
-    case SharpIR::D3: dist_Dx = front_D3.getDistance();
-      break;
-    }
-
-    if (currState == STATE_DIFFGT0) // too near; move back
-      difference = targetDist - dist_Dx;
-    else  // curState == STATE_DIFFLT0  // too far away; move forward
-      difference = dist_Dx - targetDist;
-
-    if (difference < 0.1) { // reached target distance, so stop moving
-      md.setBrakes(BRAKE_L, BRAKE_R);
-      break;
-    }
-    else {
-      newState = (dist_Dx < targetDist) ? STATE_DIFFGT0 : STATE_DIFFLT0;
-      if (currState != newState) {  // state had changed
-        // set new speed
-        if (abs(difference) > HS_THRESHOLD) { // high-speed threshold = 0.8
-          // speed: 150
-          if (newState == STATE_DIFFGT0)  md.setSpeeds(80, -75); // too near; move back
-          else  md.setSpeeds(-80, 75); // too far away; move forward
-        } else {
-          // speed: 70
-          if (newState == STATE_DIFFGT0)  md.setSpeeds(65, -60); // too near; move back
-          else  md.setSpeeds(-65, 60); // too far away; move forward
-        }
-        currState = newState;
-      }
-    }
-  }
-  md.setBrakes(BRAKE_L, BRAKE_R);
-}*/

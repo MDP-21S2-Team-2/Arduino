@@ -431,39 +431,6 @@ void rotateLeft_custom(int angle, int tickOffset)
   resetPIDControllers();
 }
 
-void moveForward() {
-  // reset encoder ticks
-  resetEnc();
-
-  // TODO: make use of this to move an extra step
-  int currStep = 0;
-
-  // check if either motor reached the target number of ticks
-  while (!emergencyBrakes)
-  {
-    if (PID::checkPIDCompute()) {
-      md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
-      md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-
-      // read right sensor
-      int currTicks = encL_overshootCount * 256 + encL_count;
-      if (currTicks >= total_lut[currStep]) {
-        sendRightSensorReadings();
-        ++currStep;
-      }
-
-      // read IR sensors here to check for emergency brakes
-      checkForCrash();
-    }
-  }
-  // reset e-brakes
-  emergencyBrakes = false;
-
-  // reset PID
-  resetPIDControllers();
-}
-
-
 // W move forward
 bool moveForward_W(int moveUnits, int *currStep)
 {

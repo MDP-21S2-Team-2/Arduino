@@ -40,6 +40,5 @@ void alignToFrontWall(bool useLeft, double distDiff = 0.0);
 // alignment behaviour - centralise
 void alignBack_Front(SharpIR::sensorCode sensor, double targetDist);
 void alignForward_Front(SharpIR::sensorCode sensor, double targetDist);
-//void align_Front(SharpIR::sensorCode sensor, double targetDist);
 
 #endif

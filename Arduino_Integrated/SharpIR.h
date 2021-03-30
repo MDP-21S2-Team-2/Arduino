@@ -15,11 +15,11 @@
 #define HALF_NUM_SAMPLES 7 // index of median
 
 // physical sensor offsets
-#define D1_OFFSET 5.0 // 3.6
-#define D2_OFFSET 5.1 // 3.2
-#define D3_OFFSET 5.0 // 6.2
-#define S1_OFFSET 5.2 // 5.2
-#define S2_OFFSET 5.1 // 5.1
+#define D1_OFFSET 5.0
+#define D2_OFFSET 5.1
+#define D3_OFFSET 5.0
+#define S1_OFFSET 5.2
+#define S2_OFFSET 5.1
 #define LR_OFFSET 9.9
 
 
@@ -49,10 +49,10 @@ class SharpIR {
     void sort(int a[], int size);
     
     // sensor types
-    static sensorCode D1 = 1; // short range, right
-    static sensorCode D2 = 2; // short range, middle ("bad")
-    static sensorCode D3 = 3; // short range, left ("good" until 30cm)
-    static sensorCode S1 = 4; // short range, front ("good", "G0")
+    static sensorCode D1 = 1; // short range, middle
+    static sensorCode D2 = 2; // short range, right
+    static sensorCode D3 = 3; // short range, left
+    static sensorCode S1 = 4; // short range, front
     static sensorCode S2 = 5; // short range, back
     static sensorCode LR = 6; // long range
 };
