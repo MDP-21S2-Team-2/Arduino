@@ -19,6 +19,7 @@
 // Setting Target RPM 125 RPM
 #define TARGETRPM_125 125
 
+// offset ticks to call setBrakes early
 #define MOVE_OFFTICKS 24  // 120 RPM
 //#define MOVE_OFFTICKS 20  // 100 RPM
 #define ONEREVDIST 18.849556

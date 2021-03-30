@@ -180,12 +180,10 @@ void checkCentralise_Sides() {
   }
   
   if ((dist_S1 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD)
-    //|| (dist_S1 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S1 < LEFT_1GRID_END)
   ) { // S1 sensor < 3.9 //3.75
     rotateLeft(90);
     delay(100);
     alignBack_Front(SharpIR::D2, LEFT_1GRID_DIST);  // align with right sensor
-    //align_Front(SharpIR::D2, LEFT_1GRID_DIST); // LEFT_1GRID_DIST
     delay(70);
     // do alignment before turning back
     checkForTilted(); // in case robot isn't able to align after rotating back
@@ -197,12 +195,10 @@ void checkCentralise_Sides() {
     didCentralise = true;
   }
   else if ((dist_S2 < LEFT_1GRID_DIST - SIDES_DIST_THRESHOLD)
-    //|| (dist_S2 > LEFT_1GRID_DIST + SIDES_DIST_THRESHOLD+0.5 && dist_S2 < LEFT_1GRID_END)
   ) {  // S2 sensor < 3.9 //3.75
     rotateLeft(90);
     delay(100);
     alignBack_Front(SharpIR::D1, LEFT_1GRID_DIST);  // align with middle sensor
-    //align_Front(SharpIR::D1, LEFT_1GRID_DIST); // LEFT_1GRID_DIST
     delay(70);
     // do alignment before turning back
     checkForTilted(); // in case robot isn't able to align after rotating back
@@ -218,7 +214,6 @@ void checkCentralise_Sides() {
     rotateLeft(90);
     delay(100);
     alignForward_Front(SharpIR::D2, LEFT_1GRID_DIST);  // align with right sensor
-    //align_Front(SharpIR::D2, FRONT_1GRID_DIST); // LEFT_1GRID_DIST
     delay(70);
     // do alignment before turning back
     checkForTilted(); // in case robot isn't able to align after rotating back
@@ -233,7 +228,6 @@ void checkCentralise_Sides() {
     rotateLeft(90);
     delay(100);
     alignForward_Front(SharpIR::D1, LEFT_1GRID_DIST);  // align with middle sensor
-    //align_Front(SharpIR::D1, FRONT_1GRID_DIST); // LEFT_1GRID_DIST
     delay(70);
     // do alignment before turning back
     checkForTilted(); // in case robot isn't able to align after rotating back
@@ -250,12 +244,10 @@ void checkCentralise_Sides() {
   if (!checkedLeft) {
     dist_LR = right_long.getDistance();
     if ((dist_LR < RIGHT_1GRID_DIST - LR_SIDES_DIST_THRESHOLD)
-      //|| (dist_LR > RIGHT_1GRID_DIST + LR_SIDES_DIST_THRESHOLD+0.5 && dist_LR < RIGHT_1GRID_END)
     ) { // right LR sensor < 3.5
       rotateRight(90);
       delay(100);
       alignBack_Front(SharpIR::D3, RIGHT_1GRID_DIST);  // align with left sensor
-      //align_Front(SharpIR::D3, RIGHT_1GRID_DIST); // RIGHT_1GRID_DIST
       delay(70);
       // do alignment before turning back
       checkForTilted(); // in case robot isn't able to align after rotating back
@@ -270,7 +262,6 @@ void checkCentralise_Sides() {
       rotateRight(90);
       delay(100);
       alignForward_Front(SharpIR::D3, RIGHT_1GRID_DIST);  // align with left sensor
-      //align_Front(SharpIR::D3, RIGHT_1GRID_DIST); // RIGHT_1GRID_DIST
       delay(70);
       // do alignment before turning back
       checkForTilted(); // in case robot isn't able to align after rotating back

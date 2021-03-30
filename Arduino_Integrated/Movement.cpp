@@ -11,8 +11,6 @@ bool moveForward(int moveUnits, bool emergencyEnabled, bool crashRecovery = true
   // reset encoder ticks
   resetEnc();
 
-  //double tEncodeVal = tDistance / oneRevDis * 562.25 - MOVE_OFFTICKS; // Calculate target number of ticks to travel the distance & reduce tEncodeVal by no. ticks needed for braking
-  //int tEncodeVal = tEncodeVal_lut[moveUnits];
   int numOvershoot = numOvershoot_lut[moveUnits];
   int remainderCount = remainderCount_lut[moveUnits];
   // add additional ticks (if any)
@@ -25,7 +23,6 @@ bool moveForward(int moveUnits, bool emergencyEnabled, bool crashRecovery = true
   }
 
   // check if either motor reached the target number of ticks
-  //while (!emergencyBrakes && ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal)))
   while (!emergencyBrakes && 
     (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   )
@@ -66,13 +63,10 @@ void moveBackward(int moveUnits)
 {
   // reset encoder ticks
   resetEnc();
-  //double tEncodeVal = tDistance / oneRevDis * 562.25 - MOVE_OFFTICKS; // Calculate target number of ticks to travel the distance & reduce tEncodeVal by no. ticks needed for braking
-  //int tEncodeVal = tEncodeVal_lut[moveUnits];
   int numOvershoot = numOvershoot_lut[moveUnits];
   int remainderCount = remainderCount_lut[moveUnits];
   
   // check if either motor reached the target number of ticks
-  //while ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal))
   while (!emergencyBrakes && 
     (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) || ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   )
@@ -128,7 +122,6 @@ void rotateLeft(int angle)
   // reset encoder ticks
   resetEnc();
   
-  //while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
   while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   {
     if (PID::checkPIDCompute()) {
@@ -183,7 +176,6 @@ void rotateRight(int angle)
   // reset encoder ticks
   resetEnc();
   
-  //while ((encL_count <= tEncodeVal) && (encR_count <= tEncodeVal))//((encL_count + encR_count) / 2 <= tEncodeVal)
   while (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   {
     if (PID::checkPIDCompute()) {
@@ -246,26 +238,12 @@ void initialGridCalibration() {
   // 3. TBD: wait a short while (for brakes to settle)
   delay(500);
 
-//  delay(500);
-//  sendIRSensorsReadings();
-//  delay(500);
-
   // 4. turn left again to face wall behind
   rotateLeft(90);
   delay(500);
 
   // 5. align with wall so robot is correct distance away
   checkCentralise_Front();
-//  if (front_D1.getDistance() < 4) { // front-mid sensor
-//    alignBack_Front(SharpIR::D1, false, 4.0);
-//  }
-//  else if (front_D1.getDistance() > 4.5) {  // front-right sensor
-//    alignForward_Front(SharpIR::D2, false, 4.0);
-//  }
-
-//  delay(500);
-//  sendIRSensorsReadings();
-//  delay(500);
 
   delay(500);
 
@@ -281,18 +259,9 @@ void initialGridCalibration() {
 if ((dist_S1 >= 2.0 && dist_S1 <= 8.0 && dist_S2 >= 3.0 && dist_S2 <= 8.0 && ((dist_S2 - dist_S1) > 0.1 || (dist_S2 - dist_S1) < 0.075)) ||
     (dist_S1 >= 13.0 && dist_S1 <= 18.0 && dist_S2 >= 13.0 && dist_S2 <= 18.0 && abs(dist_S1 - dist_S2) > 0.3) ||
     (dist_S1 >= 23.0 && dist_S1 <= 28.0 && dist_S2 >= 23.0 && dist_S2 <= 28.0 && abs(dist_S1 - dist_S2) > 0.8))
-  { // TODO: distance difference threshold
+  {
     alignToLeftWall();
   }
-
-//  delay(500);
-//  sendIRSensorsReadings();
-//  delay(500);
-
-  // 5. TBD: align with side sensors?
-
-  // TBD: if sensor readings are too different, do a double-check?
-
 }
 
 // CUSTOM MOVEMENT
@@ -312,7 +281,6 @@ void moveForward_custom(double distance, bool emergencyEnabled)
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-      //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
 
     // read IR sensors here to check for emergency brakes
       if (emergencyEnabled) {
@@ -361,9 +329,6 @@ void moveBackward_custom(double distance) {
 
 void rotateRight_custom(int angle, int tickOffset)
 {
-//  int tEncodeVal = angle * 4.3; //angle * 4.26; // 4.31; //4.41 for 100 RPM; // 4.42 for paper, 4.41 for arena
-//  int numOvershoot = tEncodeVal / 256;
-//  int remainderCount = tEncodeVal % 256;
   int numOvershoot = 0;
   int remainderCount = 0;
   if (angle == 90) {
@@ -397,9 +362,6 @@ void rotateRight_custom(int angle, int tickOffset)
 
 void rotateLeft_custom(int angle, int tickOffset)
 {
-//  int tEncodeVal = angle * 4.3; //angle * 4.3; // 4.33;  // 4.41: 100 RPM
-//  int numOvershoot = tEncodeVal / 256;
-//  int remainderCount = tEncodeVal % 256;
   int numOvershoot = 0;
   int remainderCount = 0;
   if (angle == 90) {
@@ -443,16 +405,13 @@ bool moveForward_W(int moveUnits, int *currStep)
   int remainderCount = remainderCount_lut[moveUnits];
 
   // check if either motor reached the target number of ticks
-  //while (!emergencyBrakes && ((encL_count <= tEncodeVal) || (encR_count <= tEncodeVal)))
   while (!emergencyBrakes && 
     (((encL_overshootCount < numOvershoot) || (encL_count <= remainderCount)) && ((encR_overshootCount < numOvershoot) || (encR_count <= remainderCount)))
   )
-  //while (0.5*(encL_count + encR_count) <= tEncodeVal)
   {
     if (PID::checkPIDCompute()) {
       md.setM1Speed(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm));
       md.setM2Speed(rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
-      //md.setSpeeds(-leftPIDController.computePID(calculateRpm(L_timeWidth), targetRpm), rightPIDController.computePID(calculateRpm(R_timeWidth), targetRpm));
 
       // read right sensor
       int currTicks = encL_overshootCount * 256 + encL_count;

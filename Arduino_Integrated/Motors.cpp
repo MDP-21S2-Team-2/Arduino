@@ -18,7 +18,6 @@ DualVNH5019MotorShield md;
   //rpm = 125
   // 6.45V - 1y1w, 6.4V after turned on, after tuning  
   // 6.36V~6.35V - 1y1w
-  //  - 2y
   PID leftPIDController(4.07, 1.645, 5.26, 200.0, -200);//red
   PID rightPIDController(3.82, 1.585, 5.2, 200.0, -200.0);
 #endif
