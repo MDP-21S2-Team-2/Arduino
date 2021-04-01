@@ -9,6 +9,7 @@
 #define LeftMotorA 11 // E2A
 #define RightMotorA 3 // E1A
 
+//#define targetRpm TARGETRPM_110
 //#define targetRpm TARGETRPM_120
 #define targetRpm TARGETRPM_125
 

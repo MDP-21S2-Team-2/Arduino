@@ -416,7 +416,9 @@ bool moveForward_W(int moveUnits, int *currStep)
       // read right sensor
       int currTicks = encL_overshootCount * 256 + encL_count;
       if (currTicks >= total_lut[*currStep]) {
+#ifndef IMAGEREC_MODE
         sendRightSensorReadings();
+#endif
         ++(*currStep);
       }
 

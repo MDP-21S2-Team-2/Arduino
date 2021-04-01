@@ -4,8 +4,8 @@
 #define BRAKE_L 400
 #define BRAKE_R 400
 
-// comment away if doing FP
-#define EXPLORATION_MODE
+#define EXPLORATION_MODE  // comment away if doing FP
+//#define IMAGEREC_MODE // comment away if not doing ImgRec
 
 //Declare Variables
 extern bool emergencyBrakes;

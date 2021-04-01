@@ -29,7 +29,7 @@ void checkForCrashAndRecover(int tOvershoot, int tRemainder) {
       // ~271 ticks is 1 unit (10cm), so check if at least around that much distance was not covered yet
       if (targetCount - encL_curr > 200) {  // at least slightly less than 1 unit not covered yet
         // 1. check which sensor blocked
-        delay(150);
+        delay(120);
         // get readings again
         dist_D1 = front_D1.getDistance(); // middle
         dist_D2 = front_D2.getDistance(); // right

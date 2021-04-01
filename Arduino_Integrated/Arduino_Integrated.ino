@@ -7,7 +7,7 @@
 // robot configuration
 bool enableAlignAfterMove_FP = true; // enabled by default
 bool enableEbrakes_FP = true; // enabled by default
-bool enableMoveInParts = true; // disabled by default
+bool enableMoveInParts = true; // enabled by default
 int numParts_FP = 2;  // max no. units to move at a time
 int numParts_W = 4; // max no. units to move at a time
 
@@ -67,10 +67,12 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
+#ifdef EXPLORATION_MODE
           if (enableMoveInParts) {
             moveInParts(numUnits - '0' + 1, enableEbrakes_FP);
           }
           else
+#endif
             moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
           delay(120);
@@ -96,10 +98,12 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
+#ifdef EXPLORATION_MODE
           if (enableMoveInParts) {
             moveInParts(numUnits - '&' + 1, enableEbrakes_FP);
           }
           else
+#endif
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
           delay(120);
@@ -125,10 +129,12 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
+#ifdef EXPLORATION_MODE
           if (enableMoveInParts) {
             moveInParts(numUnits - '0' + 1, enableEbrakes_FP);
           }
           else
+#endif
           moveForward(numUnits - '0', enableEbrakes_FP);
 #ifdef EXPLORATION_MODE
           delay(120);
@@ -149,10 +155,12 @@ void robotSystem_loop() {
           // read next character for no. units to move
           while (Serial.available() == 0);  // wait for next character
           char numUnits = Serial.read();
+#ifdef EXPLORATION_MODE
           if (enableMoveInParts) {
             moveInParts(numUnits - '&' + 1, enableEbrakes_FP);
           }
           else
+#endif
             moveForward(numUnits - '&', enableEbrakes_FP); // numUnits - '0' + 10
 #ifdef EXPLORATION_MODE
           delay(120);
